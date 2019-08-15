@@ -25,7 +25,7 @@ class Robot:
 
         self.color_sensors = Duo(ev3.ColorSensor('in1'), ev3.ColorSensor('in2'))
         self.ultrasonic_sensor = ev3.UltrasonicSensor('in4')
-        self.infrared_sensors = (0, 0)
+        self.infrared_sensors = Duo(0, 0)
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outD'), ev3.LargeMotor('outC'))
@@ -115,119 +115,13 @@ class Robot:
             self.motors.left.run_forever(speed_sp=vel), self.motors.right.run_forever(speed_sp=vel)
         self.motors.left.stop(), self.motors.right.stop()
 
-    def run_action(self, direction, still_learning=True):
-        print("Run action chamada com os seguintes paramentros:", "direction:", direction, "still_learning:",
-              still_learning)
-        # print("CHAMOU O RUN_ACTION COM O REVERSE_PATH = {}".format(self.reverse_path))
-        self.realigment_counter = 0
-        # if self.nao_pode:
-        #     self.move_timed(how_long=0.2, direction="back")
-        #     return
-        # print("self.primeiro_bounding_box = {}".format(self.primeiro_bounding_box))
-        # print("self.learned_colors_is_empity() = {}".format(self.learned_colors_is_empity()))
-        # if self.primeiro_bounding_box is False and self.learned_colors_is_empity():
-        #     print("TAVA NO INICIO DA PISTA")
-        #     self.tempo_para_chamar_run_action = datetime.now() + timedelta(seconds=5)
-        #     return
-
-        if datetime.now() < self.tempo_para_chamar_run_action:
-            # print("CHAMOU A RUN_ACTION NO TEMPO ERRADO")
-            ev3.Sound.beep()
-            ev3.Sound.beep()
-            self.move_timed(how_long=0.2, direction="back")
-            return
-        else:
-            # print("CHAMOU A RUN_ACTION NO TEMPO CERTO")
-            self.tempo_para_chamar_run_action = datetime.now() + timedelta(seconds=5)
-
-            if self.rect_color in self.learned_colors.keys():
-                if self.reverse_path is True:
-                    self.learned_colors[self.rect_color][-1] -= 1
-                else:
-                    self.learned_colors[self.rect_color][-1] += 1
-                # print("EXECUTOU O DESCARREGAMENTO DA COR")
-                print(self.learned_colors)
-                self.stop_motors()
-                # if self.ta_no_final_da_pista is True:
-                #     self.ta_no_final_da_pista = False
-                #     self.rotate(180)
-
-                # if self.primeiro_bounding_box is False:
-                # if self.voltou is False:
-                if self.learned_colors_is_empity() is True:
-                    if self.reverse_path is True:
-                        for i in range(5):
-                            ev3.Sound.beep()
-                        self.ta_no_final_da_pista = True
-                        self.rotate(180)
-                        self.reverse_path = False
-                        for k in sorted(self.learned_colors.keys()):
-                            if k == self.rect_color:
-                                self.learned_colors[k][-1] = 1
-                            else:
-                                self.learned_colors[k][-1] = 0
-                        # self.tempo_para_chamar_run_action = datetime.now() + timedelta(seconds=5)
-                        return
-                    # else:
-                    #     self.ta_na_ranpa = True
-                    #     for i in range(7):
-                    #         print("TA NA RAMPA")
-                if self.learned_colors_is_full() is True:
-                    self.ta_na_ranpa = True
-                    for i in range(7):
-                        print("TA NA RAMPA")
-
-            self.nao_pode = True
-
-            # if self.reverse_path:
-            #     if not still_learning:
-            #         if direction == "forward":
-            #             pass
-            #         elif direction == "left":
-            #             self.rotate(90, axis="own")
-            #         elif direction == "right":
-            #             self.rotate(-90, axis="own")
-            #     else:
-            #         self.rotate(-90, axis="own")
-            #     # return None
-            #
-            # else:
-            #     if not still_learning:
-            #         if direction == "forward":
-            #             pass
-            #         elif direction == "left":
-            #             self.rotate(-90, axis="own")
-            #         elif direction == "right":
-            #             self.rotate(90, axis="own")
-            #     else:
-            #         if :
-            #             self.rotate(90, axis="own")
-            #         else:
-            #             self.rotate(90, axis="own")
-            #     # return None
-
-            if not still_learning:
-                if direction == "forward":
-                    pass
-                elif direction == "left":
-                    self.rotate(90 if self.reverse_path else -90, axis="own")
-                elif direction == "right":
-                    self.rotate(-90 if self.reverse_path else 90, axis="own")
-            else:
-                if self.has_came_from_json:
-                    if direction == "forward":
-                        pass
-                    elif direction == "left":
-                        self.rotate(-90, axis="own")
-                    elif direction == "right":
-                        self.rotate(90, axis="own")
-
-                    self.has_came_from_json = False
-
-                else:
-                    self.rotate(90, axis="own")
-
-        # return None
+    def run_action(self, direction):
+        if direction == "forward":
+            pass
+        elif direction == "left":
+            self.rotate(90, axis="own")
+        elif direction == "right":
+            self.rotate(-90, axis="own")
 
     def stop_motors(self):
         self.motors.left.stop()
