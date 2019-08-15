@@ -8,7 +8,6 @@ import paho.mqtt.client as mqtt
 from struct import *
 from simple_pid import PID
 from assets.classes.robot import Robot
-from rescue import rescue, bounding_box
 import json
 from assets.handlers.button import ButtonApproach
 from assets.handlers.undefined_dealing import undefined_dealing
