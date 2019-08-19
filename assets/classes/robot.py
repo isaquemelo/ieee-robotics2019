@@ -19,16 +19,16 @@ class Robot:
         self.DEFAULT_SPEED = 400
 
         # define sensors
-        self.gyroscope_sensor = ev3.GyroSensor('in3')
-        self.gyroscope_sensor.mode = 'GYRO-RATE'
-        self.gyroscope_sensor.mode = 'GYRO-ANG'
-
-        self.color_sensors = Duo(ev3.ColorSensor('in1'), ev3.ColorSensor('in2'))
-        self.ultrasonic_sensor = ev3.UltrasonicSensor('in4')
-        self.infrared_sensors = Duo(0, 0)
+        # self.gyroscope_sensor = ev3.GyroSensor('in3')
+        # self.gyroscope_sensor.mode = 'GYRO-RATE'
+        # self.gyroscope_sensor.mode = 'GYRO-ANG'
+        #
+        # self.color_sensors = Duo(ev3.ColorSensor('in1'), ev3.ColorSensor('in2'))
+        # self.ultrasonic_sensor = ev3.UltrasonicSensor('in4')
+        # self.infrared_sensors = Duo(0, 0)
 
         # define motors
-        self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outD'), ev3.LargeMotor('outC'))
+        self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outB'), ev3.LargeMotor('outC'))
         # self.handler = ev3.LargeMotor('outC')
 
         # define status

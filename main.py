@@ -18,10 +18,10 @@ DEFAULT_SPEED = 350
 
 
 # 15.6 0 4.8
-pid = PID(15.6, 0, 4.8, setpoint=-4)
+#pid = PID(15.6, 0, 4.8, setpoint=-4)
 
 robot = Robot()
-server = Server()
+#server = Server()
 
 # client = mqtt.Client()
 # client.connect("10.42.0.43", 1883, 60)
@@ -38,22 +38,22 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("topic/sensors")
 
 
-server.client.on_connect = on_connect
-server.client.on_message = on_message
-server.client.loop_start()
+# server.client.on_connect = on_connect
+# server.client.on_message = on_message
+# server.client.loop_start()
 
 
 def main():
     try:
         while True:
-            pass
+            robot.move_timed(9, speed=-900)
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()
         robot.motors.alternative.stop()
 
-        server.client.loop_stop()
-        server.client.disconnect()
+        #server.client.loop_stop()
+        #server.client.disconnect()
 
 
 try:
@@ -65,5 +65,6 @@ except KeyboardInterrupt:
     robot.motors.right.stop()
     robot.motors.left.stop()
     robot.motors.alternative.stop()
-    server.client.loop_stop()
-    server.client.disconnect()
+
+    #server.client.loop_stop()
+    #server.client.disconnect()
