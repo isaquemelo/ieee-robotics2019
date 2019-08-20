@@ -13,22 +13,29 @@ class Duo:
         self.values = (self.left, self.right)
 
 
-client = mqtt.Client()
+def on_publish(client,userdata,result):             #create function for callback
+    print("data published \n")
+    pass
 
+client = mqtt.Client()
+client.on_publish = on_publish
 
 client.connect("localhost", 1883, 60)
 
-infrared_sensor = Duo(ev3.InfraredSensor('in1'), ev3.InfraredSensor('in2'))
-#infrared_sensor.left.
+ultrasonic = ev3.UltrasonicSensor("in3")
+color_sensors = Duo(ev3.ColorSensor("in1"), ev3.ColorSensor("in2"))
 
 client.loop_start()
 
+
+
+
 try:
     while True:
-        message = pack("iid", infrared_sensor.left.value(), infrared_sensor.right.value(), time.time())
+        message = pack("iiid", ultrasonic.value(), color_sensors.left.color, color_sensors.right.color, time.time())
         client.publish("topic/sensors", message, qos=0)
-        print(unpack("iid", message))
-        time.sleep(0.1)
+        print(unpack("iiid", message))
+        time.sleep(0.05)
 
 except KeyboardInterrupt:
     pass

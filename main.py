@@ -21,39 +21,56 @@ DEFAULT_SPEED = 350
 #pid = PID(15.6, 0, 4.8, setpoint=-4)
 
 robot = Robot()
-#server = Server()
+server = Server()
+
 
 # client = mqtt.Client()
-# client.connect("10.42.0.43", 1883, 60)
+# client.connect("192.168.137.3", 1883, 60)
+# client.loop_start()
+# client.on_connect = on_connect
+# client.on_message = on_message
 
 
 def on_message(client, userdata, message):
-    carga = unpack("iid", message.payload)
-    robot.infrared_sensors = carga[:2]
-    # print("Received message:", carga[:2], time.time() - float(carga[2]))
+    print("mensagem recebida")
+    payload = unpack("iiid", message.payload)
+    # robot.color_sensors = payload[1:3]
+    # robot.ultrasonic_sensor = payload[0]
+    print(payload)
 
 
 def on_connect(client, userdata, flags, rc):
-    #print("The robots are connected with result code", str(rc))
+    print("The robots are connected with result code", str(rc))
     client.subscribe("topic/sensors")
 
 
-# server.client.on_connect = on_connect
-# server.client.on_message = on_message
-# server.client.loop_start()
+def on_disconnect(client, userdata, rc):
+    print("The robots are FAILEEDD with result code", str(rc))
+
+
+#
+server.client.on_connect = on_connect
+server.client.on_message = on_message
+server.client.on_disconnect = on_disconnect
+
+server.client.loop_start()
+
+
+
 
 
 def main():
     try:
         while True:
-            robot.move_timed(9, speed=-900)
+            print("opa", robot)
+
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()
         robot.motors.alternative.stop()
 
-        #server.client.loop_stop()
-        #server.client.disconnect()
+        server.client.loop_stop()
+        server.client.disconnect()
 
 
 try:
@@ -66,5 +83,5 @@ except KeyboardInterrupt:
     robot.motors.left.stop()
     robot.motors.alternative.stop()
 
-    #server.client.loop_stop()
-    #server.client.disconnect()
+    server.client.loop_stop()
+    server.client.disconnect()

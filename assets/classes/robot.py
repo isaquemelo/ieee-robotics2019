@@ -19,17 +19,19 @@ class Robot:
         self.DEFAULT_SPEED = 400
 
         # define sensors
-        # self.gyroscope_sensor = ev3.GyroSensor('in3')
-        # self.gyroscope_sensor.mode = 'GYRO-RATE'
-        # self.gyroscope_sensor.mode = 'GYRO-ANG'
-        #
-        # self.color_sensors = Duo(ev3.ColorSensor('in1'), ev3.ColorSensor('in2'))
-        # self.ultrasonic_sensor = ev3.UltrasonicSensor('in4')
-        # self.infrared_sensors = Duo(0, 0)
+        self.gyroscope_sensor = ev3.GyroSensor('in4')
+        self.gyroscope_sensor.mode = 'GYRO-RATE'
+        self.gyroscope_sensor.mode = 'GYRO-ANG'
+
+        self.color_sensors = (0, 0)
+        self.ultrasonic_sensor = 0
+
+        self.infrared_sensors = {"left": ev3.InfraredSensor('in2'), "right": ev3.InfraredSensor('in3'),
+                                 "front": ev3.InfraredSensor("in1")}
 
         # define motors
-        self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outB'), ev3.LargeMotor('outC'))
-        # self.handler = ev3.LargeMotor('outC')
+        self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outB'))
+        self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outD'))
 
         # define status
         self.historic = [""]
@@ -115,6 +117,7 @@ class Robot:
             self.motors.left.run_forever(speed_sp=vel), self.motors.right.run_forever(speed_sp=vel)
         self.motors.left.stop(), self.motors.right.stop()
 
+
     def run_action(self, direction):
         if direction == "forward":
             pass
@@ -126,3 +129,6 @@ class Robot:
     def stop_motors(self):
         self.motors.left.stop()
         self.motors.right.stop()
+
+    def __str__(self) -> str:
+        return str(self.ultrasonic_sensor) + " color: " + str (self.color_sensors)
