@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from .duo import Duo
+from assets.classes.duo import Duo
 import ev3dev.ev3 as ev3
 import math
 from datetime import datetime, timedelta
@@ -13,15 +13,19 @@ def map_values(n, start1, stop1, start2, stop2):
 
 
 class Robot:
+
     ev3.Sound.speak("Robot started...")
 
+    # CRUCIAL METHODS
+    # DO NOT UPDATE
     def __init__(self):
         self.DEFAULT_SPEED = 400
 
+        self.pipe = None
+
         # define sensors
         self.gyroscope_sensor = ev3.GyroSensor('in4')
-        self.gyroscope_sensor.mode = 'GYRO-RATE'
-        self.gyroscope_sensor.mode = 'GYRO-ANG'
+        self.reset_gyroscope()
 
         self.color_sensors = (0, 0)
         self.ultrasonic_sensor = 0
@@ -35,6 +39,10 @@ class Robot:
 
         # define status
         self.historic = [""]
+
+    def reset_gyroscope(self):
+        self.gyroscope_sensor.mode = 'GYRO-RATE'
+        self.gyroscope_sensor.mode = 'GYRO-ANG'
 
     def get_sensor_data(self, sensor_name):
         # returns the value of a sensor
@@ -73,8 +81,7 @@ class Robot:
             reverse = True
             angle = angle * -1
 
-        self.gyroscope_sensor.mode = 'GYRO-RATE'
-        self.gyroscope_sensor.mode = 'GYRO-ANG'
+        self.reset_gyroscope()
 
         start_angle = self.get_sensor_data('GyroSensor')
         now_angle = start_angle
@@ -102,8 +109,7 @@ class Robot:
         self.motors.left.stop()
         self.motors.right.stop()
 
-        self.gyroscope_sensor.mode = 'GYRO-RATE'
-        self.gyroscope_sensor.mode = 'GYRO-ANG'
+        self.reset_gyroscope()
 
     def move_timed(self, how_long=0.3, direction="forward", speed=DEFAULT_SPEED):
         end_time = datetime.now() + timedelta(seconds=how_long)
@@ -117,7 +123,6 @@ class Robot:
             self.motors.left.run_forever(speed_sp=vel), self.motors.right.run_forever(speed_sp=vel)
         self.motors.left.stop(), self.motors.right.stop()
 
-
     def run_action(self, direction):
         if direction == "forward":
             pass
@@ -130,5 +135,46 @@ class Robot:
         self.motors.left.stop()
         self.motors.right.stop()
 
+    def reset(self):
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        pass
+
     def __str__(self) -> str:
-        return str(self.ultrasonic_sensor) + " color: " + str (self.color_sensors)
+
+        return "ultrasonic: " + str(self.ultrasonic_sensor) + " color: " + str(self.color_sensors) + \
+               " infrared: " + self.get_sensor_data("ColorSensor")
+
+    # END OF CRUCIAL METHODS
+
+    def pipe_following(self):
+        pass
+
+    def request_area(self, area):
+        pass
+
+    def request_pipe(self, size):
+        pass
+
+    def pipe_rescue(self):
+        pass
+
+    def anti_falling(self):
+        pass
+
+    def color_alignment(self):
+        pass
+
+    def pid_alignment(self):
+        pass
+
+    def pipe_allocation(self):
+        pass
+
+    def gap_measurement(self):
+        pass
+
+
+
+
+
+

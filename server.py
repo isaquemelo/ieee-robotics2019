@@ -28,8 +28,6 @@ color_sensors = Duo(ev3.ColorSensor("in1"), ev3.ColorSensor("in2"))
 client.loop_start()
 
 
-
-
 try:
     while True:
         message = pack("iiid", ultrasonic.value(), color_sensors.left.color, color_sensors.right.color, time.time())

@@ -32,11 +32,11 @@ server = Server()
 
 
 def on_message(client, userdata, message):
-    print("mensagem recebida")
+    #print("mensagem recebida")
     payload = unpack("iiid", message.payload)
-    # robot.color_sensors = payload[1:3]
-    # robot.ultrasonic_sensor = payload[0]
-    print(payload)
+    robot.color_sensors = payload[1:3]
+    robot.ultrasonic_sensor = payload[0]
+    #print(payload)
 
 
 def on_connect(client, userdata, flags, rc):
@@ -44,25 +44,17 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("topic/sensors")
 
 
-def on_disconnect(client, userdata, rc):
-    print("The robots are FAILEEDD with result code", str(rc))
-
-
-#
 server.client.on_connect = on_connect
 server.client.on_message = on_message
-server.client.on_disconnect = on_disconnect
 
 server.client.loop_start()
-
-
-
 
 
 def main():
     try:
         while True:
-            print("opa", robot)
+            print(robot)
+            robot.pegarCano()
 
     except KeyboardInterrupt:
         robot.motors.right.stop()
