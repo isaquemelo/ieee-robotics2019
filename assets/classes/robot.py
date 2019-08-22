@@ -5,6 +5,7 @@ import math
 from datetime import datetime, timedelta
 from simple_pid import PID
 import json
+import time
 
 DEFAULT_SPEED = 400
 
@@ -25,14 +26,15 @@ class Robot:
         self.pipe = None
 
         # define sensors
-        self.gyroscope_sensor = ev3.GyroSensor('in4')
-        self.reset_gyroscope()
+        # self.gyroscope_sensor = ev3.GyroSensor('in4')
+        # self.reset_gyroscope()
+        self.gyro_value = 0
 
         self.color_sensors = (0, 0)
 
-        self.ultrasonic_sensors = 0
+        self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "left": ev3.UltrasonicSensor('in1')}
 
-        self.infrared_sensors = {"right": ev3.UltrasonicSensor('in3'), "left": ev3.UltrasonicSensor('in2')}
+        self.infrared_sensors = {"right": ev3.InfraredSensor('in4'), "left": ev3.InfraredSensor('in3')}
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outB'))
@@ -196,95 +198,48 @@ class Robot:
         pass
 
     def pipe_rescue(self):
+        # step size
+        step_size = 6
+        full_block_size = 84
+        hw_many_cycles = 10 # full_block_size // step_size
+
+        # data for debugging
+        sensor_data = [[], []]
         value_index = [300, 300]
         value_minor = [300000, 300000]
 
         cycles = 0
         while True:
-            self.move_metered(cm=6, speed=-DEFAULT_SPEED)
+            self.move_metered(cm=step_size, speed=-DEFAULT_SPEED)
+            sensor_values = (self.ultrasonic_sensors['left'].value(), self.ultrasonic_sensors['right'].value())
 
-            sensor_values = (self.infrared_sensors['left'].value(), self.infrared_sensors['right'].value())
+            sensor_data[0].append(sensor_values[0])
+            sensor_data[1].append(sensor_values[1])
+
             cycles += 1
 
             if sensor_values[0] < value_minor[0]:
-                value_minor[0] = self.infrared_sensors['left'].value()
+                value_minor[0] = self.ultrasonic_sensors['left'].value()
                 value_index[0] = cycles
 
-            if sensor_values[1]  < value_minor[1]:
-                value_minor[1] = self.infrared_sensors['right'].value()
+            if sensor_values[1] < value_minor[1]:
+                value_minor[1] = self.ultrasonic_sensors['right'].value()
                 value_index[1] = cycles
 
-            if cycles > 10:
+            if cycles >= hw_many_cycles:
                 break
 
+        counter = 0
+        hw_far_should_i_go = hw_many_cycles - value_index[1]
 
 
-        for i in range(len(valuesR)):
+        print(value_index, value_minor)
+        while counter <= hw_many_cycles - value_index[1]:
+            self.move_metered(cm=-step_size, speed=-DEFAULT_SPEED)
+            counter += 1
 
+        print(sensor_data)
 
-        cont = 0
-        while cont < 10 - value_indexL:
-            self.move_metered(cm=-6, speed=-DEFAULT_SPEED)
-            cont += 1
-
-        print(valuesL, valuesR)
-
-    # def pipe_rescue(self):
-    #     # keep in mind this function thinks the robot its on the middle of the pipes yield
-    #
-    #     # scanning for a pipe
-    #     k = 35
-    #     while True:
-    #
-    #         if not self.rotate(angle=90, speed=300, infrared_sensor_condicional=True, k_for_infrared_sensor=k):
-    #             if not self.rotate(angle=-180, speed=300, infrared_sensor_condicional=True, k_for_infrared_sensor=k):
-    #                 if not self.rotate(angle=90, speed=300, infrared_sensor_condicional=True, k_for_infrared_sensor=k):
-    #                     pass
-    #                 else:
-    #                     break
-    #             else:
-    #                 break
-    #         else:
-    #             break
-    #
-    #         self.move_metered(cm=5)
-    #         self.stop_motors()
-    #     # scanning for a pipe
-    #
-    #     # get close to the pipe with PID
-    #     pid = PID(20, 0, 0, setpoint=0)
-    #     default = 100
-    #     max_speed_bound = 300
-    #     max_control = max_speed_bound - default
-    #     min_control = -max_speed_bound + default
-    #     left_value = self.infrared_sensors["left"].value()
-    #     right_value = self.infrared_sensors["right"].value()
-    #     approach_k = 1
-    #     while left_value > approach_k and right_value > approach_k:
-    #
-    #         left_value = self.infrared_sensors["left"].value()
-    #         right_value = self.infrared_sensors["right"].value()
-    #
-    #         control = abs(pid(left_value - right_value))
-    #
-    #         if control > max_control:
-    #             control = max_speed_bound - default
-    #         elif control < min_control:
-    #             control = -max_speed_bound + default
-    #
-    #         if left_value > right_value:
-    #             self.motors.left.run_forever(speed_sp=default + control)
-    #             self.motors.right.run_forever(speed_sp=default - control)
-    #
-    #         elif right_value > left_value:
-    #             self.motors.left.run_forever(speed_sp=default - control)
-    #             self.motors.right.run_forever(speed_sp=default + control)
-    #
-    #     self.stop_motors()
-    #     # get close to the pipe with PID
-    #
-    #
-    #     pass
 
     def anti_falling(self):
         pass

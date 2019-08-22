@@ -33,8 +33,9 @@ robot = Robot()
 
 def on_message(client, userdata, message):
     #print("mensagem recebida")
-    payload = unpack("iiid", message.payload)
+    payload = unpack("iiiid", message.payload)
     robot.color_sensors = payload[1:3]
+    robot.gyro_value = payload[-2]
     robot.ultrasonic_sensors['top-left'] = payload[0]
     #print(payload)
 
