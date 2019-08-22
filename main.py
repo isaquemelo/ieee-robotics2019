@@ -35,7 +35,7 @@ def on_message(client, userdata, message):
     #print("mensagem recebida")
     payload = unpack("iiid", message.payload)
     robot.color_sensors = payload[1:3]
-    robot.ultrasonic_sensor = payload[0]
+    robot.ultrasonic_sensors['top-left'] = payload[0]
     #print(payload)
 
 
@@ -52,10 +52,11 @@ server.client.loop_start()
 
 def main():
     try:
+        #robot.pipe_rescue()
         while True:
-            print(robot)
-            robot.pegarCano()
-
+            print(ev3.InfraredSensor('in2').value(), ev3.InfraredSensor('in3').value())
+            robot.pipe_rescue()
+            break
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()
