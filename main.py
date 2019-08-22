@@ -21,7 +21,7 @@ DEFAULT_SPEED = 350
 #pid = PID(15.6, 0, 4.8, setpoint=-4)
 
 robot = Robot()
-server = Server()
+# server = Server()
 
 
 # client = mqtt.Client()
@@ -44,19 +44,19 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("topic/sensors")
 
 
-server.client.on_connect = on_connect
-server.client.on_message = on_message
-
-server.client.loop_start()
+# server.client.on_connect = on_connect
+# server.client.on_message = on_message
+#
+# server.client.loop_start()
 
 
 def main():
     try:
-        #robot.pipe_rescue()
-        while True:
-            print(ev3.InfraredSensor('in2').value(), ev3.InfraredSensor('in3').value())
-            robot.pipe_rescue()
-            break
+        robot.pipe_rescue()
+        # while True:
+        #     print(ev3.InfraredSensor('in2').value(), ev3.InfraredSensor('in3').value())
+        #     robot.pipe_rescue()
+        #     break
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()
