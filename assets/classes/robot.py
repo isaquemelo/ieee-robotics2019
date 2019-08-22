@@ -203,6 +203,8 @@ class Robot:
         full_block_size = 84
         hw_many_cycles = 10 # full_block_size // step_size
 
+        # PARA CANOS DE DIFERENTES TAMANHOS AS CONSTANTEM STEP SIZE E HOW MANY DEVEM SER MUDADAS
+
         # data for debugging
         sensor_data = [[], []]
         value_index = [300, 300]
