@@ -4,8 +4,6 @@
     <list default="true" id="e33d40b6-f1d9-43d1-a073-691af46b2087" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/classes/robot.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/classes/robot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,8 +16,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="91">
-              <caret line="35" column="45" lean-forward="true" selection-start-line="35" selection-start-column="45" selection-end-line="35" selection-end-column="45" />
+            <state relative-caret-position="180">
+              <caret line="63" column="39" lean-forward="true" selection-start-line="63" selection-start-column="39" selection-end-line="63" selection-end-column="39" />
               <folding>
                 <element signature="e#24#48#0" expanded="true" />
               </folding>
@@ -31,7 +29,19 @@
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="316">
-              <caret line="34" column="16" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
+              <caret line="38" column="16" selection-start-line="38" selection-start-column="16" selection-end-line="38" selection-end-column="16" />
+              <folding>
+                <element signature="e#23#54#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/assets/handlers/server_config.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="10" column="25" lean-forward="true" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
               <folding>
                 <element signature="e#23#54#0" expanded="true" />
               </folding>
@@ -42,18 +52,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/assets/classes/robot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="481">
-              <caret line="165" column="7" selection-start-line="165" selection-start-column="7" selection-end-line="165" selection-end-column="7" />
+            <state relative-caret-position="105">
+              <caret line="208" column="12" lean-forward="true" selection-start-line="208" selection-start-column="12" selection-end-line="208" selection-end-column="12" />
               <folding>
-                <element signature="e#23#43#0" expanded="true" />
-                <element signature="e#367#1002#0" />
-                <element signature="e#1043#1131#0" />
-                <element signature="e#1185#1961#0" />
-                <element signature="e#2034#3240#0" />
-                <element signature="e#3332#3669#0" />
-                <element signature="e#3717#3910#0" />
-                <element signature="e#3947#4003#0" />
+                <element signature="e#23#57#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/assets/classes/duo.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="18" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -99,7 +111,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -120,18 +131,13 @@
             </path>
             <path>
               <item name="code" type="b2602c69:ProjectViewProjectNode" />
-              <item name="code" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="handlers" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="code" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -184,7 +190,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="20508000" />
+    <option name="totallyTimeSpent" value="28866000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -197,9 +203,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-3" y="0" width="1372" height="738" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27954546" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22348484" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -213,8 +218,8 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.3282572" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49469697" weight="0.32994923" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.505303" side_tool="true" weight="0.32994923" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.4939394" visible="true" weight="0.32994923" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.5060606" side_tool="true" weight="0.32994923" />
       <window_info anchor="bottom" id="Python Console" order="13" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -228,13 +233,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/assets/classes/duo.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="17" lean-forward="true" selection-start-column="17" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.local/lib/python3.6/site-packages/paho/mqtt/client.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-4062">
@@ -252,8 +250,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/handlers/server_config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="26" lean-forward="true" selection-start-line="11" selection-start-column="26" selection-end-line="11" selection-end-column="26" />
+        <state relative-caret-position="135">
+          <caret line="10" column="25" lean-forward="true" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
           <folding>
             <element signature="e#23#54#0" expanded="true" />
           </folding>
@@ -275,17 +273,11 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/pipe.py" />
-    <entry file="file://$PROJECT_DIR$/assets/classes/methods.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/classes/methods.py" />
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="91">
-          <caret line="35" column="45" lean-forward="true" selection-start-line="35" selection-start-column="45" selection-end-line="35" selection-end-column="45" />
+        <state relative-caret-position="180">
+          <caret line="63" column="39" lean-forward="true" selection-start-line="63" selection-start-column="39" selection-end-line="63" selection-end-column="39" />
           <folding>
             <element signature="e#24#48#0" expanded="true" />
           </folding>
@@ -295,26 +287,26 @@
     <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="316">
-          <caret line="34" column="16" selection-start-line="34" selection-start-column="16" selection-end-line="34" selection-end-column="16" />
+          <caret line="38" column="16" selection-start-line="38" selection-start-column="16" selection-end-line="38" selection-end-column="16" />
           <folding>
             <element signature="e#23#54#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/assets/classes/duo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="18" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/robot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="481">
-          <caret line="165" column="7" selection-start-line="165" selection-start-column="7" selection-end-line="165" selection-end-column="7" />
+        <state relative-caret-position="105">
+          <caret line="208" column="12" lean-forward="true" selection-start-line="208" selection-start-column="12" selection-end-line="208" selection-end-column="12" />
           <folding>
-            <element signature="e#23#43#0" expanded="true" />
-            <element signature="e#367#1002#0" />
-            <element signature="e#1043#1131#0" />
-            <element signature="e#1185#1961#0" />
-            <element signature="e#2034#3240#0" />
-            <element signature="e#3332#3669#0" />
-            <element signature="e#3717#3910#0" />
-            <element signature="e#3947#4003#0" />
+            <element signature="e#23#57#0" expanded="true" />
           </folding>
         </state>
       </provider>

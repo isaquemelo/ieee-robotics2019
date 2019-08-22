@@ -41,7 +41,7 @@ class Robot:
         self.motors.left.polarity = "inversed"
         self.motors.right.polarity = "inversed"
 
-        self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outD'))
+        self.handler = Duo(ev3.MediumMotor('outC'), ev3.LargeMotor('outD'))
 
         # define status
         self.historic = [""]
@@ -181,6 +181,18 @@ class Robot:
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         pass
 
+    def move_handler(self, how_long=7, direction="down", speed=1000):
+        end_time = datetime.now() + timedelta(seconds=how_long)
+
+        vel = speed
+
+        if direction != "down":
+            vel = -speed
+
+        while datetime.now() < end_time:
+            self.handler.left.run_forever(speed_sp=vel)
+        self.handler.left.stop()
+
     def __str__(self) -> str:
 
         return "ultrasonic: " + str(self.ultrasonic_sensor) + " color: " + str(self.color_sensors) + \
@@ -201,7 +213,7 @@ class Robot:
         # step size
         step_size = 6
         full_block_size = 84
-        hw_many_cycles = 10 # full_block_size // step_size
+        hw_many_cycles = 10  # full_block_size // step_size
 
         # PARA CANOS DE DIFERENTES TAMANHOS AS CONSTANTEM STEP SIZE E HOW MANY DEVEM SER MUDADAS
 
@@ -242,6 +254,63 @@ class Robot:
 
         print(sensor_data)
 
+        pid = PID(54, 0, 25, setpoint=0)
+        default = 200
+        max_speed_bound = 500
+        max_control = max_speed_bound - default
+        min_control = -max_speed_bound + default
+        # baseado no cano o max approach tera que mudar --- no cano de 20 1 é ideal
+        max_approach_k = 3
+        first_key = False
+        second_key = False
+        while True:
+
+            left_value = self.infrared_sensors["left"].value()
+            right_value = self.infrared_sensors["right"].value()
+
+            if left_value <= max_approach_k or right_value <= max_approach_k:
+                first_key = True
+
+            if first_key and abs(left_value - right_value) <= 1:
+                second_key = True
+
+            if first_key and second_key:
+                # first_key = False
+                # second_key = False
+                # self.stop_motors()
+                # time.sleep(5)
+                break
+
+            # if abs(left_value - right_value) <= 1:
+            #     self.stop_motors()
+            #     time.sleep(5)
+
+            control = pid(left_value - right_value)
+
+            if control > max_control:
+                control = max_speed_bound - default
+            elif control < min_control:
+                control = -max_speed_bound + default
+
+            # if left_value > right_value:
+            #     self.motors.left.run_forever(speed_sp=default + control)
+            #     self.motors.right.run_forever(speed_sp=default - control)
+            #
+            # elif right_value > left_value:
+            self.motors.left.run_forever(speed_sp=default - control)
+            self.motors.right.run_forever(speed_sp=default + control)
+            print(control)
+
+        self.stop_motors()
+        # get close to the pipe with PID
+
+        # grab the pipe
+        self.handler.right.run_forever(speed_sp=-1000)
+        self.move_handler(how_long=6, direction="down")
+        self.handler.right.run_forever(speed_sp=1000)
+        self.move_handler(how_long=6, direction="up")
+        time.sleep(100)
+        # grab the pipe
 
     def anti_falling(self):
         pass
