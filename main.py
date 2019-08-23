@@ -53,11 +53,11 @@ def on_connect(client, userdata, flags, rc):
 
 def main():
     try:
-        robot.pipe_rescue()
-        # while True:
-        #     print(ev3.InfraredSensor('in2').value(), ev3.InfraredSensor('in3').value())
-        #     robot.pipe_rescue()
-        #     break
+
+        while True:
+            #print(ev3.InfraredSensor('in2').value(), ev3.InfraredSensor('in3').value())
+            robot.pipe_rescue()
+
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()

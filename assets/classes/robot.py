@@ -177,6 +177,11 @@ class Robot:
         self.motors.left.stop()
         self.motors.right.stop()
 
+    def stop_handler(self):
+        self.handler.left.stop()
+        self.handler.right.stop()
+
+
     def reset(self):
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         pass
@@ -246,8 +251,8 @@ class Robot:
         counter = 0
         hw_far_should_i_go = hw_many_cycles - value_index[1]
 
+        print(sensor_data)
 
-        print(value_index, value_minor)
         while counter <= hw_many_cycles - value_index[1]:
             self.move_metered(cm=-step_size, speed=-DEFAULT_SPEED)
             counter += 1
@@ -309,7 +314,9 @@ class Robot:
         self.move_handler(how_long=6, direction="down")
         self.handler.right.run_forever(speed_sp=1000)
         self.move_handler(how_long=6, direction="up")
-        time.sleep(100)
+        time.sleep(6)
+        self.stop_handler()
+        time.sleep(8)
         # grab the pipe
 
     def anti_falling(self):
