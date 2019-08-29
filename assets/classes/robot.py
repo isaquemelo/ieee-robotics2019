@@ -32,10 +32,10 @@ class Robot:
 
         self.color_sensors = (2, 2)
 
-        self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "left": ev3.UltrasonicSensor('in1'), "top": 0}
+        self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "left": ev3.UltrasonicSensor('in1'), "top": 0,
+                                   "front-right": ev3.UltrasonicSensor('in4'), "front-left": ev3.UltrasonicSensor('in3')}
 
-        self.infrared_sensors = {"right": ev3.InfraredSensor('in4'), "left": ev3.InfraredSensor('in3'),
-                                 "upper_front": 25}
+        self.infrared_sensors = {"upper_front": 25}
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outB'))
@@ -55,7 +55,7 @@ class Robot:
         # returns the value of a sensor
 
         if sensor_name == "InfraredSensor":
-            return self.infrared_sensors["left"].value(), self.infrared_sensors["right"].value(), \
+            return self.ultrasonic_sensors["front-left"].value() / 10, self.ultrasonic_sensors["front-right"].value() / 10, \
                    self.infrared_sensors["upper_front"]
 
         elif sensor_name == "GyroSensor":
@@ -147,12 +147,17 @@ class Robot:
     def request_pipe(self, size):
         pass
 
-    def pipe_rescue(self):
+    def pipe_rescue(self, size):
         # step size
-        step_size = 4
-        # full_block_size = 84
-        hw_many_cycles = 15
-        perpendicular = False
+        if size == 20:
+            step_size = 4
+            hw_many_cycles = 15
+        elif size == 15:
+            step_size = 3
+            hw_many_cycles = 20
+        elif size == 10:
+            step_size = 1
+            hw_many_cycles = 55
 
         # data for debugging
         sensor_data = [[], []]
@@ -185,70 +190,6 @@ class Robot:
         # print(sensor_data)
         self.rotate()
 
-        # get close to the pipe with PID
-        pid = PID(54, 0, 25, setpoint=0)
-        default = 200
-        max_speed_bound = 500
-        max_control = max_speed_bound - default
-        min_control = -max_speed_bound + default
-        # baseado no cano o max approach tera que mudar --- no cano de 20 1 é ideal
-        max_approach_k = 3
-        first_key = False
-        second_key = False
-        while True:
-
-            left_value = self.infrared_sensors["left"].value()
-            right_value = self.infrared_sensors["right"].value()
-
-            if left_value <= max_approach_k or right_value <= max_approach_k:
-                first_key = True
-
-            if first_key and abs(left_value - right_value) <= 1:
-                second_key = True
-
-            if first_key and second_key:
-                # first_key = False
-                # second_key = False
-                # self.stop_motors()
-                # time.sleep(5)
-                break
-
-            # if abs(left_value - right_value) <= 1:
-            #     self.stop_motors()
-            #     time.sleep(5)
-
-            control = pid(left_value - right_value)
-
-            if control > max_control:
-                control = max_speed_bound - default
-            elif control < min_control:
-                control = -max_speed_bound + default
-
-            # if left_value > right_value:
-            #     self.motors.left.run_forever(speed_sp=default + control)
-            #     self.motors.right.run_forever(speed_sp=default - control)
-            #
-            # elif right_value > left_value:
-            #if left_value < 70 or right_value < 70:
-            self.motors.left.run_forever(speed_sp=default - control)
-            self.motors.right.run_forever(speed_sp=default + control)
-            #else:
-               # self.motors.left.run_forever(speed_sp=default)
-                #self.motors.right.run_forever(speed_sp=default)
-            print(control)
-
-        self.stop_motors()
-        # get close to the pipe with PID
-
-        # grab the pipe
-        self.handler.right.run_forever(speed_sp=-1000)
-        self.move_handler(how_long=6, direction="down")
-        self.handler.right.run_forever(speed_sp=1000)
-        self.move_handler(how_long=6, direction="up")
-        time.sleep(3)
-        self.stop_handler()
-        time.sleep(8)
-        # grab the pipe
 
     def get_in_position_to_grab_pipe(self):
         # get close to the pipe with PID
@@ -258,10 +199,10 @@ class Robot:
         max_control = max_speed_bound - default
         min_control = -max_speed_bound + default
         # baseado no cano o max approach tera que mudar --- no cano de 20 1 é ideal
-        max_approach_k = 3
+        max_approach_k = 4
         first_key = False
         second_key = False
-        k_to_identify_perpendicular = 15
+        k_to_identify_perpendicular = 5
 
         while True:
 
@@ -277,7 +218,7 @@ class Robot:
                     print("its perpendicular")
                     break
 
-            if first_key and abs(left - right) <= 1:
+            if first_key and abs(left - right) <= 1 and min(left, right) < 5:
                 second_key = True
 
             if first_key and second_key:

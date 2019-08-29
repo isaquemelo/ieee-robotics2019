@@ -55,8 +55,8 @@ def main():
     try:
         #while True:
             # print(robot.get_sensor_data("InfraredSensor"))
-        robot.pipe_rescue()
-        #robot.get_in_position_to_grab_pipe()
+        robot.pipe_rescue(20)
+        robot.get_in_position_to_grab_pipe()
             #time.sleep(8)
             # break
 
