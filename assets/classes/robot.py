@@ -28,13 +28,14 @@ class Robot:
         # define sensors
         # self.gyroscope_sensor = ev3.GyroSensor('in4')
         # self.reset_gyroscope()
-        self.gyro_value = 0
+        # self.gyro_value = 0
 
-        self.color_sensors = (0, 0)
+        self.color_sensors = (2, 2)
 
-        self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "left": ev3.UltrasonicSensor('in1')}
+        self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "left": ev3.UltrasonicSensor('in1'), "top": 0}
 
-        self.infrared_sensors = {"right": ev3.InfraredSensor('in4'), "left": ev3.InfraredSensor('in3')}
+        self.infrared_sensors = {"right": ev3.InfraredSensor('in4'), "left": ev3.InfraredSensor('in3'),
+                                 "upper_front": 25}
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outB'))
@@ -54,13 +55,15 @@ class Robot:
         # returns the value of a sensor
 
         if sensor_name == "InfraredSensor":
-            return self.infrared_sensors.left.value(), self.infrared_sensors.right.value()
+            return self.infrared_sensors["left"].value(), self.infrared_sensors["right"].value(), \
+                   self.infrared_sensors["upper_front"]
 
         elif sensor_name == "GyroSensor":
             return self.gyroscope_sensor.angle
 
         elif sensor_name == "Ultrasonic":
-            return self.ultrasonic_sensor.value() / 10
+            #return self.ultrasonic_sensor.value() / 10
+            return [self.ultrasonic_sensors['left'].value(), self.ultrasonic_sensors['right'].value()]
 
         elif sensor_name == "ColorSensor":
             dict_colors = {
@@ -74,77 +77,13 @@ class Robot:
                 7: 'Brown'
             }
 
-            return [dict_colors[self.color_sensors.left.color], dict_colors[self.color_sensors.right.color]]
+            return [dict_colors[self.color_sensors[0]], dict_colors[self.color_sensors[1]]]
 
-    def rotate(self, angle, axis="own", speed=DEFAULT_SPEED, infrared_sensor_condicional=False, k_for_infrared_sensor=None):
-
-        if 30 > angle > 0:
-            speed = map_values(math.fabs(angle), 0, 90, 100, 1000)
-
-        reverse = False
-
-        if angle < 0:
-            reverse = True
-            angle = angle * -1
-
-        self.reset_gyroscope()
-
-        start_angle = self.get_sensor_data('GyroSensor')
-        now_angle = start_angle
-
-        self.motors.left.stop()
-        self.motors.right.stop()
-
-        if not infrared_sensor_condicional:
-            while now_angle < angle + start_angle:
-                if reverse:
-                    if axis == "own":
-                        self.motors.left.run_forever(speed_sp=-speed)
-                        self.motors.right.run_forever(speed_sp=speed)
-                    else:
-                        self.motors.right.run_forever(speed_sp=speed)
-
-                    now_angle = self.gyroscope_sensor.angle * -1
-                else:
-                    if axis == "own":
-                        self.motors.left.run_forever(speed_sp=speed)
-                        self.motors.right.run_forever(speed_sp=-speed)
-                    else:
-                        self.motors.left.run_forever(speed_sp=speed)
-                    now_angle = self.gyroscope_sensor.angle
-
-        elif infrared_sensor_condicional:
-            while now_angle < angle + start_angle:
-
-                if self.infrared_sensors["left"].value() <= k_for_infrared_sensor or \
-                   self.infrared_sensors["right"].value() <= k_for_infrared_sensor:
-
-                    self.motors.left.stop()
-                    self.motors.right.stop()
-                    self.reset_gyroscope()
-                    return True
-
-                if reverse:
-                    if axis == "own":
-                        self.motors.left.run_forever(speed_sp=-speed)
-                        self.motors.right.run_forever(speed_sp=speed)
-                    else:
-                        self.motors.right.run_forever(speed_sp=speed)
-
-                    now_angle = self.gyroscope_sensor.angle * -1
-                else:
-                    if axis == "own":
-                        self.motors.left.run_forever(speed_sp=speed)
-                        self.motors.right.run_forever(speed_sp=-speed)
-                    else:
-                        self.motors.left.run_forever(speed_sp=speed)
-                    now_angle = self.gyroscope_sensor.angle
-
-        self.motors.left.stop()
-        self.motors.right.stop()
-
-        self.reset_gyroscope()
-        return False
+    def rotate(self, speed=DEFAULT_SPEED):
+        self.motors.left.run_to_rel_pos(position_sp=-430, speed_sp=speed)
+        self.motors.right.run_to_rel_pos(position_sp=430, speed_sp=speed)
+        self.motors.left.wait_while("running")
+        self.motors.right.wait_while("running")
 
     def move_timed(self, how_long=0.3, direction="forward", speed=DEFAULT_SPEED):
         end_time = datetime.now() + timedelta(seconds=how_long)
@@ -181,7 +120,6 @@ class Robot:
         self.handler.left.stop()
         self.handler.right.stop()
 
-
     def reset(self):
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         pass
@@ -198,11 +136,6 @@ class Robot:
             self.handler.left.run_forever(speed_sp=vel)
         self.handler.left.stop()
 
-    def __str__(self) -> str:
-
-        return "ultrasonic: " + str(self.ultrasonic_sensor) + " color: " + str(self.color_sensors) + \
-               " infrared: " + self.get_sensor_data("ColorSensor")
-
     # END OF CRUCIAL METHODS
 
     def pipe_following(self):
@@ -216,16 +149,15 @@ class Robot:
 
     def pipe_rescue(self):
         # step size
-        step_size = 6
-        full_block_size = 84
-        hw_many_cycles = 10  # full_block_size // step_size
-
-        # PARA CANOS DE DIFERENTES TAMANHOS AS CONSTANTEM STEP SIZE E HOW MANY DEVEM SER MUDADAS
+        step_size = 4
+        # full_block_size = 84
+        hw_many_cycles = 15
+        perpendicular = False
 
         # data for debugging
         sensor_data = [[], []]
-        value_index = [300, 300]
-        value_minor = [300000, 300000]
+        value_index = 300
+        value_minor = 30000
 
         cycles = 0
         while True:
@@ -237,28 +169,23 @@ class Robot:
 
             cycles += 1
 
-            if sensor_values[0] < value_minor[0]:
-                value_minor[0] = self.ultrasonic_sensors['left'].value()
-                value_index[0] = cycles
-
-            if sensor_values[1] < value_minor[1]:
-                value_minor[1] = self.ultrasonic_sensors['right'].value()
-                value_index[1] = cycles
+            if (sensor_values[0] + sensor_values[1]) < value_minor:
+                value_minor = sensor_values[0] + sensor_values[1]
+                value_index = cycles
 
             if cycles >= hw_many_cycles:
                 break
 
         counter = 0
-        hw_far_should_i_go = hw_many_cycles - value_index[1]
 
-        print(sensor_data)
-
-        while counter <= hw_many_cycles - value_index[1]:
+        while counter <= hw_many_cycles - value_index:
             self.move_metered(cm=-step_size, speed=-DEFAULT_SPEED)
             counter += 1
 
-        print(sensor_data)
+        # print(sensor_data)
+        self.rotate()
 
+        # get close to the pipe with PID
         pid = PID(54, 0, 25, setpoint=0)
         default = 200
         max_speed_bound = 500
@@ -302,8 +229,12 @@ class Robot:
             #     self.motors.right.run_forever(speed_sp=default - control)
             #
             # elif right_value > left_value:
+            #if left_value < 70 or right_value < 70:
             self.motors.left.run_forever(speed_sp=default - control)
             self.motors.right.run_forever(speed_sp=default + control)
+            #else:
+               # self.motors.left.run_forever(speed_sp=default)
+                #self.motors.right.run_forever(speed_sp=default)
             print(control)
 
         self.stop_motors()
@@ -314,10 +245,57 @@ class Robot:
         self.move_handler(how_long=6, direction="down")
         self.handler.right.run_forever(speed_sp=1000)
         self.move_handler(how_long=6, direction="up")
-        time.sleep(6)
+        time.sleep(3)
         self.stop_handler()
         time.sleep(8)
         # grab the pipe
+
+    def get_in_position_to_grab_pipe(self):
+        # get close to the pipe with PID
+        pid = PID(54, 0, 25, setpoint=0)
+        default = 200
+        max_speed_bound = 500
+        max_control = max_speed_bound - default
+        min_control = -max_speed_bound + default
+        # baseado no cano o max approach tera que mudar --- no cano de 20 1 é ideal
+        max_approach_k = 3
+        first_key = False
+        second_key = False
+        k_to_identify_perpendicular = 15
+
+        while True:
+
+            lis = self.get_sensor_data("InfraredSensor")
+            left = lis[0]
+            right = lis[1]
+            upper_front = lis[2]
+            print(lis)
+
+            if left <= max_approach_k or right <= max_approach_k or upper_front <= max_approach_k:
+                first_key = True
+                if abs(left - right) > k_to_identify_perpendicular and upper_front < 15:
+                    print("its perpendicular")
+                    break
+
+            if first_key and abs(left - right) <= 1:
+                second_key = True
+
+            if first_key and second_key:
+                print("its parallel")
+                break
+
+            control = pid(left - right)
+
+            if control > max_control:
+                control = max_speed_bound - default
+            elif control < min_control:
+                control = -max_speed_bound + default
+
+            self.motors.left.run_forever(speed_sp=default - control)
+            self.motors.right.run_forever(speed_sp=default + control)
+
+        self.stop_motors()
+
 
     def anti_falling(self):
         pass

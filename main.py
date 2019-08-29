@@ -21,7 +21,7 @@ DEFAULT_SPEED = 350
 #pid = PID(15.6, 0, 4.8, setpoint=-4)
 
 robot = Robot()
-# server = Server()
+server = Server()
 
 
 # client = mqtt.Client()
@@ -35,8 +35,8 @@ def on_message(client, userdata, message):
     #print("mensagem recebida")
     payload = unpack("iiiid", message.payload)
     robot.color_sensors = payload[1:3]
-    robot.gyro_value = payload[-2]
-    robot.ultrasonic_sensors['top-left'] = payload[0]
+    robot.infrared_sensors["upper_front"] = payload[-2]
+    robot.ultrasonic_sensors['top'] = payload[0]
     #print(payload)
 
 
@@ -45,18 +45,28 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("topic/sensors")
 
 
-# server.client.on_connect = on_connect
-# server.client.on_message = on_message
-#
-# server.client.loop_start()
+server.client.on_connect = on_connect
+server.client.on_message = on_message
+
+server.client.loop_start()
 
 
 def main():
     try:
+        #while True:
+            # print(robot.get_sensor_data("InfraredSensor"))
+        robot.pipe_rescue()
+        #robot.get_in_position_to_grab_pipe()
+            #time.sleep(8)
+            # break
 
-        while True:
-            #print(ev3.InfraredSensor('in2').value(), ev3.InfraredSensor('in3').value())
-            robot.pipe_rescue()
+            # robot.motors.left.run_forever(speed_sp=speed)
+            # robot.motors.right.run_forever(speed_sp=speed)
+            # colors = robot.get_sensor_data("ColorSensor")
+            # print(colors)
+            # if colors[0] != "Blue" and colors[1] != "Blue":
+            #     robot.stop_motors()
+            #     break
 
     except KeyboardInterrupt:
         robot.motors.right.stop()

@@ -24,10 +24,7 @@ client.connect("localhost", 1883, 60)
 
 ultrasonic = ev3.UltrasonicSensor("in3")
 color_sensors = Duo(ev3.ColorSensor("in1"), ev3.ColorSensor("in2"))
-gyroscope_sensor = ev3.GyroSensor('in4')
-gyroscope_sensor.mode = 'GYRO-RATE'
-gyroscope_sensor.mode = 'GYRO-ANG'
-
+infrared_sensor = ev3.InfraredSensor('in4')
 
 client.loop_start()
 
