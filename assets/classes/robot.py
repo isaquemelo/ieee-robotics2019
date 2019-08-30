@@ -79,11 +79,17 @@ class Robot:
 
             return [dict_colors[self.color_sensors[0]], dict_colors[self.color_sensors[1]]]
 
-    def rotate(self, speed=DEFAULT_SPEED):
-        self.motors.left.run_to_rel_pos(position_sp=-430, speed_sp=speed)
-        self.motors.right.run_to_rel_pos(position_sp=430, speed_sp=speed)
-        self.motors.left.wait_while("running")
-        self.motors.right.wait_while("running")
+    def rotate(self, angle, speed=DEFAULT_SPEED):
+        if angle == -90:
+            self.motors.left.run_to_rel_pos(position_sp=-400, speed_sp=200)
+            self.motors.right.run_to_rel_pos(position_sp=400, speed_sp=200)
+            self.motors.left.wait_while("running")
+            self.motors.right.wait_while("running")
+        elif angle == 90:
+            self.motors.left.run_to_rel_pos(position_sp=430, speed_sp=200)
+            self.motors.right.run_to_rel_pos(position_sp=-430, speed_sp=200)
+            self.motors.left.wait_while("running")
+            self.motors.right.wait_while("running")
 
     def move_timed(self, how_long=0.3, direction="forward", speed=DEFAULT_SPEED):
         end_time = datetime.now() + timedelta(seconds=how_long)
@@ -138,8 +144,28 @@ class Robot:
 
     # END OF CRUCIAL METHODS
 
-    def pipe_following(self):
-        pass
+    def pipeline_support_following(self):
+        pid = PID(54, 0, 25, setpoint=0)
+
+        while True:
+            control = pid(self.ultrasonic_sensors["right"].value())
+
+            if self.ultrasonic_sensors["front-right"].value() < 100 or \
+                    self.ultrasonic_sensors["front-left"].value() < 100:
+                print("Vai bater")
+                self.rotate(90)
+            elif self.ultrasonic_sensors["right"].value() > 100 and self.ultrasonic_sensors["left"].value() > 100:
+                print("Passou lateralmente")
+                time.sleep(1.4)
+                self.rotate(-90)
+                self.motors.left.run_forever(speed_sp=200)
+                self.motors.right.run_forever(speed_sp=200)
+
+                while not (self.ultrasonic_sensors["right"].value() < 100 and self.ultrasonic_sensors["left"].value() < 100):
+                    pass
+
+            self.motors.left.run_forever(speed_sp=200)
+            self.motors.right.run_forever(speed_sp=200)
 
     def request_area(self, area):
         pass
@@ -150,8 +176,8 @@ class Robot:
     def pipe_rescue(self, size):
         # step size
         if size == 20:
-            step_size = 4
-            hw_many_cycles = 15
+            step_size = 6
+            hw_many_cycles = 10
         elif size == 15:
             step_size = 3
             hw_many_cycles = 20
@@ -188,7 +214,7 @@ class Robot:
             counter += 1
 
         # print(sensor_data)
-        self.rotate()
+        self.rotate(-90)
 
 
     def get_in_position_to_grab_pipe(self):
@@ -236,7 +262,6 @@ class Robot:
             self.motors.right.run_forever(speed_sp=default + control)
 
         self.stop_motors()
-
 
     def anti_falling(self):
         pass

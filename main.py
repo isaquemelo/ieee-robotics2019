@@ -50,13 +50,16 @@ server.client.on_message = on_message
 
 server.client.loop_start()
 
+# 51 lateral
+# 110 frente
 
 def main():
     try:
         #while True:
-            # print(robot.get_sensor_data("InfraredSensor"))
-        robot.pipe_rescue(20)
-        robot.get_in_position_to_grab_pipe()
+            #print((robot.ultrasonic_sensors['front-left'].value(), robot.ultrasonic_sensors['front-right'].value()), robot.ultrasonic_sensors['left'].value())
+        #robot.pipe_rescue(15)
+        robot.pipeline_support_following()
+        #robot.get_in_position_to_grab_pipe()
             #time.sleep(8)
             # break
 
