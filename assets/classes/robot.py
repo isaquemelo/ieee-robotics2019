@@ -32,10 +32,10 @@ class Robot:
 
         self.color_sensors = (2, 2)
 
-        self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "left": ev3.UltrasonicSensor('in1'), "top": 0,
+        self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "top": 0,
                                    "front-right": ev3.UltrasonicSensor('in4'), "front-left": ev3.UltrasonicSensor('in3')}
 
-        self.infrared_sensors = {"upper_front": 25}
+        self.infrared_sensors = {"upper_front": 25, "left": ev3.InfraredSensor('in1')}
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outB'))
@@ -81,13 +81,13 @@ class Robot:
 
     def rotate(self, angle, speed=DEFAULT_SPEED):
         if angle == -90:
-            self.motors.left.run_to_rel_pos(position_sp=-400, speed_sp=200)
-            self.motors.right.run_to_rel_pos(position_sp=400, speed_sp=200)
+            self.motors.left.run_to_rel_pos(position_sp=-400, speed_sp=speed)
+            self.motors.right.run_to_rel_pos(position_sp=400, speed_sp=speed)
             self.motors.left.wait_while("running")
             self.motors.right.wait_while("running")
         elif angle == 90:
-            self.motors.left.run_to_rel_pos(position_sp=430, speed_sp=200)
-            self.motors.right.run_to_rel_pos(position_sp=-430, speed_sp=200)
+            self.motors.left.run_to_rel_pos(position_sp=430, speed_sp=speed)
+            self.motors.right.run_to_rel_pos(position_sp=-430, speed_sp=speed)
             self.motors.left.wait_while("running")
             self.motors.right.wait_while("running")
 
@@ -145,27 +145,41 @@ class Robot:
     # END OF CRUCIAL METHODS
 
     def pipeline_support_following(self):
-        pid = PID(54, 0, 25, setpoint=0)
+        pid = PID(7, 0, 1.2, setpoint=8)
 
         while True:
-            control = pid(self.ultrasonic_sensors["right"].value())
+            control = pid(self.infrared_sensors['left'].value())
 
-            if self.ultrasonic_sensors["front-right"].value() < 100 or \
-                    self.ultrasonic_sensors["front-left"].value() < 100:
-                print("Vai bater")
-                self.rotate(90)
-            elif self.ultrasonic_sensors["right"].value() > 100 and self.ultrasonic_sensors["left"].value() > 100:
-                print("Passou lateralmente")
-                time.sleep(1.4)
-                self.rotate(-90)
-                self.motors.left.run_forever(speed_sp=200)
-                self.motors.right.run_forever(speed_sp=200)
+            #
+            # if self.ultrasonic_sensors["front-right"].value() < 100 or \
+            #         self.ultrasonic_sensors["front-left"].value() < 100:
+            #     print("Vai bater")
+            #     self.rotate(90)
+            # elif self.ultrasonic_sensors["right"].value() > 100 and self.ultrasonic_sensors["left"].value() > 100:
+            #     print("Passou lateralmente")
+            #     time.sleep(1.4)
+            #     self.rotate(-90)
+            #     self.motors.left.run_forever(speed_sp=400)
+            #     self.motors.right.run_forever(speed_sp=400)
+            #
+            #     while not (self.ultrasonic_sensors["right"].value() < 100 and self.ultrasonic_sensors["left"].value() < 100):
+            #         pass
 
-                while not (self.ultrasonic_sensors["right"].value() < 100 and self.ultrasonic_sensors["left"].value() < 100):
-                    pass
+            calculated_speed_a = control + DEFAULT_SPEED
+            calculated_speed_b = - control + DEFAULT_SPEED
 
-            self.motors.left.run_forever(speed_sp=200)
-            self.motors.right.run_forever(speed_sp=200)
+            if calculated_speed_a > 1000:
+                calculated_speed_a = 1000
+            elif calculated_speed_a < -1000:
+                calculated_speed_a = -1000
+
+            if calculated_speed_b > 1000:
+                calculated_speed_b = 1000
+            elif calculated_speed_b < -1000:
+                calculated_speed_b = -1000
+
+            self.motors.left.run_forever(speed_sp=calculated_speed_a)
+            self.motors.right.run_forever(speed_sp=calculated_speed_b)
 
     def request_area(self, area):
         pass
@@ -193,7 +207,7 @@ class Robot:
         cycles = 0
         while True:
             self.move_metered(cm=step_size, speed=-DEFAULT_SPEED)
-            sensor_values = (self.ultrasonic_sensors['left'].value(), self.ultrasonic_sensors['right'].value())
+            sensor_values = (self.infrared_sensors['left'].value(), self.ultrasonic_sensors['right'].value())
 
             sensor_data[0].append(sensor_values[0])
             sensor_data[1].append(sensor_values[1])

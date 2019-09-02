@@ -55,10 +55,11 @@ server.client.loop_start()
 
 def main():
     try:
-        #while True:
-            #print((robot.ultrasonic_sensors['front-left'].value(), robot.ultrasonic_sensors['front-right'].value()), robot.ultrasonic_sensors['left'].value())
+        while True:
+            print(ev3.InfraredSensor('in1').value())
         #robot.pipe_rescue(15)
-        robot.pipeline_support_following()
+
+        #robot.pipeline_support_following()
         #robot.get_in_position_to_grab_pipe()
             #time.sleep(8)
             # break
