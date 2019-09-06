@@ -12,6 +12,13 @@
           </excludedPaths>
         </serverdata>
       </paths>
+      <paths name="master_pipeline_fowler">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="slave robot">
         <serverdata>
           <mappings>
