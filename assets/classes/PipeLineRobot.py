@@ -83,8 +83,8 @@ class PipeLineRobot:
             print("Rotate 0 deg does not make sense")
             return
 
-        if 30 > angle > 0:
-            speed = map_values(math.fabs(angle), 0, 90, 100, 1000)
+        # if 30 > angle > 0:
+        #     speed = map_values(math.fabs(angle), 0, 90, 100, 1000)
 
         reverse = False
         if angle < 0:
@@ -100,7 +100,7 @@ class PipeLineRobot:
         self.stop_motors()
 
         while now_angle < angle + start_angle:
-            # print("now angle:", now_angle, "goal: |", angle + start_angle, "|")
+            print("now angle:", now_angle, "goal: |", angle + start_angle, "|")
 
             if reverse:
                 if axis == "own":
@@ -117,7 +117,8 @@ class PipeLineRobot:
                 else:
                     self.motors.left.run_forever(speed_sp=speed)
                 now_angle = self.gyroscope_sensor.value()
-
+        self.motors.left.stop()
+        self.motors.right.stop()
     def move_timed(self, how_long=0.3, direction="forward", speed=DEFAULT_SPEED):
         end_time = datetime.now() + timedelta(seconds=how_long)
 
@@ -173,7 +174,7 @@ class PipeLineRobot:
     # END OF CRUCIAL METHODS
 
     def pipeline_support_following(self):
-        default_speed = 400
+        default_speed = 350
         pid = PID(12, 0, 2, setpoint=4)
         side_k_to_rotate = 15
         front_k_to_rotate = 5
@@ -182,19 +183,19 @@ class PipeLineRobot:
         speed_a = 0
         speed_b = 0
         while True:
-            side_distance = self.infrared_sensors['frontal'].value()
-            front_distance = self.infrared_sensors['side'].value()
+            side_distance = self.infrared_sensors['side'].value()
+            front_distance = self.infrared_sensors['frontal'].value()
             control = pid(side_distance)
             # print(side_distance)
 
             if side_distance > side_k_to_rotate:
                 self.stop_motors()
-                self.move_timed(0.7, speed=-1000)
-                self.rotate(-90, axis="own", speed=200)
+                self.move_timed(0.9, speed=-500)
+                self.rotate(-80, axis="own", speed=90)
 
             if front_distance < front_k_to_rotate:
                 self.stop_motors()
-                self.rotate(80, axis="own", speed=200)
+                self.rotate(80, axis="own", speed=90)
 
             speed_a = control - default_speed
             speed_b = -control - default_speed

@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-import ev3dev.ev3 as ev3
-import math
-from datetime import datetime, timedelta
-import time
-import paho.mqtt.client as mqtt
-from struct import *
-from simple_pid import PID
+# import ev3dev.ev3 as ev3
+# import math
+# from datetime import datetime, timedelta
+# import time
+# import paho.mqtt.client as mqtt
+# from struct import *
+# from simple_pid import PID
 from assets.classes.PipeLineRobot import PipeLineRobot
-import json
-from assets.handlers.button import ButtonApproach
-from assets.handlers.undefined_dealing import undefined_dealing
-from assets.handlers.server_config import Server
+# import json
+# from assets.handlers.button import ButtonApproach
+# from assets.handlers.undefined_dealing import undefined_dealing
+# from assets.handlers.server_config import Server
 
 DEFAULT_SPEED = 350
 
@@ -55,6 +55,7 @@ robot = PipeLineRobot()
 
 def main():
     try:
+        #robot.rotate(80, axis="own", speed=90)
         robot.pipeline_support_following()
         #robot.pipe_rescue(15)
 
