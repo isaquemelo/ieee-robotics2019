@@ -3,6 +3,7 @@
 import ev3dev.ev3 as ev3
 from simple_pid import PID
 from assets.classes.PipeLineRobot import PipeLineRobot
+from calibrated_consts import setpoint_for_pid_pipeline_fowler as setpoint
 
 
 # 15.6 0 4.8
@@ -13,7 +14,6 @@ robot = PipeLineRobot()
 def main():
     try:
         # it may need to get adjusted according to the value that the material from pipeline base reflects to the infrared
-        setpoint = 4
         default_speed = 400
         pid = PID(12, 0, 2, setpoint=setpoint)
         side_k_to_rotate = 15
@@ -31,11 +31,11 @@ def main():
             if side_distance > side_k_to_rotate:
                 robot.stop_motors()
                 robot.move_timed(0.7, speed=-1000)
-                robot.rotate(-90, speed=rotation_speed)
+                robot.rotate(-90, axis="own", speed=200)
 
             if front_distance < front_k_to_rotate:
                 robot.stop_motors()
-                robot.rotate(90, speed=rotation_speed)
+                robot.rotate(90, axis="own", speed=200)
 
             speed_a = control - default_speed
             speed_b = -control - default_speed
