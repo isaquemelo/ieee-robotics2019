@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e33d40b6-f1d9-43d1-a073-691af46b2087" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ieee-robotics2019.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ieee-robotics2019.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +20,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-line="94" selection-end-column="30" />
+            <state relative-caret-position="230">
+              <caret line="65" column="19" lean-forward="true" selection-start-line="65" selection-start-column="19" selection-end-line="65" selection-end-column="19" />
               <folding>
                 <element signature="e#24#48#0" expanded="true" />
               </folding>
@@ -27,53 +30,31 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/test_follow_gasoduto_PID.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="23" column="19" lean-forward="true" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
-              <folding>
-                <element signature="e#24#48#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="466">
-              <caret line="124" lean-forward="true" selection-start-line="124" selection-end-line="124" />
+            <state relative-caret-position="80">
+              <caret line="248" column="13" selection-start-line="248" selection-start-column="13" selection-end-line="248" selection-end-column="13" />
               <folding>
-                <element signature="e#24#48#0" expanded="true" />
-                <element signature="e#959#1296#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/assets/classes/robot.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="705">
-              <caret line="116" column="39" lean-forward="true" selection-start-line="116" selection-start-column="39" selection-end-line="116" selection-end-column="39" />
-              <folding>
-                <element signature="e#23#57#0" expanded="true" />
-                <element signature="e#263#331#0" />
-                <element signature="e#393#410#0" />
-                <element signature="e#1355#1443#0" />
-                <element signature="e#1497#2451#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/assets/handlers/server_config.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="7" column="42" selection-start-line="7" selection-start-column="42" selection-end-line="7" selection-end-column="42" />
-              <folding>
-                <element signature="e#23#54#0" expanded="true" />
+                <element signature="e#47#81#0" expanded="true" />
+                <element signature="e#1330#1418#0" />
+                <element signature="e#2579#3941#0" />
+                <element signature="e#3138#3475#0" />
+                <element signature="e#3538#3850#0" />
+                <element signature="e#3897#4090#0" />
+                <element signature="e#4127#4183#0" />
+                <element signature="e#4221#4279#0" />
+                <element signature="e#4310#4372#0" />
+                <element signature="e#4452#4717#0" />
+                <element signature="e#4799#6283#0" />
+                <element signature="e#6917#6947#0" />
+                <element signature="e#6375#6379#0" />
+                <element signature="e#6422#7601#0" />
+                <element signature="e#7656#9173#0" />
+                <element signature="e#9211#9215#0" />
+                <element signature="e#9256#9260#0" />
+                <element signature="e#9299#9303#0" />
+                <element signature="e#9337#9341#0" />
+                <element signature="e#9382#9386#0" />
               </folding>
             </state>
           </provider>
@@ -108,10 +89,11 @@
         <option value="$PROJECT_DIR$/assets/classes/robot/robot.py" />
         <option value="$USER_HOME$/PycharmProjects/iRobots/sala_3.py" />
         <option value="$PROJECT_DIR$/assets/handlers/server_config.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/assets/classes/robot.py" />
-        <option value="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" />
+        <option value="$PROJECT_DIR$/calibrated_consts.py" />
         <option value="$PROJECT_DIR$/test_follow_gasoduto_PID.py" />
+        <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" />
       </list>
     </option>
   </component>
@@ -131,23 +113,19 @@
         <subPane>
           <expand>
             <path>
-              <item name="code" type="b2602c69:ProjectViewProjectNode" />
-              <item name="code" type="462c0819:PsiDirectoryNode" />
+              <item name="ieee-robotics2019" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ieee-robotics2019" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="code" type="b2602c69:ProjectViewProjectNode" />
-              <item name="code" type="462c0819:PsiDirectoryNode" />
+              <item name="ieee-robotics2019" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ieee-robotics2019" type="462c0819:PsiDirectoryNode" />
               <item name="assets" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="code" type="b2602c69:ProjectViewProjectNode" />
-              <item name="code" type="462c0819:PsiDirectoryNode" />
+              <item name="ieee-robotics2019" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ieee-robotics2019" type="462c0819:PsiDirectoryNode" />
               <item name="assets" type="462c0819:PsiDirectoryNode" />
               <item name="classes" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="code" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
@@ -164,6 +142,12 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
     <property name="last_opened_file_path" value="$USER_HOME$/PycharmProjects/iRobots/sala_3.py" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -214,7 +198,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="56489000" />
+    <option name="totallyTimeSpent" value="68268000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -226,10 +210,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-3" y="0" width="1372" height="738" extended-state="6" />
-    <editor active="true" />
+    <frame x="37" y="-4" width="1329" height="772" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18409091" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18394388" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -241,18 +224,43 @@
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49924242" weight="0.32994923" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.32656515" />
+      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.3258595" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.4939394" visible="true" weight="0.3248731" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.4939394" visible="true" weight="0.32436472" />
       <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.5060606" side_tool="true" weight="0.32994923" />
       <window_info anchor="bottom" id="Python Console" order="13" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" />
+      <window_info anchor="right" id="SciView" order="3" weight="0.32969603" />
       <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="right" id="Remote Host" order="5" weight="0.17727272" />
+      <window_info anchor="right" id="Remote Host" order="5" weight="0.17692907" />
     </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18394388" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49924242" weight="0.32994923" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.3258595" />
+      <window_info anchor="bottom" id="Database Changes" order="10" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.4939394" visible="true" weight="0.32436472" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.5060606" side_tool="true" weight="0.32994923" />
+      <window_info anchor="bottom" id="Python Console" order="13" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" weight="0.32969603" />
+      <window_info anchor="right" id="Database" order="4" />
+      <window_info anchor="right" id="Remote Host" order="5" weight="0.17692907" />
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -274,40 +282,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-1247971763/_struct.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="123">
-          <caret line="77" column="4" selection-start-line="77" selection-start-column="4" selection-end-line="77" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2018.3/system/python_stubs/-1247971763/_struct.py" />
     <entry file="file://$PROJECT_DIR$/assets/classes/pipe.py" />
     <entry file="file://$PROJECT_DIR$/assets/classes/methods.py" />
-    <entry file="file://$PROJECT_DIR$/server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="38" column="16" selection-start-line="38" selection-start-column="16" selection-end-line="38" selection-end-column="16" />
-          <folding>
-            <element signature="e#23#54#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/PycharmProjects/iRobots/sala_3.py" />
     <entry file="file://$PROJECT_DIR$/assets/classes/duo.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="45">
           <caret line="3" column="31" lean-forward="true" selection-start-line="3" selection-start-column="31" selection-end-line="3" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="94" selection-end-column="30" />
-          <folding>
-            <element signature="e#24#48#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -321,37 +303,78 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
+    <entry file="file://$PROJECT_DIR$/test_follow_gasoduto_PID.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="124" lean-forward="true" selection-start-line="124" selection-end-line="124" />
+        <state relative-caret-position="34">
+          <caret line="17" column="42" selection-start-line="17" selection-start-column="42" selection-end-line="17" selection-end-column="42" />
           <folding>
             <element signature="e#24#48#0" expanded="true" />
-            <element signature="e#959#1296#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/calibrated_consts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/robot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="116" column="39" lean-forward="true" selection-start-line="116" selection-start-column="39" selection-end-line="116" selection-end-column="39" />
+        <state relative-caret-position="119">
+          <caret line="49" column="4" lean-forward="true" selection-start-line="49" selection-start-column="4" selection-end-line="51" selection-end-column="47" />
           <folding>
             <element signature="e#23#57#0" expanded="true" />
-            <element signature="e#263#331#0" />
-            <element signature="e#393#410#0" />
-            <element signature="e#1355#1443#0" />
-            <element signature="e#1497#2451#0" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test_follow_gasoduto_PID.py">
+    <entry file="file://$PROJECT_DIR$/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="23" column="19" lean-forward="true" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
+        <state relative-caret-position="255">
+          <caret line="33" column="59" selection-start-line="33" selection-start-column="54" selection-end-line="33" selection-end-column="59" />
+          <folding>
+            <element signature="e#23#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="65" column="19" lean-forward="true" selection-start-line="65" selection-start-column="19" selection-end-line="65" selection-end-column="19" />
           <folding>
             <element signature="e#24#48#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="248" column="13" selection-start-line="248" selection-start-column="13" selection-end-line="248" selection-end-column="13" />
+          <folding>
+            <element signature="e#47#81#0" expanded="true" />
+            <element signature="e#1330#1418#0" />
+            <element signature="e#2579#3941#0" />
+            <element signature="e#3138#3475#0" />
+            <element signature="e#3538#3850#0" />
+            <element signature="e#3897#4090#0" />
+            <element signature="e#4127#4183#0" />
+            <element signature="e#4221#4279#0" />
+            <element signature="e#4310#4372#0" />
+            <element signature="e#4452#4717#0" />
+            <element signature="e#4799#6283#0" />
+            <element signature="e#6917#6947#0" />
+            <element signature="e#6375#6379#0" />
+            <element signature="e#6422#7601#0" />
+            <element signature="e#7656#9173#0" />
+            <element signature="e#9211#9215#0" />
+            <element signature="e#9256#9260#0" />
+            <element signature="e#9299#9303#0" />
+            <element signature="e#9337#9341#0" />
+            <element signature="e#9382#9386#0" />
           </folding>
         </state>
       </provider>

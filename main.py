@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# import ev3dev.ev3 as ev3
+import ev3dev.ev3 as ev3
 # import math
 # from datetime import datetime, timedelta
 # import time
@@ -56,7 +56,8 @@ robot = PipeLineRobot()
 def main():
     try:
         #robot.rotate(80, axis="own", speed=90)
-        robot.pipeline_support_following()
+        #robot.pipeline_support_following()
+        robot.black_line_following()
         #robot.pipe_rescue(15)
 
         #robot.pipeline_support_following()
