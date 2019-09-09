@@ -119,6 +119,7 @@ class PipeLineRobot:
                 now_angle = self.gyroscope_sensor.value()
         self.motors.left.stop()
         self.motors.right.stop()
+
     def move_timed(self, how_long=0.3, direction="forward", speed=DEFAULT_SPEED):
         end_time = datetime.now() + timedelta(seconds=how_long)
 
@@ -170,9 +171,6 @@ class PipeLineRobot:
             self.handler.left.run_forever(speed_sp=vel)
         self.handler.left.stop()
 
-
-    # END OF CRUCIAL METHODS
-
     def pipeline_support_following(self):
         default_speed = 350
         pid = PID(12, 0, 2, setpoint=4)
@@ -182,11 +180,11 @@ class PipeLineRobot:
 
         speed_a = 0
         speed_b = 0
+
         while True:
             side_distance = self.infrared_sensors['side'].value()
             front_distance = self.infrared_sensors['frontal'].value()
             control = pid(side_distance)
-            # print(side_distance)
 
             if side_distance > side_k_to_rotate:
                 self.stop_motors()
@@ -212,6 +210,39 @@ class PipeLineRobot:
 
             self.motors.left.run_forever(speed_sp=speed_a)
             self.motors.right.run_forever(speed_sp=speed_b)
+
+    def initial_location_reset(self):
+        # anda frente -> procura cor (verde, preto, undefined)
+        # achou cor:
+            # alinha
+        # se ambos undefined:
+          # rezinha
+          # 90 graus
+          # anda frente ate achar cor
+              # achei verde: fim
+              # achei preto:
+                 # alinha
+                 # 90 graus
+                 # pid linha preta undefined-undefined
+                 # 90 graus
+                 # pid undefined ate verde-verde
+        # se preto:
+          # 90 graus
+          # segue preto "PID"
+            # achar undefined:
+            # 90 graus
+            # PID undefined ate achar verde
+
+        # se verde:
+          # 180 graus
+          # anda ate preto
+          # alinha cor
+          # 90 graus
+          # pid ate undefined-undefined
+          # 90 graus
+          # pid undefined ate verde-verde
+
+        pass
 
     def request_area(self, area):
         pass
@@ -261,7 +292,6 @@ class PipeLineRobot:
 
         # print(sensor_data)
         self.rotate(-90)
-
 
     def get_in_position_to_grab_pipe(self):
         # get close to the pipe with PID
