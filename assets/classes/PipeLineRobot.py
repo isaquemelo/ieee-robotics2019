@@ -316,25 +316,27 @@ class PipeLineRobot:
 
     def black_line_following_ac(self):
         default_speed = 200
-        white_value = 440
-        # black_value = 500
-
+        white_value = 435
+        max_white_var = 30
+        setpoint = 457
+        speed_to_get_on_black_line = 30
         max_value = 400
         min_value = -400
 
-        l_pid = PID(2, 0, 2, setpoint=420)
+        l_pid = PID(1.5, 0.4, 1.3, setpoint=setpoint)
 
         while True:
             color_data = self.get_sensor_data("ColorSensor")
-            l_control = l_pid(color_data[0])
+            left = color_data[0]
 
-            l_speed = default_speed + l_control
-
-            if self.tolerancia(actual=color_data[0], wanted=white_value, ratio=40):
-                print("its white")
-                self.motors.left.run_forever(speed_sp=default_speed - 30)
+            if self.spread(actual=left, expected=white_value, amplitude=max_white_var):
+                self.motors.left.run_forever(speed_sp=default_speed - speed_to_get_on_black_line)
                 self.motors.right.run_forever(speed_sp=default_speed)
                 continue
+
+            l_control = l_pid(left)
+
+            l_speed = default_speed + l_control
 
             if l_speed > max_value:
                 l_speed = max_value
@@ -342,18 +344,33 @@ class PipeLineRobot:
                 l_speed = min_value
 
             self.motors.left.run_forever(speed_sp=default_speed - l_speed)
-            self.motors.right.run_forever(speed_sp=default_speed)
-            print("control = ", l_control)
-            print("speed = ", l_speed)
-            print("color = ", color_data[0])
+            self.motors.right.run_forever(speed_sp=default_speed + l_speed)
 
-    def tolerancia(self, actual, wanted, ratio):
-        wanted = abs(wanted)
-        actual = abs(actual)
-        dif = abs(wanted - actual)
-        if dif <= ratio:
+    def spread(self, actual, expected, amplitude):
+        dif = abs(expected - actual)
+
+        if dif <= amplitude:
             return True
         return False
+
+    def find_max_white_var(self):
+        colors = self.get_sensor_data("ColorSensor")
+        smallest = colors[0]
+        biggest = colors[0]
+
+        while True:
+            colors = self.get_sensor_data("ColorSensor")
+            if colors[0] < smallest:
+                smallest = colors[0]
+            if colors[1] < smallest:
+                smallest = colors[1]
+            if colors[0] > biggest:
+                biggest = colors[0]
+            if colors[1] > biggest:
+                biggest = colors[1]
+
+            print("biggest = ", biggest, " - ", "smallest = ", smallest, " == ", biggest - smallest)
+
 
     def request_area(self, area):
         pass
