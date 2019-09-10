@@ -7,6 +7,8 @@ from simple_pid import PID
 import json
 import time
 
+from calibrated_consts import flw_black_line_consts
+
 DEFAULT_SPEED = 400
 
 
@@ -30,8 +32,16 @@ class PipeLineRobot:
         self.gyro_value = 0
 
         self.color_sensors = (ev3.ColorSensor('in1'), ev3.ColorSensor('in4'))
-        self.color_sensors[0].mode = "REF-RAW"
-        self.color_sensors[1].mode = "REF-RAW"
+        self.dict_colors = {
+            0: 'Undefined',
+            1: 'Black',
+            2: 'Blue',
+            3: 'Green',
+            4: 'Yellow',
+            5: 'Red',
+            6: 'White',
+            7: 'Brown'
+        }
 
         #self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "top": 0,
                                    #"front-right": ev3.UltrasonicSensor('in4'), "front-left": ev3.UltrasonicSensor('in3')}
@@ -52,7 +62,7 @@ class PipeLineRobot:
         self.gyroscope_sensor.mode = 'GYRO-RATE'
         self.gyroscope_sensor.mode = 'GYRO-ANG'
 
-    def get_sensor_data(self, sensor_name):
+    def get_sensor_data(self, sensor_name, ColorSensorMode="REF-RAW"):
         # returns the value of a sensor
 
         if sensor_name == "InfraredSensor":
@@ -67,19 +77,12 @@ class PipeLineRobot:
             return [self.ultrasonic_sensors['left'].value(), self.ultrasonic_sensors['right'].value()]
 
         elif sensor_name == "ColorSensor":
-            dict_colors = {
-                0: 'Undefined',
-                1: 'Black',
-                2: 'Blue',
-                3: 'Green',
-                4: 'Yellow',
-                5: 'Red',
-                6: 'White',
-                7: 'Brown'
-            }
+            self.color_sensors[0].mode = ColorSensorMode
+            self.color_sensors[1].mode = ColorSensorMode
 
-            # return [dict_colors[self.color_sensors[0].color], dict_colors[self.color_sensors[1].color]]
-            return [self.color_sensors[0].value(), self.color_sensors[1].value()]
+            if ColorSensorMode == "REF-RAW":
+                return [self.color_sensors[0].value(), self.color_sensors[1].value()]
+            return [self.dict_colors[self.color_sensors[0].color], self.dict_colors[self.color_sensors[1].color]]
 
     def rotate(self, angle, axis="own", speed=DEFAULT_SPEED):
         if angle == 0:
@@ -252,7 +255,7 @@ class PipeLineRobot:
     #     l_initial_value = 500
     #     r_initial_value = (0/100)*l_initial_value
     #     while True:
-    #         color_data = self.get_sensor_data("ColorSensor")
+    #         color_data = self.get_sensor_data("ColorSensor", ColorSensorMode=)
     #         if color_data[0] != "White":
     #             # while color_data[0] != "White":
     #             #     self.motors.left.run_forever(speed_sp=500)
@@ -278,15 +281,15 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=default_speed)
             self.motors.right.run_forever(speed_sp=default_speed)
 
-            color_data = self.get_sensor_data("ColorSensor")
+            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode=)
             if color_data[0] == "Black":
-                while self.get_sensor_data("ColorSensor")[0] != "White":
+                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] != "White":
                     self.motors.left.run_forever(speed_sp=default_speed)
                     self.motors.right.run_forever(speed_sp=default_speed - reduce_speed)
 
                 continue
             if color_data[0] == "White":
-                while self.get_sensor_data("ColorSensor")[0] != "Black":
+                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] != "Black":
                     self.motors.left.run_forever(speed_sp=default_speed - reduce_speed)
                     self.motors.right.run_forever(speed_sp=default_speed)
 
@@ -300,36 +303,36 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=default_speed)
             self.motors.right.run_forever(speed_sp=default_speed)
 
-            color_data = self.get_sensor_data("ColorSensor")
+            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode=)
             if color_data[0] > 500:
-                while self.get_sensor_data("ColorSensor")[0] > 460:
+                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] > 460:
                     self.motors.left.run_forever(speed_sp=default_speed + reduce_speed)
                     self.motors.right.run_forever(speed_sp=default_speed - reduce_speed)
 
                 continue
             if color_data[0] < 460:
-                while self.get_sensor_data("ColorSensor")[0] < 500:
+                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] < 500:
                     self.motors.left.run_forever(speed_sp=default_speed - reduce_speed)
                     self.motors.right.run_forever(speed_sp=default_speed + reduce_speed)
 
                 continue
 
-    def black_line_following_ac(self):
+    def flw_black_line(self):
+        white_value = flw_black_line_consts["white_value"]
+        max_white_var = flw_black_line_consts["max_white_var"]
+        setpoint = flw_black_line_consts["setpoint"]
+
         default_speed = 200
-        white_value = 435
-        max_white_var = 30
-        setpoint = 457
         speed_to_get_on_black_line = 30
         max_value = 400
         min_value = -400
-
         l_pid = PID(1.5, 0.4, 1.3, setpoint=setpoint)
 
         while True:
-            color_data = self.get_sensor_data("ColorSensor")
+            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode=)
             left = color_data[0]
 
-            if self.spread(actual=left, expected=white_value, amplitude=max_white_var):
+            if self.whitin_range(actual=left, expected=white_value, amplitude=max_white_var):
                 self.motors.left.run_forever(speed_sp=default_speed - speed_to_get_on_black_line)
                 self.motors.right.run_forever(speed_sp=default_speed)
                 continue
@@ -346,30 +349,13 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=default_speed - l_speed)
             self.motors.right.run_forever(speed_sp=default_speed + l_speed)
 
-    def spread(self, actual, expected, amplitude):
-        dif = abs(expected - actual)
+    def whitin_range(self, actual, expected, amplitude, all_values_positive=True):
+        if all_values_positive:
+            dif = abs(expected - actual)
 
-        if dif <= amplitude:
-            return True
-        return False
-
-    def find_max_white_var(self):
-        colors = self.get_sensor_data("ColorSensor")
-        smallest = colors[0]
-        biggest = colors[0]
-
-        while True:
-            colors = self.get_sensor_data("ColorSensor")
-            if colors[0] < smallest:
-                smallest = colors[0]
-            if colors[1] < smallest:
-                smallest = colors[1]
-            if colors[0] > biggest:
-                biggest = colors[0]
-            if colors[1] > biggest:
-                biggest = colors[1]
-
-            print("biggest = ", biggest, " - ", "smallest = ", smallest, " == ", biggest - smallest)
+            if dif <= amplitude:
+                return True
+            return False
 
 
     def request_area(self, area):

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e33d40b6-f1d9-43d1-a073-691af46b2087" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/calibrated_consts.py" beforeDir="false" afterPath="$PROJECT_DIR$/calibrated_consts.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,8 +17,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="900">
-              <caret line="60" column="39" selection-start-line="60" selection-start-column="39" selection-end-line="60" selection-end-column="39" />
+            <state relative-caret-position="315">
+              <caret line="60" column="18" selection-start-line="60" selection-start-column="18" selection-end-line="60" selection-end-column="18" />
               <folding>
                 <element signature="e#24#48#0" expanded="true" />
               </folding>
@@ -29,8 +29,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="18">
-              <caret line="325" column="28" selection-start-line="325" selection-start-column="28" selection-end-line="325" selection-end-column="28" />
+            <state relative-caret-position="-90">
+              <caret line="326" column="24" selection-start-line="326" selection-start-column="24" selection-end-line="326" selection-end-column="24" />
+              <folding>
+                <element signature="e#23#57#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/calibrated_consts.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="151">
+              <caret line="23" column="21" selection-start-line="23" selection-end-line="23" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -51,6 +63,7 @@
       <find>rotate</find>
       <find>unde</find>
       <find>initial</find>
+      <find>flw</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -67,9 +80,9 @@
         <option value="$USER_HOME$/PycharmProjects/iRobots/sala_3.py" />
         <option value="$PROJECT_DIR$/assets/handlers/server_config.py" />
         <option value="$PROJECT_DIR$/assets/classes/robot.py" />
-        <option value="$PROJECT_DIR$/calibrated_consts.py" />
         <option value="$PROJECT_DIR$/test_follow_gasoduto_PID.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/calibrated_consts.py" />
         <option value="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" />
       </list>
     </option>
@@ -85,7 +98,17 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="code" type="b2602c69:ProjectViewProjectNode" />
+              <item name="code" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope" />
     </panes>
   </component>
@@ -150,12 +173,12 @@
       <workItem from="1567101598008" duration="2722000" />
       <workItem from="1567701302638" duration="12223000" />
       <workItem from="1567779569744" duration="4575000" />
-      <workItem from="1568136711056" duration="11744000" />
+      <workItem from="1568136711056" duration="13991000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="80012000" />
+    <option name="totallyTimeSpent" value="82259000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -168,8 +191,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-3" y="0" width="1372" height="738" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18712121" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18712121" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -183,7 +207,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.3248731" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.4939394" visible="true" weight="0.7800338" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4939394" weight="0.7800338" />
       <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.5060606" side_tool="true" weight="0.32994923" />
       <window_info anchor="bottom" id="Python Console" order="13" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -270,13 +294,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/calibrated_consts.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/robot.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -299,18 +316,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="900">
-          <caret line="60" column="39" selection-start-line="60" selection-start-column="39" selection-end-line="60" selection-end-column="39" />
+        <state relative-caret-position="315">
+          <caret line="60" column="18" selection-start-line="60" selection-start-column="18" selection-end-line="60" selection-end-column="18" />
           <folding>
             <element signature="e#24#48#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/calibrated_consts.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="151">
+          <caret line="23" column="21" selection-start-line="23" selection-end-line="23" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="325" column="28" selection-start-line="325" selection-start-column="28" selection-end-line="325" selection-end-column="28" />
+        <state relative-caret-position="-90">
+          <caret line="326" column="24" selection-start-line="326" selection-start-column="24" selection-end-line="326" selection-end-column="24" />
+          <folding>
+            <element signature="e#23#57#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
