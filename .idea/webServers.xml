@@ -18,8 +18,8 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
-      <webServer id="86e4f2ab-8092-4bf9-bfa9-07ab1f97ae0b" name="master_pipeline_fowler" url="http://10.42.0.39">
-        <fileTransfer host="10.42.0.39" port="22" rootFolder="/home/robot" accessType="SFTP">
+      <webServer id="86e4f2ab-8092-4bf9-bfa9-07ab1f97ae0b" name="master_pipeline_fowler" url="http://10.172.91.34">
+        <fileTransfer host="10.172.91.34" port="22" rootFolder="/home/robot" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

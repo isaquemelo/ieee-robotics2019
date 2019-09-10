@@ -271,37 +271,89 @@ class PipeLineRobot:
     #         self.motors.right.run_forever(speed_sp=default_speed + r_const)
 
     def black_line_following(self):
+        default_speed = 400
+        reduce_speed = 180
+
+        while True:
+            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
+
+            color_data = self.get_sensor_data("ColorSensor")
+            if color_data[0] == "Black":
+                while self.get_sensor_data("ColorSensor")[0] != "White":
+                    self.motors.left.run_forever(speed_sp=default_speed)
+                    self.motors.right.run_forever(speed_sp=default_speed - reduce_speed)
+
+                continue
+            if color_data[0] == "White":
+                while self.get_sensor_data("ColorSensor")[0] != "Black":
+                    self.motors.left.run_forever(speed_sp=default_speed - reduce_speed)
+                    self.motors.right.run_forever(speed_sp=default_speed)
+
+                continue
+
+    def undefined_following(self):
+        default_speed = 300
+        reduce_speed = 150
+
+        while True:
+            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
+
+            color_data = self.get_sensor_data("ColorSensor")
+            if color_data[0] > 500:
+                while self.get_sensor_data("ColorSensor")[0] > 460:
+                    self.motors.left.run_forever(speed_sp=default_speed + reduce_speed)
+                    self.motors.right.run_forever(speed_sp=default_speed - reduce_speed)
+
+                continue
+            if color_data[0] < 460:
+                while self.get_sensor_data("ColorSensor")[0] < 500:
+                    self.motors.left.run_forever(speed_sp=default_speed - reduce_speed)
+                    self.motors.right.run_forever(speed_sp=default_speed + reduce_speed)
+
+                continue
+
+    def black_line_following_ac(self):
         default_speed = 200
+        white_value = 440
+        # black_value = 500
 
         max_value = 400
         min_value = -400
 
-        l_pid = PID(1, 0, 0, setpoint=420)
-        r_pid = PID(0.05, 0, 0.05, setpoint=320)
+        l_pid = PID(2, 0, 2, setpoint=420)
 
         while True:
             color_data = self.get_sensor_data("ColorSensor")
             l_control = l_pid(color_data[0])
-            r_control = r_pid(color_data[1])
 
             l_speed = default_speed + l_control
-            r_speed = default_speed
+
+            if self.tolerancia(actual=color_data[0], wanted=white_value, ratio=40):
+                print("its white")
+                self.motors.left.run_forever(speed_sp=default_speed - 30)
+                self.motors.right.run_forever(speed_sp=default_speed)
+                continue
 
             if l_speed > max_value:
                 l_speed = max_value
             elif l_speed < min_value:
                 l_speed = min_value
 
-            if r_speed > max_value:
-                r_speed = max_value
-            elif r_speed < min_value:
-                r_speed = min_value
+            self.motors.left.run_forever(speed_sp=default_speed - l_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
+            print("control = ", l_control)
+            print("speed = ", l_speed)
+            print("color = ", color_data[0])
 
-
-            self.motors.left.run_forever(speed_sp=l_speed)
-            self.motors.right.run_forever(speed_sp=r_speed)
-            print(l_control)
-            print(l_speed, r_speed)
+    def tolerancia(self, actual, wanted, ratio):
+        wanted = abs(wanted)
+        actual = abs(actual)
+        dif = abs(wanted - actual)
+        if dif <= ratio:
+            return True
+        return False
 
     def request_area(self, area):
         pass
