@@ -58,7 +58,7 @@ def main():
         #robot.rotate(80, axis="own", speed=90)
         #robot.pipeline_support_following()
         ## robot.black_line_following()
-        robot.flw_black_line()
+        robot.black_line_following()
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
         #robot.pipe_rescue(15)

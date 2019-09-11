@@ -7,7 +7,7 @@ from simple_pid import PID
 import json
 import time
 
-from calibrated_consts import flw_black_line_consts
+from calibrated_consts import black_line_following
 
 DEFAULT_SPEED = 400
 
@@ -62,7 +62,7 @@ class PipeLineRobot:
         self.gyroscope_sensor.mode = 'GYRO-RATE'
         self.gyroscope_sensor.mode = 'GYRO-ANG'
 
-    def get_sensor_data(self, sensor_name, ColorSensorMode="REF-RAW"):
+    def get_sensor_data(self, sensor_name, ColorSensorMode="COL-REFLECT"):
         # returns the value of a sensor
 
         if sensor_name == "InfraredSensor":
@@ -281,15 +281,15 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=default_speed)
             self.motors.right.run_forever(speed_sp=default_speed)
 
-            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode=)
+            color_data = self.get_sensor_data("ColorSensor")
             if color_data[0] == "Black":
-                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] != "White":
+                while self.get_sensor_data("ColorSensor", ColorSensorMode="COL-REFLECT")[0] != "White":
                     self.motors.left.run_forever(speed_sp=default_speed)
                     self.motors.right.run_forever(speed_sp=default_speed - reduce_speed)
 
                 continue
             if color_data[0] == "White":
-                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] != "Black":
+                while self.get_sensor_data("ColorSensor")[0] != "Black":
                     self.motors.left.run_forever(speed_sp=default_speed - reduce_speed)
                     self.motors.right.run_forever(speed_sp=default_speed)
 
@@ -303,36 +303,36 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=default_speed)
             self.motors.right.run_forever(speed_sp=default_speed)
 
-            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode=)
+            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode="REF-RAW")
             if color_data[0] > 500:
-                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] > 460:
+                while self.get_sensor_data("ColorSensor", ColorSensorMode="REF-RAW")[0] > 460:
                     self.motors.left.run_forever(speed_sp=default_speed + reduce_speed)
                     self.motors.right.run_forever(speed_sp=default_speed - reduce_speed)
 
                 continue
             if color_data[0] < 460:
-                while self.get_sensor_data("ColorSensor", ColorSensorMode=)[0] < 500:
+                while self.get_sensor_data("ColorSensor", ColorSensorMode="REF-RAW")[0] < 500:
                     self.motors.left.run_forever(speed_sp=default_speed - reduce_speed)
                     self.motors.right.run_forever(speed_sp=default_speed + reduce_speed)
 
                 continue
 
-    def flw_black_line(self):
-        white_value = flw_black_line_consts["white_value"]
-        max_white_var = flw_black_line_consts["max_white_var"]
-        setpoint = flw_black_line_consts["setpoint"]
+    def black_line_following(self):
+        white_value = black_line_following["white_value"]
+        max_white_var = black_line_following["max_white_var"]
+        setpoint = black_line_following["setpoint"]
 
         default_speed = 200
         speed_to_get_on_black_line = 30
         max_value = 400
         min_value = -400
-        l_pid = PID(1.5, 0.4, 1.3, setpoint=setpoint)
+        l_pid = PID(2, 0.2, 1, setpoint=setpoint)
 
         while True:
-            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode=)
+            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode="REF-RAW")
             left = color_data[0]
 
-            if self.whitin_range(actual=left, expected=white_value, amplitude=max_white_var):
+            if self.within_range(actual=left, expected=white_value, amplitude=max_white_var):
                 self.motors.left.run_forever(speed_sp=default_speed - speed_to_get_on_black_line)
                 self.motors.right.run_forever(speed_sp=default_speed)
                 continue
@@ -349,7 +349,8 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=default_speed - l_speed)
             self.motors.right.run_forever(speed_sp=default_speed + l_speed)
 
-    def whitin_range(self, actual, expected, amplitude, all_values_positive=True):
+    @staticmethod
+    def within_range(actual, expected, amplitude, all_values_positive=True):
         if all_values_positive:
             dif = abs(expected - actual)
 
