@@ -263,7 +263,7 @@ class PipeLineRobot:
                     self.color_alignment()
                     self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
 
-                else:  # the color did change after a little walk
+                else:  # the color did change to a undesired color after a little walk
                     print("Not reliable sensor info")
                     continue
 
@@ -285,6 +285,54 @@ class PipeLineRobot:
                     if color_data[0] == "Black" or color_data[1] == "Black":
                         self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
                         break
+
+            elif color_data[0] == "Green" or color_data[1] == "Green":
+                self.color_alignment()
+                self.rotate(180, speed=rotation_speed)
+
+                while True:
+                    color_data = self.get_sensor_data("ColorSensor")
+                    self.motors.left.run_forever(speed_sp=inner_speed - 150)
+                    self.motors.right.run_forever(speed_sp=inner_speed - 150)
+
+                    if color_data[0] == "Black" or color_data[1] == "Black":
+                        possible_colors_after_black = ["Red", "Blue", "Yellow"]
+                        print("Black detected, checking the matter of info")
+                        self.stop_motors()
+
+                        self.move_timed(0.13, speed=50)
+
+                        color_data = self.get_sensor_data("ColorSensor")
+
+                        if color_data[0] in possible_colors_after_black or color_data[1] in possible_colors_after_black:
+                            print("The black detected is reliable")
+                            if color_data[0] in possible_colors_after_black:
+                                while self.get_sensor_data("ColorSensor")[0] != "Black":
+                                    self.motors.left.run_forever(speed_sp=-100)
+                                self.motors.left.stop()
+
+                                while self.get_sensor_data("ColorSensor")[1] != "Black":
+                                    self.motors.right.run_forever(speed_sp=100)
+                                self.motors.right.stop()
+
+                            elif color_data[1] in possible_colors_after_black:
+                                while self.get_sensor_data("ColorSensor")[1] != "Black":
+                                    self.motors.right.run_forever(speed_sp=-100)
+                                self.motors.right.stop()
+
+                                while self.get_sensor_data("ColorSensor")[0] != "Black":
+                                    self.motors.left.run_forever(speed_sp=100)
+                                self.motors.left.stop()
+
+                            self.color_alignment()
+                            self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
+
+                        else:  # the color did change to a undesired color after a little walk
+                            print("Not reliable sensor info")
+                            continue
+
+
+
 
         # anda frente -> procura cor (verde, preto, undefined)
         # achou cor:
