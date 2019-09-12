@@ -5,7 +5,7 @@ import math
 from datetime import datetime, timedelta
 from simple_pid import PID
 #import json
-#import time
+import time
 
 from calibrated_consts import black_line_following
 
@@ -229,7 +229,36 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=inner_speed)
             self.motors.right.run_forever(speed_sp=inner_speed)
 
-            if color_data[0] == "Undefined" or color_data[1] == "Undefined":
+            if color_data[0] == "Black" or color_data[1] == "Black":
+                possible_colors_after_black = ["Red", "Blue", "Yellow", "Black"]
+                print("Black detected, checking the matter of info")
+                self.stop_motors()
+
+                self.move_timed(0.13, speed=inner_speed)
+
+                color_data = self.get_sensor_data("ColorSensor")
+                print(color_data)
+
+                if color_data[0] in possible_colors_after_black or color_data[1] in possible_colors_after_black:
+                    print("The black detected is reliable")
+                    if color_data[0] in possible_colors_after_black:
+                        while self.get_sensor_data("ColorSensor")[0] != "Black":
+                            self.motors.left.run_forever(speed_sp=-100)
+                        self.motors.left.stop()
+                    elif color_data[1] in possible_colors_after_black:
+                        while self.get_sensor_data("ColorSensor")[1] != "Black":
+                            self.motors.right.run_forever(speed_sp=-100)
+                        self.motors.right.stop()
+
+                    self.color_alignment()
+                    self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
+
+                else:  # the color did change after a little walk
+                    print("Not reliable sensor info")
+                    continue
+
+
+            elif color_data[0] == "Undefined" or color_data[1] == "Undefined":
                 self.color_alignment()  # align with white border
                 self.move_timed(0.4, direction="backward", speed=inner_speed)
                 self.rotate(80, speed=rotation_speed)
@@ -246,30 +275,8 @@ class PipeLineRobot:
                         break
 
                     if color_data[0] == "Black" or color_data[1] == "Black":
-                        self.color_alignment("White")
-                        self.move_timed(0.5, speed=80)
-                        self.move_timed(0.3, direction="backwards", speed=80)
-                        self.rotate(80, speed=rotation_speed - 50)
-                        self.black_line_following()  # only returns when both sensors are undefined
-                        self.move_timed(0.5, direction="backwards", speed=inner_speed)
-                        self.rotate(90, speed=rotation_speed - 50)
-
-                        while True:
-                            color_data = self.get_sensor_data("ColorSensor")
-
-                            self.motors.left.run_forever(speed_sp=inner_speed - 150)
-                            self.motors.right.run_forever(speed_sp=inner_speed - 150)
-
-                            if color_data[0] == "Green" or color_data[1] == "Green":
-                                self.color_alignment()
-                                self.stop_motors()
-                                print("All set!")
-                                break
-
+                        self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
                         break
-            elif color_data[0] == "Black" or color_data[1] == "Black":
-                self.rotate(80, speed=rotation_speed)
-
 
         # anda frente -> procura cor (verde, preto, undefined)
         # achou cor:
@@ -301,8 +308,6 @@ class PipeLineRobot:
           # 90 graus
           # pid undefined ate verde-verde
 
-        pass
-
     def black_line_routine(self, rotation_speed=150, inner_speed=400):
         self.color_alignment()
         self.move_timed(0.5, speed=80)
@@ -322,6 +327,7 @@ class PipeLineRobot:
                 self.color_alignment()
                 self.stop_motors()
                 print("All set!")
+                time.sleep(10)
                 break
 
     def black_line_following(self):
