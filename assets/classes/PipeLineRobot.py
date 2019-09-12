@@ -230,7 +230,7 @@ class PipeLineRobot:
             self.motors.right.run_forever(speed_sp=inner_speed)
 
             if color_data[0] == "Black" or color_data[1] == "Black" and \
-                    color_data[0] != "Green" and color_data[1] != "Green":
+                    (color_data[0] != "Green" or color_data[1] != "Green"):
 
                 possible_colors_after_black = ["Red", "Blue", "Yellow"]
                 print("Black detected, checking the matter of info")
