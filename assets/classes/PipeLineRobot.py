@@ -4,7 +4,7 @@ import ev3dev.ev3 as ev3
 import math
 from datetime import datetime, timedelta
 from simple_pid import PID
-#import json
+# import json
 import time
 
 from calibrated_consts import black_line_following
@@ -43,10 +43,10 @@ class PipeLineRobot:
             7: 'Brown'
         }
 
-        #self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "top": 0,
-                                   #"front-right": ev3.UltrasonicSensor('in4'), "front-left": ev3.UltrasonicSensor('in3')}
+        # self.ultrasonic_sensors = {"right": ev3.UltrasonicSensor('in2'), "top": 0,
+        # "front-right": ev3.UltrasonicSensor('in4'), "front-left": ev3.UltrasonicSensor('in3')}
 
-        #self.infrared_sensors = {"frontal": ev3.InfraredSensor('in3'), "side": ev3.InfraredSensor('in4'), "back": ev3.InfraredSensor('in1')}
+        # self.infrared_sensors = {"frontal": ev3.InfraredSensor('in3'), "side": ev3.InfraredSensor('in4'), "back": ev3.InfraredSensor('in1')}
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outC'))
@@ -66,14 +66,15 @@ class PipeLineRobot:
         # returns the value of a sensor
 
         if sensor_name == "InfraredSensor":
-            return self.ultrasonic_sensors["front-left"].value() / 10, self.ultrasonic_sensors["front-right"].value() / 10, \
+            return self.ultrasonic_sensors["front-left"].value() / 10, self.ultrasonic_sensors[
+                "front-right"].value() / 10, \
                    self.infrared_sensors["upper_front"]
 
         elif sensor_name == "GyroSensor":
             return self.gyroscope_sensor.angle
 
         elif sensor_name == "Ultrasonic":
-            #return self.ultrasonic_sensor.value() / 10
+            # return self.ultrasonic_sensor.value() / 10
             return [self.ultrasonic_sensors['left'].value(), self.ultrasonic_sensors['right'].value()]
 
         elif sensor_name == "ColorSensor":
@@ -141,7 +142,7 @@ class PipeLineRobot:
         self.motors.left.stop(), self.motors.right.stop()
 
     def move_metered(self, cm, speed=DEFAULT_SPEED):
-        const = 500/17
+        const = 500 / 17
         self.motors.left.run_to_rel_pos(position_sp=cm * const, speed_sp=speed, stop_action="brake")
         self.motors.right.run_to_rel_pos(position_sp=cm * const, speed_sp=speed, stop_action="brake")
         self.motors.left.wait_while("running")
@@ -223,7 +224,7 @@ class PipeLineRobot:
         self.stop_motors()
 
         inner_speed = 400  # > 150
-        rotation_speed = 150 # > 50
+        rotation_speed = 150  # > 50
         while True:
             color_data = self.get_sensor_data("ColorSensor")
             self.motors.left.run_forever(speed_sp=inner_speed)
@@ -331,38 +332,37 @@ class PipeLineRobot:
                             print("Not reliable sensor info")
                             continue
 
-
-
-
         # anda frente -> procura cor (verde, preto, undefined)
         # achou cor:
-            # alinha
+        # alinha
+
         # se ambos undefined:
-          # rezinha
-          # 90 graus
-          # anda frente ate achar cor
-              # achei verde: fim
-              # achei preto:
-                 # alinha
-                 # 90 graus
-                 # pid linha preta undefined-undefined
-                 # 90 graus
-                 # pid undefined ate verde-verde
+        # rezinha
+        # 90 graus
+        # anda frente ate achar cor
+        # achei verde: fim
+
+        # achei preto:
+        # alinha
+        # 90 graus
+        # pid linha preta undefined-undefined
+        # 90 graus
+        # pid undefined ate verde-verde
         # se preto:
-          # 90 graus
-          # segue preto "PID"
-            # achar undefined:
-            # 90 graus
-            # PID undefined ate achar verde
+        # 90 graus
+        # segue preto "PID"
+        # achar undefined:
+        # 90 graus
+        # PID undefined ate achar verde
 
         # se verde:
-          # 180 graus
-          # anda ate preto
-          # alinha cor
-          # 90 graus
-          # pid ate undefined-undefined
-          # 90 graus
-          # pid undefined ate verde-verde
+        # 180 graus
+        # anda ate preto
+        # alinha cor
+        # 90 graus
+        # pid ate undefined-undefined
+        # 90 graus
+        # pid undefined ate verde-verde
 
     def black_line_routine(self, rotation_speed=150, inner_speed=400):
         self.color_alignment()
@@ -490,7 +490,6 @@ class PipeLineRobot:
     #         #     self.motors.left.stop()
     #         #     self.motors.right.stop()
     #         #     return
-
 
     @staticmethod
     def within_range(actual, expected, amplitude, all_values_positive=True):
@@ -622,8 +621,6 @@ class PipeLineRobot:
                 continue
 
             self.move_timed(0.2, direction="backwards", speed=200)
-
-
 
     def pid_alignment(self):
         pass
