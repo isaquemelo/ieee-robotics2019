@@ -230,9 +230,10 @@ class PipeLineRobot:
             self.motors.right.run_forever(speed_sp=inner_speed)
 
             if color_data[0] == "Undefined" or color_data[1] == "Undefined":
-                self.color_alignment()
+                self.color_alignment()  # align with white border
                 self.move_timed(0.4, direction="backward", speed=inner_speed)
                 self.rotate(80, speed=rotation_speed)
+
                 while True:
                     color_data = self.get_sensor_data("ColorSensor")
                     print(color_data)
@@ -266,7 +267,8 @@ class PipeLineRobot:
                                 break
 
                         break
-
+            elif color_data[0] == "Black" or color_data[1] == "Black":
+                self.rotate(80, speed=rotation_speed)
 
 
         # anda frente -> procura cor (verde, preto, undefined)
@@ -300,6 +302,27 @@ class PipeLineRobot:
           # pid undefined ate verde-verde
 
         pass
+
+    def black_line_routine(self, rotation_speed=150, inner_speed=400):
+        self.color_alignment()
+        self.move_timed(0.5, speed=80)
+        self.move_timed(0.3, direction="backwards", speed=80)
+        self.rotate(80, speed=rotation_speed - 50)
+        self.black_line_following()  # only returns when both sensors are undefined
+        self.move_timed(0.5, direction="backwards", speed=inner_speed)
+        self.rotate(90, speed=rotation_speed - 50)
+
+        while True:
+            color_data = self.get_sensor_data("ColorSensor")
+
+            self.motors.left.run_forever(speed_sp=inner_speed - 150)
+            self.motors.right.run_forever(speed_sp=inner_speed - 150)
+
+            if color_data[0] == "Green" or color_data[1] == "Green":
+                self.color_alignment()
+                self.stop_motors()
+                print("All set!")
+                break
 
     def black_line_following(self):
         default_speed = 300
@@ -343,8 +366,6 @@ class PipeLineRobot:
                 self.motors.left.stop()
                 self.motors.right.stop()
                 continue
-
-
 
     def undefined_following(self):
         default_speed = 300
