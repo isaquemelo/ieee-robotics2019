@@ -229,15 +229,16 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=inner_speed)
             self.motors.right.run_forever(speed_sp=inner_speed)
 
-            if color_data[0] == "Black" or color_data[1] == "Black":
-                possible_colors_after_black = ["Red", "Blue", "Yellow", "Black"]
+            if color_data[0] == "Black" or color_data[1] == "Black" and \
+                    color_data[0] != "Green" and color_data[1] != "Green":
+
+                possible_colors_after_black = ["Red", "Blue", "Yellow"]
                 print("Black detected, checking the matter of info")
                 self.stop_motors()
 
-                self.move_timed(0.13, speed=inner_speed)
+                self.move_timed(0.13, speed=50)
 
                 color_data = self.get_sensor_data("ColorSensor")
-                print(color_data)
 
                 if color_data[0] in possible_colors_after_black or color_data[1] in possible_colors_after_black:
                     print("The black detected is reliable")
@@ -245,10 +246,19 @@ class PipeLineRobot:
                         while self.get_sensor_data("ColorSensor")[0] != "Black":
                             self.motors.left.run_forever(speed_sp=-100)
                         self.motors.left.stop()
+
+                        while self.get_sensor_data("ColorSensor")[1] != "Black":
+                            self.motors.right.run_forever(speed_sp=100)
+                        self.motors.right.stop()
+
                     elif color_data[1] in possible_colors_after_black:
                         while self.get_sensor_data("ColorSensor")[1] != "Black":
                             self.motors.right.run_forever(speed_sp=-100)
                         self.motors.right.stop()
+
+                        while self.get_sensor_data("ColorSensor")[0] != "Black":
+                            self.motors.left.run_forever(speed_sp=100)
+                        self.motors.left.stop()
 
                     self.color_alignment()
                     self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
@@ -257,7 +267,6 @@ class PipeLineRobot:
                     print("Not reliable sensor info")
                     continue
 
-
             elif color_data[0] == "Undefined" or color_data[1] == "Undefined":
                 self.color_alignment()  # align with white border
                 self.move_timed(0.4, direction="backward", speed=inner_speed)
@@ -265,13 +274,12 @@ class PipeLineRobot:
 
                 while True:
                     color_data = self.get_sensor_data("ColorSensor")
-                    print(color_data)
                     self.motors.left.run_forever(speed_sp=inner_speed - 150)
                     self.motors.right.run_forever(speed_sp=inner_speed - 150)
 
                     if color_data[0] == "Green" or color_data[1] == "Green":
                         self.color_alignment()
-                        print("Green end.")
+                        print("All set!")
                         break
 
                     if color_data[0] == "Black" or color_data[1] == "Black":
