@@ -5,7 +5,7 @@ from struct import *
 class Server:
     def __init__(self):
         self.client = mqtt.Client()
-        self.client.connect("\192.168.2.83", 1883, 60)
+        self.client.connect("192.168.2.83", 1883, 60)
 
     @property
     def get_client(self):

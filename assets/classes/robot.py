@@ -81,8 +81,8 @@ class Robot:
 
     def rotate(self, angle, speed=DEFAULT_SPEED):
         if angle == -90:
-            self.motors.left.run_to_rel_pos(position_sp=-400, speed_sp=speed)
-            self.motors.right.run_to_rel_pos(position_sp=400, speed_sp=speed)
+            self.motors.left.run_to_rel_pos(position_sp=-200, speed_sp=speed)
+            self.motors.right.run_to_rel_pos(position_sp=200, speed_sp=speed)
             self.motors.left.wait_while("running")
             self.motors.right.wait_while("running")
         elif angle == 90:

@@ -22,7 +22,7 @@ client.on_publish = on_publish
 
 client.connect("localhost", 1883, 60)
 
-#ultrasonic = ev3.UltrasonicSensor("in3")
+ultrasonic = ev3.UltrasonicSensor("in3")
 color_sensors = Duo(ev3.ColorSensor("in1"), ev3.ColorSensor("in2"))
 infrared_sensor = ev3.InfraredSensor('in4')
 
@@ -31,7 +31,7 @@ client.loop_start()
 
 try:
     while True:
-        message = pack("iiiid", 0, color_sensors.left.color, color_sensors.right.color, infrared_sensor.value(), time.time())
+        message = pack("iiiid", ultrasonic.value(), color_sensors.left.color, color_sensors.right.color, gyroscope_sensor.value(), time.time())
         client.publish("topic/sensors", message, qos=0)
         print(unpack("iiiid", message))
         time.sleep(0.05)
