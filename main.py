@@ -5,23 +5,19 @@ import ev3dev.ev3 as ev3
 # from datetime import datetime, timedelta
 # import time
 # import paho.mqtt.client as mqtt
-# from struct import *
+from struct import *
 # from simple_pid import PID
 from assets.classes.PipeLineRobot import PipeLineRobot
 # import json
 # from assets.handlers.button import ButtonApproach
 # from assets.handlers.undefined_dealing import undefined_dealing
-# from assets.handlers.server_config import Server
+from assets.handlers.server_config import Server
 
 DEFAULT_SPEED = 350
 
 
-
-# 15.6 0 4.8
-#pid = PID(15.6, 0, 4.8, setpoint=-4)
-
 robot = PipeLineRobot()
-#server = Server()
+server = Server()
 
 
 # client = mqtt.Client()
@@ -31,24 +27,25 @@ robot = PipeLineRobot()
 # client.on_message = on_message
 
 
-# def on_message(client, userdata, message):
-#     #print("mensagem recebida")
-#     payload = unpack("iiiid", message.payload)
-#     robot.color_sensors = payload[1:3]
-#     robot.infrared_sensors["upper_front"] = payload[-2]
-#     robot.ultrasonic_sensors['top'] = payload[0]
-#     #print(payload)
-#
-#
-# def on_connect(client, userdata, flags, rc):
-#     print("The robots are connected with result code", str(rc))
-#     client.subscribe("topic/sensors")
-#
-#
-# server.client.on_connect = on_connect
-# server.client.on_message = on_message
-#
-# server.client.loop_start()
+def on_message(client, userdata, message):
+    print("mensagem recebida")
+    payload = unpack("iiiid", message.payload)
+    robot.ultrasonic_sensors['left'] = payload[0]
+    robot.ultrasonic_sensors['right'] = payload[1]
+    robot.infrared_sensors['front'] = payload[2]
+    robot.infrared_sensors['right'] = payload[3]
+    print(payload)
+
+
+def on_connect(client, userdata, flags, rc):
+    print("The robots are connected with result code", str(rc))
+    client.subscribe("topic/sensors")
+
+
+server.client.on_connect = on_connect
+server.client.on_message = on_message
+
+server.client.loop_start()
 
 # 51 lateral
 # 110 frente
@@ -56,9 +53,9 @@ robot = PipeLineRobot()
 def main():
     try:
         #robot.rotate(80, axis="own", speed=90)
-        #robot.pipeline_support_following()
+        robot.pipeline_support_following()
         #robot.black_line_following()
-        robot.initial_location_reset()
+        #robot.initial_location_reset()
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
         #robot.pipe_rescue(15)
