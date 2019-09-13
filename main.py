@@ -28,13 +28,13 @@ server = Server()
 
 
 def on_message(client, userdata, message):
-    print("mensagem recebida")
+    #print("mensagem recebida")
     payload = unpack("iiiid", message.payload)
     robot.ultrasonic_sensors['left'] = payload[0]
     robot.ultrasonic_sensors['right'] = payload[1]
     robot.infrared_sensors['front'] = payload[2]
     robot.infrared_sensors['right'] = payload[3]
-    print(payload)
+    #print(payload)
 
 
 def on_connect(client, userdata, flags, rc):

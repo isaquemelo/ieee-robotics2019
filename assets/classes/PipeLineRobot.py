@@ -44,10 +44,10 @@ class PipeLineRobot:
             7: 'Brown'
         }
 
-        self.ultrasonic_sensors = {"right": 0, "left": 0}
+        self.ultrasonic_sensors = {"right": 10, "left": 10}
         # "front-right": ev3.UltrasonicSensor('in4'), "front-left": ev3.UltrasonicSensor('in3')}
 
-        self.infrared_sensors = {"diagonal_top": ev3.InfraredSensor('in3'), "right": 0, "front": 0}
+        self.infrared_sensors = {"diagonal_top": ev3.InfraredSensor('in3'), "right": 10, "front": 10}
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outC'))
@@ -184,7 +184,7 @@ class PipeLineRobot:
     def pipeline_support_following(self):
         default_speed = 350
         pid = PID(12, 0, 2, setpoint=4)
-        side_k_to_rotate = 15
+        side_k_to_rotate = 20
         front_k_to_rotate = 5
         rotation_speed = 40
 
@@ -196,17 +196,19 @@ class PipeLineRobot:
             front_distance = self.infrared_sensors['front']
             control = pid(side_distance)
 
+            print(side_distance, front_distance)
+
             if side_distance > side_k_to_rotate:
                 self.stop_motors()
-                self.move_timed(0.9, speed=-500)
+                self.move_timed(0.9, speed=500)
                 self.rotate(-80, axis="own", speed=90)
 
             if front_distance < front_k_to_rotate:
                 self.stop_motors()
                 self.rotate(80, axis="own", speed=90)
 
-            speed_a = control - default_speed
-            speed_b = -control - default_speed
+            speed_a = default_speed + control
+            speed_b = default_speed - control
 
             if speed_a >= 1000:
                 speed_a = 1000
