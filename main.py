@@ -53,9 +53,9 @@ server.client.loop_start()
 def main():
     try:
         #robot.rotate(80, axis="own", speed=90)
-        robot.pipeline_support_following()
+        #robot.pipeline_support_following()
         #robot.black_line_following()
-        #robot.initial_location_reset()
+        robot.initial_location_reset()
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
         #robot.pipe_rescue(15)
