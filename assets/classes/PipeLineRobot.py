@@ -49,7 +49,7 @@ class PipeLineRobot:
         # self.infrared_sensors = {"frontal": ev3.InfraredSensor('in3'), "side": ev3.InfraredSensor('in4'), "back": ev3.InfraredSensor('in1')}
 
         # define motors
-        self.motors = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outC'))
+        self.motors = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outD'))
         self.motors.left.polarity = "inversed"
         self.motors.right.polarity = "inversed"
 
@@ -180,32 +180,58 @@ class PipeLineRobot:
             self.handler.left.run_forever(speed_sp=vel)
         self.handler.left.stop()
 
+    # def pipeline_support_following(self):
+    #     default_speed = 350
+    #     pid = PID(12, 0, 2, setpoint=4)
+    #     side_k_to_rotate = 15
+    #     front_k_to_rotate = 5
+    #     rotation_speed = 40
+    #
+    #     speed_a = 0
+    #     speed_b = 0
+    #
+    #     while True:
+    #         side_distance = self.infrared_sensors['side'].value()
+    #         front_distance = self.infrared_sensors['frontal'].value()
+    #         control = pid(side_distance)
+    #
+    #         if side_distance > side_k_to_rotate:
+    #             self.stop_motors()
+    #             self.move_timed(0.9, speed=-500)
+    #             self.rotate(-80, axis="own", speed=90)
+    #
+    #         if front_distance < front_k_to_rotate:
+    #             self.stop_motors()
+    #             self.rotate(80, axis="own", speed=90)
+    #
+    #         speed_a = control - default_speed
+    #         speed_b = -control - default_speed
+    #
+    #         if speed_a >= 1000:
+    #             speed_a = 1000
+    #         elif speed_a <= -1000:
+    #             speed_a = -1000
+    #
+    #         if speed_b >= 1000:
+    #             speed_b = 1000
+    #         elif speed_b <= -1000:
+    #             speed_b = -1000
+    #
+    #         self.motors.left.run_forever(speed_sp=speed_a)
+    #         self.motors.right.run_forever(speed_sp=speed_b)
+
     def pipeline_support_following(self):
         default_speed = 350
+        max_speed = 1000
+        min_speed = -1000
         pid = PID(12, 0, 2, setpoint=4)
-        side_k_to_rotate = 15
-        front_k_to_rotate = 5
-        rotation_speed = 40
-
-        speed_a = 0
-        speed_b = 0
 
         while True:
             side_distance = self.infrared_sensors['side'].value()
             front_distance = self.infrared_sensors['frontal'].value()
             control = pid(side_distance)
 
-            if side_distance > side_k_to_rotate:
-                self.stop_motors()
-                self.move_timed(0.9, speed=-500)
-                self.rotate(-80, axis="own", speed=90)
 
-            if front_distance < front_k_to_rotate:
-                self.stop_motors()
-                self.rotate(80, axis="own", speed=90)
-
-            speed_a = control - default_speed
-            speed_b = -control - default_speed
 
             if speed_a >= 1000:
                 speed_a = 1000
@@ -217,7 +243,7 @@ class PipeLineRobot:
             elif speed_b <= -1000:
                 speed_b = -1000
 
-            self.motors.left.run_forever(speed_sp=speed_a)
+            self.motors.left.run_forever(speed_sp=default_speed)
             self.motors.right.run_forever(speed_sp=speed_b)
 
     def initial_location_reset(self):
@@ -237,32 +263,52 @@ class PipeLineRobot:
                 print("Black detected, checking the matter of info")
                 self.stop_motors()
 
-                self.move_timed(0.13, speed=50)
+                self.move_timed(0.2, speed=300)
 
                 color_data = self.get_sensor_data("ColorSensor")
 
                 if color_data[0] in possible_colors_after_black or color_data[1] in possible_colors_after_black:
                     print("The black detected is reliable")
-                    if color_data[0] in possible_colors_after_black:
-                        while self.get_sensor_data("ColorSensor")[0] != "Black":
-                            self.motors.left.run_forever(speed_sp=-100)
-                        self.motors.left.stop()
+                    print(color_data)
+                    if color_data[0] != color_data[1]:
+                        print("Oposite sensor data")
+                        if color_data[0] in possible_colors_after_black:
+                            while self.get_sensor_data("ColorSensor")[0] != "Black":
+                                self.motors.left.run_forever(speed_sp=-100)
+                            self.motors.left.stop()
 
-                        while self.get_sensor_data("ColorSensor")[1] != "Black":
-                            self.motors.right.run_forever(speed_sp=100)
-                        self.motors.right.stop()
+                            while self.get_sensor_data("ColorSensor")[1] != "Black":
+                                self.motors.right.run_forever(speed_sp=100)
+                            self.motors.right.stop()
 
-                    elif color_data[1] in possible_colors_after_black:
-                        while self.get_sensor_data("ColorSensor")[1] != "Black":
-                            self.motors.right.run_forever(speed_sp=-100)
-                        self.motors.right.stop()
+                        elif color_data[1] in possible_colors_after_black:
+                            while self.get_sensor_data("ColorSensor")[1] != "Black":
+                                self.motors.right.run_forever(speed_sp=-100)
+                            self.motors.right.stop()
 
-                        while self.get_sensor_data("ColorSensor")[0] != "Black":
-                            self.motors.left.run_forever(speed_sp=100)
-                        self.motors.left.stop()
+                            while self.get_sensor_data("ColorSensor")[0] != "Black":
+                                self.motors.left.run_forever(speed_sp=100)
+                            self.motors.left.stop()
 
-                    self.color_alignment()
-                    self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
+                        self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
+
+                    elif color_data[0] == color_data[1]:
+                        if color_data[0] == "Black":
+                            print("Equals black")
+                            self.color_alignment()
+                            self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
+                        else:
+                            print("Equals other")
+                            while self.get_sensor_data("ColorSensor")[0] != "Black":
+                                self.motors.left.run_forever(speed_sp=-100)
+                            self.motors.left.stop()
+
+                            while self.get_sensor_data("ColorSensor")[1] != "Black":
+                                self.motors.right.run_forever(speed_sp=-100)
+                            self.motors.right.stop()
+
+                            self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
+
 
                 else:  # the color did change to a undesired color after a little walk
                     print("Not reliable sensor info")
