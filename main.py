@@ -33,7 +33,7 @@ def on_message(client, userdata, message):
     robot.ultrasonic_sensors['left'] = payload[0]
     robot.ultrasonic_sensors['right'] = payload[1]
     robot.infrared_sensors['front'] = payload[2]
-    robot.infrared_sensors['right'] = payload[3]
+    robot.infrared_sensors['left'] = payload[3]
     #print(payload)
 
 
@@ -47,7 +47,7 @@ server.client.on_message = on_message
 
 server.client.loop_start()
 
-# 51 lateral
+# 51 lateral]
 # 110 frente
 
 def main():

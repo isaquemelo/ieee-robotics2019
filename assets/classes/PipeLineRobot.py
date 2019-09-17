@@ -279,7 +279,7 @@ class PipeLineRobot:
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
 
-        setpoint = 30
+        bord_dist_expected = 30
         default_speed = 200
         max_value = 400
         min_value = -400
@@ -288,7 +288,7 @@ class PipeLineRobot:
         while True:
             color_data = self.get_sensor_data("ColorSensor")
             left_dist = self.get_sensor_data("InfraredSensor")[0]
-            control = left_bord_pid(left_dist - setpoint)
+            control = left_bord_pid(bord_dist_expected - left_dist)
 
             if color_data[0] == "Green" and color_data[1] == "Green":
                 self.stop_motors()
@@ -329,10 +329,6 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor", ColorSensorMode="REF-RAW")
         self.stop_motors()
 
-        while color_data[0] > 520:
-            self.motors.right.run_forever(speed_sp=-speed)
-            color_data = self.get_sensor_data("ColorSensor", ColorSensorMode="REF-RAW")
-        self.stop_motors()
 
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
@@ -347,62 +343,82 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor")
 
             if color_data[0] == "Black" or color_data[1] == "Black":
-                """
-                remember it may happen that the black we found here its ont the black we were expecting
-                 (in case the black_line), it means it may need a verification 
-                """
+                print("blazada")
                 self.stop_motors()
-                self.adjust_before_black_line_flw()
-                self.black_line_following()
-                self.adjust_corner_to_go_green()
-                self.go_for_green()
-                return
+                self.color_alignment()
+                self.move_timed(0.8, direction="backwards", speed=inner_speed)
+                self.rotate(180, speed=2*rotation_speed)
+                while True:
+                    self.motors.left.run_forever(speed_sp=inner_speed)
+                    self.motors.right.run_forever(speed_sp=inner_speed)
+                    color_data = self.get_sensor_data("ColorSensor")
+                    if "Green" in color_data:
+                        self.color_alignment()
+                        self.move_timed(0.5, direction="forward", speed=inner_speed)
+                        self.underground_position_reset()
+                        break
 
+                        #while self.get_sensor_data("ColorSensor")
 
             elif color_data[0] == "Green" or color_data[1] == "Green":
-                self.color_alignment()
-                self.rotate(180, speed=rotation_speed)
+                print("verdezada")
+                self.stop_motors()
+                self.underground_position_reset()
+                self.color_alignment("Green")
 
+            elif self.get_sensor_data("InfraredSensor")[2] > 70:
+                print("suicidiozada")
                 while True:
+                    self.motors.left.run_forever(speed_sp=inner_speed)
+                    self.motors.right.run_forever(speed_sp=inner_speed)
                     color_data = self.get_sensor_data("ColorSensor")
-                    self.motors.left.run_forever(speed_sp=inner_speed - 150)
-                    self.motors.right.run_forever(speed_sp=inner_speed - 150)
-
-                    if color_data[0] == "Black" or color_data[1] == "Black":
-                        possible_colors_after_black = ["Red", "Blue", "Yellow"]
-                        print("Black detected, checking the matter of info")
-                        self.stop_motors()
-
-                        #self.move_timed(0.13, speed=50)
-
-                        color_data = self.get_sensor_data("ColorSensor")
-
-                        #if color_data[0] in possible_colors_after_black or color_data[1] in possible_colors_after_black:
-                        print("The black detected is reliable")
-                        if color_data[0] in possible_colors_after_black:
-                            while self.get_sensor_data("ColorSensor")[0] != "Black":
-                                self.motors.left.run_forever(speed_sp=-100)
-                            self.motors.left.stop()
-
-                            while self.get_sensor_data("ColorSensor")[1] != "Black":
-                                self.motors.right.run_forever(speed_sp=100)
-                            self.motors.right.stop()
-
-                        elif color_data[1] in possible_colors_after_black:
-                            while self.get_sensor_data("ColorSensor")[1] != "Black":
-                                self.motors.right.run_forever(speed_sp=-100)
-                            self.motors.right.stop()
-
-                            while self.get_sensor_data("ColorSensor")[0] != "Black":
-                                self.motors.left.run_forever(speed_sp=100)
-                            self.motors.left.stop()
-
+                    if "Undefined" in color_data:
+                        print("Undefined encontrado")
                         self.color_alignment()
-                        self.black_line_routine(inner_speed=inner_speed, rotation_speed=rotation_speed)
+                        self.move_timed(0.4, speed=inner_speed, direction="backwards")
+                        self.rotate(80, speed=rotation_speed)
 
-                        # else:  # the color did change to a undesired color after a little walk
-                        #     print("Not reliable sensor info")
-                        #     continue
+                        biggest = 0
+                        while True:
+                            color_data = self.get_sensor_data("ColorSensor")
+                            self.motors.left.run_forever(speed_sp=150)
+                            self.motors.right.run_forever(speed_sp=150)
+
+                            if "Black" in color_data:
+                                self.stop_motors()
+                                print("Lado direito!")
+                                #self.adjust_before_black_line_flw()
+                                self.color_alignment()
+                                self.move_timed(0.8, direction="backwards", speed=inner_speed)
+                                self.rotate(160, speed=rotation_speed)
+
+                                while True:
+                                    color_data = self.get_sensor_data("ColorSensor")
+
+                                    if "Green" in color_data:
+                                        self.color_alignment()
+                                        self.underground_position_reset(side="left")
+                                        break
+
+                                    self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
+                                    self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
+
+                            elif "Green" in color_data:
+                                self.stop_motors()
+                                print("Lado esquerdo!")
+                                # if biggest > 35:
+                                self.underground_position_reset(side="left")
+
+                                # else:
+                                #     self.underground_position_reset(side="right")
+
+
+
+
+
+
+
+
             self.motors.left.run_forever(speed_sp=200)
             self.motors.right.run_forever(speed_sp=200)
     # anda frente -> procura cor (verde, preto, undefined)
@@ -579,47 +595,7 @@ class PipeLineRobot:
         pass
 
     def pipe_rescue(self, size):
-        # step size
-        if size == 20:
-            step_size = 6
-            hw_many_cycles = 10
-        elif size == 15:
-            step_size = 3
-            hw_many_cycles = 20
-        elif size == 10:
-            step_size = 1
-            hw_many_cycles = 55
-
-        # data for debugging
-        sensor_data = [[], []]
-        value_index = 300
-        value_minor = 30000
-
-        cycles = 0
-        while True:
-            self.move_metered(cm=step_size, speed=-DEFAULT_SPEED)
-            sensor_values = (self.infrared_sensors['left'].value(), self.ultrasonic_sensors['right'].value())
-
-            sensor_data[0].append(sensor_values[0])
-            sensor_data[1].append(sensor_values[1])
-
-            cycles += 1
-
-            if (sensor_values[0] + sensor_values[1]) < value_minor:
-                value_minor = sensor_values[0] + sensor_values[1]
-                value_index = cycles
-
-            if cycles >= hw_many_cycles:
-                break
-
-        counter = 0
-
-        while counter <= hw_many_cycles - value_index:
-            self.move_metered(cm=-step_size, speed=-DEFAULT_SPEED)
-            counter += 1
-
-#         # print(sensor_data)
-        self.rotate(-90)
+        pass
 
     def get_in_position_to_grab_pipe(self):
         # get close to the pipe with PID
@@ -670,10 +646,9 @@ class PipeLineRobot:
     def anti_falling(self):
         pass
 
-
     def color_alignment(self, color="White"):
         self.stop_motors()
-        print("trying to alignment with ", color, " at speed ", -200)
+        # print("trying to alignment with ", color, " at speed ", -200)
 
         color_data = self.get_sensor_data("ColorSensor")
         while not (color_data[0] == color and color_data[1] == color):
@@ -690,11 +665,16 @@ class PipeLineRobot:
                     self.motors.left.run_forever(speed_sp=-200)
                 self.motors.left.stop()
 
-            if color_data[0] == color_data[1] and color_data[0] != color:
-                self.move_timed(0.2, direction="backwards", speed=200)
-                continue
+            if color_data[0] == color_data[1] and color_data[1] != color:
+                while color_data[0] != color:
+                    color_data = self.get_sensor_data("ColorSensor")
+                    self.motors.left.run_forever(speed_sp=-200)
+                self.motors.left.stop()
 
-            self.move_timed(0.2, direction="backwards", speed=200)
+                while color_data[1] != color:
+                    color_data = self.get_sensor_data("ColorSensor")
+                    self.motors.right.run_forever(speed_sp=-200)
+                self.motors.left.stop()
 
     def pid_alignment(self):
         pass
@@ -704,3 +684,18 @@ class PipeLineRobot:
 
     def gap_measurement(self):
         pass
+
+    def underground_position_reset(self, side="left"):
+        self.stop_motors()
+        self.move_timed(how_long=0.5)
+
+        color_data = self.get_sensor_data("ColorSensor")
+        while "Blue" not in color_data:
+            self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
+            self.motors.left .run_forever(speed_sp=DEFAULT_SPEED)
+            color_data = self.get_sensor_data("ColorSensor")
+
+        print("Fim underground")
+        self.stop_motors()
+        return
+
