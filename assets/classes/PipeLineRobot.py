@@ -31,7 +31,6 @@ class PipeLineRobot:
         self.reset_gyroscope()
         self.gyro_value = 0
 
-
         self.color_sensors = (ev3.ColorSensor('in1'), ev3.ColorSensor('in4'))
         self.dict_colors = {
             0: 'Undefined',
@@ -55,6 +54,7 @@ class PipeLineRobot:
         self.motors.right.polarity = "inversed"
 
         self.handler = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outA'))
+        self.handler.left.run_forever(speed_sp=-150)
 
         # define status
         self.historic = [""]
@@ -343,7 +343,7 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor")
 
             if color_data[0] == "Black" or color_data[1] == "Black":
-                print("blazada")
+                print("blackzada")
                 self.stop_motors()
                 self.color_alignment()
                 self.move_timed(0.8, direction="backwards", speed=inner_speed)
@@ -382,7 +382,7 @@ class PipeLineRobot:
                     self.motors.right.run_forever(speed_sp=200)
                     color_data = self.get_sensor_data("ColorSensor")
                     if "Undefined" in color_data:
-                        print("Undefined encontrado")
+                        print("Found undefined")
                         self.color_alignment()
                         self.move_timed(0.4, speed=inner_speed, direction="backwards")
                         self.rotate(80, speed=rotation_speed)
@@ -418,7 +418,7 @@ class PipeLineRobot:
 
                             if "Black" in color_data and upper_dist < 50:
                                 self.stop_motors()
-                                print("Lado direito!")
+                                print("Right side!")
                                 self.adjust_before_black_line_flw()
                                 #self.color_alignment()
                                 self.move_timed(0.8, direction="backwards", speed=inner_speed)
@@ -437,7 +437,7 @@ class PipeLineRobot:
 
                             elif "Green" in color_data and upper_dist > 50:
                                 self.stop_motors()
-                                print("Lado esquerdo!")
+                                print("Left side!")
                                 # if biggest > 35:
                                 self.underground_position_reset(side="left")
                                 return
@@ -776,7 +776,15 @@ class PipeLineRobot:
             self.stop_motors()
         print("Fim underground")
 
+    def avoid_collision(self):
+        if self.get_sensor_data("InfraredSensor")[1] < 40:
+            possible_options = ["left", "right "]
 
+            color_data = self.get_sensor_data("ColorSensor")
+            while True:
+                color_data = self.get_sensor_data("ColorSensor")
+                self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
+                self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
 
-
-
+                if "Undefined" in color_data:
+                    pass

@@ -56,7 +56,6 @@ def main():
         #robot.pipeline_support_following()
         #robot.black_line_following()
         robot.initial_location_reset()
-
         #robot.underground_position_reset(side="right")
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
@@ -78,6 +77,7 @@ def main():
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()
+        robot.handler.left.stop()
         robot.motors.alternative.stop()
 
         server.client.loop_stop()
@@ -92,6 +92,7 @@ except KeyboardInterrupt:
     print(Exception)
     robot.motors.right.stop()
     robot.motors.left.stop()
+    robot.handler.left.stop()
     robot.motors.alternative.stop()
 
     server.client.loop_stop()
