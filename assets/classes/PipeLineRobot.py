@@ -80,7 +80,7 @@ class PipeLineRobot:
         self.infrared_sensors['left'] = payload[3]
         # print(payload)
 
-    def on_connect(client, userdata, flags, rc):
+    def on_connect(self, client, userdata, flags, rc):
         print("The robots are connected with result code", str(rc))
         client.subscribe("topic/sensors")
 
@@ -249,10 +249,12 @@ class PipeLineRobot:
         default_speed = 350
         max_speed = 1000
         min_speed = -1000
-        pid = PID(12, 0, 2, setpoint=4)
+        set = None
+        expected_dist = None
+        pid = PID(12, 0, 6, setpoint=2)
 
         side_k_to_rotate = 20
-        front_k_to_rotate = 5
+        front_k_to_rotate = 10
         rotation_speed = 40
 
         speed_a = 0
@@ -260,20 +262,25 @@ class PipeLineRobot:
 
 
         while True:
-            side_distance = self.infrared_sensors['right']
+            side_distance = self.infrared_sensors['left']
             front_distance = self.infrared_sensors['front']
             control = pid(side_distance)
 
-
             print(side_distance, front_distance)
+            print("control = ", control)
 
-            if side_distance > side_k_to_rotate:
-                self.stop_motors()
-                self.move_timed(0.9, speed=500)
-                self.rotate(-80, axis="own", speed=90)
+            # if side_distance > side_k_to_rotate and front_distance > front_k_to_rotate:
+            #     self.stop_motors()
+            #     print("rotating cause it found big side dist")
+            #     ev3.Sound.beep().wait()
+            #     self.move_timed(0.9, speed=500)
+            #     self.rotate(-80, axis="own", speed=90)
 
             if front_distance < front_k_to_rotate:
                 self.stop_motors()
+                print("rotating cause it found small front dist")
+                ev3.Sound.beep().wait()
+                self.move_timed(how_long=0.3, direction="backwards")
                 self.rotate(80, axis="own", speed=90)
 
             speed_a = default_speed + control
@@ -290,7 +297,7 @@ class PipeLineRobot:
             elif speed_b <= -1000:
                 speed_b = -1000
 
-            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.left.run_forever(speed_sp=speed_a)
             self.motors.right.run_forever(speed_sp=speed_b)
 
     def adjust_corner_to_go_green(self):

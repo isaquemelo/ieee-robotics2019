@@ -25,13 +25,13 @@ def main():
         #robot.rotate(80, axis="own", speed=90)
         #robot.pipeline_support_following()
         #robot.black_line_following()
-        robot.initial_location_reset()
+        # robot.initial_location_reset()
         #robot.underground_position_reset(side="right")
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
         #robot.pipe_rescue(15)
 
-        #robot.pipeline_support_following()
+        robot.pipeline_support_following()
         #robot.get_in_position_to_grab_pipe()
             #time.sleep(8)
             # break
