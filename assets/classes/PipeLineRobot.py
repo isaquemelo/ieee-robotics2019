@@ -8,6 +8,8 @@ from simple_pid import PID
 import time
 
 from calibrated_consts import black_line_following
+import paho.mqtt.client as mqtt
+from struct import *
 
 DEFAULT_SPEED = 400
 
@@ -44,8 +46,6 @@ class PipeLineRobot:
         }
 
         self.ultrasonic_sensors = {"right": 10, "left": 10}
-        # "front-right": ev3.UltrasonicSensor('in4'), "front-left": ev3.UltrasonicSensor('in3')}
-
         self.infrared_sensors = {"diagonal_top": ev3.InfraredSensor('in3'), "left": 10, "front": 10}
 
         # define motors
@@ -58,6 +58,31 @@ class PipeLineRobot:
 
         # define status
         self.historic = [""]
+
+        # watter server settings
+        self.has_pipe = False
+        self.current_pipe_size = 10  # [10, 15, 20]
+        self.status = "pipeRescue"  # [placingPipe, findingHole, waitingForMasterRescue, pipeTransfering, initialPositionReset]
+        self.server_ip = "172.169.0.254"
+        self.secondary_brick_ip = "10.42.0.3"
+        self.client = mqtt.Client()
+        self.client.connect(self.secondary_brick_ip, 1883, 60)
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
+        self.client.loop_start()
+
+    def on_message(self, client, userdata, message):
+        # print("info received")
+        payload = unpack("iiiid", message.payload)
+        self.ultrasonic_sensors['left'] = payload[0]
+        self.ultrasonic_sensors['right'] = payload[1]
+        self.infrared_sensors['front'] = payload[2]
+        self.infrared_sensors['left'] = payload[3]
+        # print(payload)
+
+    def on_connect(client, userdata, flags, rc):
+        print("The robots are connected with result code", str(rc))
+        client.subscribe("topic/sensors")
 
     def reset_gyroscope(self):
         self.gyroscope_sensor.mode = 'GYRO-RATE'
@@ -394,6 +419,7 @@ class PipeLineRobot:
                         default_speed = 300
                         set = 20
                         pid = PID(5, 0, 2, setpoint=-20)
+
 
                         while True:
 
