@@ -341,8 +341,9 @@ class PipeLineRobot:
         rotation_speed = 150  # > 50
         while True:
             color_data = self.get_sensor_data("ColorSensor")
+            # print((self.color_sensors[0].red, self.color_sensors[0].green, self.color_sensors[0].blue))
 
-            if color_data[0] == "Black" or color_data[1] == "Black":
+            if color_data[0] == "Black" or color_data[1] == "Black" and self.infrared_sensors['diagonal_top'] < 50:
                 print("blackzada")
                 self.stop_motors()
                 self.color_alignment()
@@ -354,9 +355,10 @@ class PipeLineRobot:
                     color_data = self.get_sensor_data("ColorSensor")
                     if "Green" in color_data:
                         #self.color_alignment()
-                        self.move_timed(0.3, direction="forward", speed=inner_speed)
+                        self.move_timed(0.6, direction="forward", speed=inner_speed)
+                        self.rotate(angle=140, speed=150)
                         self.underground_position_reset()
-                        break
+                        return
 
                         #while self.get_sensor_data("ColorSensor")
 
@@ -365,6 +367,7 @@ class PipeLineRobot:
                 self.stop_motors()
                 self.underground_position_reset()
                 self.color_alignment("Green")
+                break
 
             elif self.get_sensor_data("InfraredSensor")[2] > 70:
                 color_data = self.get_sensor_data("ColorSensor")
@@ -377,6 +380,7 @@ class PipeLineRobot:
                     self.rotate(angle=-20)
                     continue
                 print("Abismo")
+
                 while True:
                     self.motors.left.run_forever(speed_sp=200)
                     self.motors.right.run_forever(speed_sp=200)
@@ -390,7 +394,7 @@ class PipeLineRobot:
                         default_speed = 300
                         set = 20
                         pid = PID(5, 0, 2, setpoint=-20)
-                        print("got inside PId")
+
                         while True:
 
                             side_distance = self.get_sensor_data("InfraredSensor")[0]
@@ -398,51 +402,43 @@ class PipeLineRobot:
                             upper_dist = self.get_sensor_data("InfraredSensor")[2]
                             control = pid(set - side_distance)
 
-                            # print(side_distance, front_distance)
+                            print(color_data)
 
-                            speed_a = default_speed - control
-                            speed_b = default_speed + control
-
-                            if speed_a >= 1000:
-                                speed_a = 600
-                            elif speed_a <= -1000:
-                                speed_a = -600
-
-                            if speed_b >= 1000:
-                                speed_b = 600
-                            elif speed_b <= -1000:
-                                speed_b = -600
-
-                            self.motors.left.run_forever(speed_sp=speed_b)
-                            self.motors.right.run_forever(speed_sp=speed_a)
-
-                            if "Black" in color_data and upper_dist < 50:
+                            if "Black" in color_data and upper_dist < 45:
                                 self.stop_motors()
                                 print("Right side!")
-                                self.adjust_before_black_line_flw()
-                                #self.color_alignment()
+                                self.color_alignment()
+                                # self.color_alignment()
                                 self.move_timed(0.8, direction="backwards", speed=inner_speed)
                                 self.rotate(160, speed=rotation_speed)
 
                                 while True:
                                     color_data = self.get_sensor_data("ColorSensor")
 
-                                    if "Green" in color_data:
+                                    if "Green" in color_data and self.get_sensor_data("InfraredSensor")[2] > 55:
                                         self.color_alignment()
+                                        self.move_timed(0.8, direction="forward", speed=inner_speed)
+                                        self.rotate(160, speed=rotation_speed)
                                         self.underground_position_reset(side="right")
                                         return
 
                                     self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
                                     self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
 
-                            elif "Green" in color_data and upper_dist > 50:
+                            elif "Green" in color_data:
                                 self.stop_motors()
                                 print("Left side!")
-                                # if biggest > 35:
+                                self.move_timed(0.8, direction="forward", speed=inner_speed)
+                                self.rotate(-140, speed=150)
                                 self.underground_position_reset(side="left")
                                 return
                                 # else:
                                 #     self.underground_position_reset(side="right")
+
+
+
+                            self.motors.left.run_forever(speed_sp=inner_speed)
+                            self.motors.right.run_forever(speed_sp=inner_speed)
 
             self.motors.left.run_forever(speed_sp=250)
             self.motors.right.run_forever(speed_sp=250)
@@ -712,34 +708,78 @@ class PipeLineRobot:
 
     def underground_position_reset(self, side=None):
         self.stop_motors()
-        self.move_timed(how_long=0.5)
+        self.move_timed(how_long=0.5, direction="backwards")
 
         if side == "left":
+
             color_data = self.get_sensor_data("ColorSensor")
             while "Blue" not in color_data or "Black" not in color_data:
-                self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
-                self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
+                self.motors.right.run_forever(speed_sp=-DEFAULT_SPEED)
+                self.motors.left.run_forever(speed_sp=-DEFAULT_SPEED)
                 color_data = self.get_sensor_data("ColorSensor")
 
             print("Fim de while com blue || black")
             self.stop_motors()
-            self.move_timed(how_long=0.8, direction="forward", speed=DEFAULT_SPEED)
+            self.rotate(80, speed=DEFAULT_SPEED)
+
+            default_speed = 500
+            pid = PID(12, 0, 10, setpoint=15)
+            counter = 0
+
+            while True:
+                upper_dist = self.get_sensor_data("InfraredSensor")[2]
+                side_distance = self.get_sensor_data("InfraredSensor")[0]
+                control = pid(side_distance)
+
+                print("diagonal sensors", upper_dist)
+
+                if upper_dist >= 70:
+                    counter += 1
+                else:
+                    counter = 0
+
+                if counter > 8:
+                    break
+
+                speed_a = default_speed + control
+                speed_b = default_speed - control
+
+                if speed_a >= 1000:
+                    speed_a = 1000
+                elif speed_a <= -1000:
+                    speed_a = -1000
+
+                if speed_b >= 1000:
+                    speed_b = 1000
+                elif speed_b <= -1000:
+                    speed_b = -1000
+
+                self.motors.left.run_forever(speed_sp=speed_a)
+                self.motors.right.run_forever(speed_sp=speed_b)
+
+            self.stop_motors()
+
+
+
+            # self.move_timed(how_long=0.8, direction="forward", speed=DEFAULT_SPEED)
+            print("Fim underground")
             return
 
         else:
             color_data = self.get_sensor_data("ColorSensor")
-            self.move_timed(how_long=0.8, direction="forward", speed=DEFAULT_SPEED)
+            # self.move_timed(how_long=0.8, direction="forward", speed=DEFAULT_SPEED)
             while "Blue" not in color_data or "Black" not in color_data:
                 print("color_data = ", color_data)
-                self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
-                self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
+                self.motors.right.run_forever(speed_sp=-DEFAULT_SPEED)
+                self.motors.left.run_forever(speed_sp=-DEFAULT_SPEED)
                 color_data = self.get_sensor_data("ColorSensor")
 
-            self.color_alignment("Black")
+            #self.color_alignment("Black")
             self.stop_motors()
-            self.move_timed(how_long=0.8, direction="forward", speed=DEFAULT_SPEED)
+            self.rotate(80, speed=DEFAULT_SPEED)
 
-            self.rotate(angle=-80)
+            # self.move_timed(how_long=0.8, direction="forward", speed=DEFAULT_SPEED)
+            # self.rotate(angle=-80)
             upper_dist = self.get_sensor_data("InfraredSensor")[2]
 
             default_speed = 500
@@ -749,10 +789,9 @@ class PipeLineRobot:
             while counter < 10:
                 upper_dist = self.get_sensor_data("InfraredSensor")[2]
                 side_distance = self.get_sensor_data("InfraredSensor")[0]
-                front_distance = self.get_sensor_data("InfraredSensor")[1]
                 control = pid(side_distance)
 
-                #print(side_distance, front_distance)
+                print("diagonal sensors", upper_dist)
 
                 if upper_dist >= 60:
                     counter += 1
@@ -774,7 +813,9 @@ class PipeLineRobot:
                 self.motors.right.run_forever(speed_sp=speed_b)
 
             self.stop_motors()
-        print("Fim underground")
+            print("Fim underground")
+            return
+
 
     def avoid_collision(self):
         if self.get_sensor_data("InfraredSensor")[1] < 40:
