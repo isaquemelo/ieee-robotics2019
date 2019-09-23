@@ -246,6 +246,7 @@ class PipeLineRobot:
     #         self.motors.right.run_forever(speed_sp=speed_b)
 
     def pipeline_support_following(self):
+        print("called pipeline_support_following")
         default_speed = 350
         max_speed = 1000
         min_speed = -1000
@@ -264,17 +265,16 @@ class PipeLineRobot:
         while True:
             side_distance = self.infrared_sensors['left']
             front_distance = self.infrared_sensors['front']
+            upper_dist = self.infrared_sensors['diagonal_top'].value()
             control = pid(side_distance)
 
-            print(side_distance, front_distance)
-            print("control = ", control)
+            # print(side_distance, front_distance)
+            # print("control = ", control)
 
-            # if side_distance > side_k_to_rotate and front_distance > front_k_to_rotate:
-            #     self.stop_motors()
-            #     print("rotating cause it found big side dist")
-            #     ev3.Sound.beep().wait()
-            #     self.move_timed(0.9, speed=500)
-            #     self.rotate(-80, axis="own", speed=90)
+            if upper_dist > 70:
+                self.stop_motors()
+                ev3.Sound.beep()
+                print("finished pipeline_support_following couse found the edge")
 
             if front_distance < front_k_to_rotate:
                 self.stop_motors()
