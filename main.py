@@ -31,7 +31,7 @@ def main():
         #     print(robot.get_sensor_data("ColorSensor"))
         #robot.pipe_rescue(15)
 
-        robot.pipeline_support_following()
+        robot.initial_location_reset()
         #robot.get_in_position_to_grab_pipe()
             #time.sleep(8)
             # break

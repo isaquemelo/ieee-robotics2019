@@ -263,9 +263,9 @@ class PipeLineRobot:
 
 
         while True:
-            side_distance = self.infrared_sensors['left']
-            front_distance = self.infrared_sensors['front']
-            upper_dist = self.infrared_sensors['diagonal_top'].value()
+            side_distance = self.get_sensor_data("InfraredSensor")[0]
+            front_distance = self.get_sensor_data("InfraredSensor")[1]
+            upper_dist = self.get_sensor_data("InfraredSensor")[2]
             control = pid(side_distance)
 
             # print(side_distance, front_distance)
@@ -373,9 +373,19 @@ class PipeLineRobot:
         rotation_speed = 150  # > 50
         while True:
             color_data = self.get_sensor_data("ColorSensor")
+            front_dist = self.get_sensor_data("InfraredSensor")[1]
+            upper_dist = self.get_sensor_data("InfraredSensor")[2]
             # print((self.color_sensors[0].red, self.color_sensors[0].green, self.color_sensors[0].blue))
 
-            if color_data[0] == "Black" or color_data[1] == "Black" and self.infrared_sensors['diagonal_top'] < 50:
+            if front_dist < 30:
+                self.stop_motors()
+                print("found robot")
+                ev3.Sound.beep()
+                #if upper_dist < 40:
+                self.rotate(-80)
+
+
+            if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist < 50:
                 print("blackzada")
                 self.stop_motors()
                 self.color_alignment()
@@ -417,6 +427,10 @@ class PipeLineRobot:
                     self.motors.left.run_forever(speed_sp=200)
                     self.motors.right.run_forever(speed_sp=200)
                     color_data = self.get_sensor_data("ColorSensor")
+
+                    upper_dist = self.get_sensor_data("InfraredSensor")[2]
+                    print(upper_dist)
+
                     if "Undefined" in color_data:
                         print("Found undefined")
                         self.color_alignment()
@@ -802,7 +816,7 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor")
             # self.move_timed(how_long=0.8, direction="forward", speed=DEFAULT_SPEED)
             while "Blue" not in color_data or "Black" not in color_data:
-                print("color_data = ", color_data)
+                # print("color_data = ", color_data)
                 self.motors.right.run_forever(speed_sp=-DEFAULT_SPEED)
                 self.motors.left.run_forever(speed_sp=-DEFAULT_SPEED)
                 color_data = self.get_sensor_data("ColorSensor")
