@@ -44,6 +44,7 @@ def main():
             #     robot.stop_motors()
             #     break
 
+        robot.handler.left.stop()
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()
