@@ -42,11 +42,11 @@ class PipeLineRobot:
             4: 'Yellow',
             5: 'Red',
             6: 'White',
-            7: 'Brown'
+            7: 'Black'
         }
 
-        self.ultrasonic_sensors = {"bottom": 10, "left": 10}
-        self.infrared_sensors = {"diagonal_top": ev3.InfraredSensor('in3'), "right": 50, "left": 50}
+        self.ultrasonic_sensors = {"bottom": 2550, "left": 2550}
+        self.infrared_sensors = {"diagonal_top": ev3.InfraredSensor('in3'), "right": 50, "left": 50, "frontal": 100}
 
         # define motors
         self.motors = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outD'))
@@ -74,7 +74,7 @@ class PipeLineRobot:
     def on_message(self, client, userdata, message):
         # print("info received")
         payload = unpack("iiiid", message.payload)
-        self.ultrasonic_sensors['bottom'] = payload[0]
+        self.infrared_sensors['frontal'] = payload[0]
         self.ultrasonic_sensors['left'] = payload[1]
         self.infrared_sensors['left'] = payload[2]
         self.infrared_sensors['right'] = payload[3]
@@ -255,7 +255,7 @@ class PipeLineRobot:
         pid = PID(12, 0, 6, setpoint=2)
 
         side_k_to_rotate = 20
-        front_k_to_rotate = 10
+        front_k_to_rotate = 5
         rotation_speed = 40
 
         speed_a = 0
@@ -264,11 +264,11 @@ class PipeLineRobot:
 
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
-            front_distance = self.get_sensor_data("InfraredSensor")[1]
+            front_distance = self.get_sensor_data("Ultrasonic")[1]
             upper_dist = self.get_sensor_data("InfraredSensor")[2]
             control = pid(side_distance)
 
-            # print(side_distance, front_distance)
+            print(side_distance, front_distance)
             # print("control = ", control)
 
             if upper_dist > 70:
@@ -280,7 +280,7 @@ class PipeLineRobot:
                 self.stop_motors()
                 print("rotating cause it found small front dist")
                 ev3.Sound.beep().wait()
-                self.move_timed(how_long=0.3, direction="backwards")
+                # self.move_timed(how_long=0.3, direction="backwards")
                 self.rotate(80, axis="own", speed=90)
 
             speed_a = default_speed + control
@@ -367,28 +367,29 @@ class PipeLineRobot:
         return
 
     def initial_location_reset(self):
+        k = -1
         self.stop_motors()
 
         inner_speed = 400  # > 150
         rotation_speed = 150  # > 50
         while True:
             color_data = self.get_sensor_data("ColorSensor")
-            front_dist = self.get_sensor_data("InfraredSensor")[1]
+            front_dist = self.infrared_sensors['frontal']
             upper_dist = self.get_sensor_data("InfraredSensor")[2]
             # print((self.color_sensors[0].red, self.color_sensors[0].green, self.color_sensors[0].blue))
 
-            if front_dist < 30:
+            print(front_dist, upper_dist)
+            if front_dist < 25:
                 self.stop_motors()
                 print("found robot")
                 ev3.Sound.beep()
-                #if upper_dist < 40:
-                self.rotate(-80)
-
+                self.rotate(80 * k)
+                k = k * -1
 
             if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist < 50:
                 print("blackzada")
                 self.stop_motors()
-                self.color_alignment() # talvez tenha que alinhar com o black
+                self.color_alignment()  # talvez tenha que alinhar com o black
                 self.move_timed(0.8, direction="backwards", speed=inner_speed)
                 self.rotate(180, speed=2*rotation_speed)
                 while True:
@@ -399,7 +400,7 @@ class PipeLineRobot:
                         self.stop_motors()
                         #self.color_alignment()  # talvez alinhar com o verde
                         self.move_timed(0.6, direction="forward", speed=inner_speed)
-                        self.rotate(angle=140, speed=150)
+                        self.rotate(angle=180, speed=150)
                         self.underground_position_reset()
                         return
 
@@ -415,8 +416,9 @@ class PipeLineRobot:
                 # self.color_alignment("Green")
                 return
 
-            elif self.get_sensor_data("InfraredSensor")[2] > 70:
+            elif self.get_sensor_data("InfraredSensor")[2] >= 55:
                 color_data = self.get_sensor_data("ColorSensor")
+
                 if color_data[0] == "Black":
                     self.stop_motors()
                     self.rotate(angle=20)
@@ -425,21 +427,29 @@ class PipeLineRobot:
                     self.stop_motors()
                     self.rotate(angle=-20)
                     continue
+
                 print("Abismo")
 
                 while True:
-                    self.motors.left.run_forever(speed_sp=200)
-                    self.motors.right.run_forever(speed_sp=200)
+                    self.motors.left.run_forever(speed_sp=150)
+                    self.motors.right.run_forever(speed_sp=150)
                     color_data = self.get_sensor_data("ColorSensor")
 
                     upper_dist = self.get_sensor_data("InfraredSensor")[2]
                     print(upper_dist)
 
+                    if "Green" in color_data:
+                        print("Nao e abismo, me enganei")
+                        self.move_timed(0.5, direction="backwards")
+                        self.rotate(angle=180, speed=150)
+                        self.underground_position_reset()
+
                     if "Undefined" in color_data:
                         print("Found undefined")
                         self.color_alignment()
-                        self.move_timed(0.4, speed=inner_speed, direction="backwards")
+                        self.move_timed(0.7, speed=inner_speed, direction="backwards")
                         self.rotate(80, speed=rotation_speed)
+                        # time.sleep(1)
 
                         default_speed = 300
                         set = 20
@@ -452,14 +462,14 @@ class PipeLineRobot:
                             upper_dist = self.get_sensor_data("InfraredSensor")[2]
                             control = pid(set - side_distance)
 
-                            print(color_data)
+                            print(color_data, upper_dist)
 
-                            if "Black" in color_data and upper_dist < 45:
+                            if "Black" in color_data:
                                 self.stop_motors()
                                 print("Right side!")
                                 self.color_alignment()
                                 # self.color_alignment()
-                                self.move_timed(0.8, direction="backwards", speed=inner_speed)
+                                self.move_timed(0.5, direction="backwards", speed=inner_speed)
                                 self.rotate(160, speed=rotation_speed)
 
                                 while True:
@@ -467,7 +477,7 @@ class PipeLineRobot:
 
                                     if "Green" in color_data and self.get_sensor_data("InfraredSensor")[2] > 55:
                                         self.color_alignment()
-                                        self.move_timed(0.8, direction="forward", speed=inner_speed)
+                                        self.move_timed(0.8, direction="backwards", speed=inner_speed)
                                         self.rotate(160, speed=rotation_speed)
                                         self.underground_position_reset()
                                         return
@@ -478,8 +488,8 @@ class PipeLineRobot:
                             elif "Green" in color_data:
                                 self.stop_motors()
                                 print("Left side!")
-                                self.move_timed(0.8, direction="forward", speed=inner_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
-                                self.rotate(-140, speed=150)
+                                self.move_timed(1.4, direction="backwards", speed=rotation_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
+                                self.rotate(-160, speed=150)
                                 self.underground_position_reset()
                                 return
                                 # else:
@@ -487,8 +497,8 @@ class PipeLineRobot:
 
 
 
-                            self.motors.left.run_forever(speed_sp=inner_speed)
-                            self.motors.right.run_forever(speed_sp=inner_speed)
+                            self.motors.left.run_forever(speed_sp=200)
+                            self.motors.right.run_forever(speed_sp=200)
 
             self.motors.left.run_forever(speed_sp=250)
             self.motors.right.run_forever(speed_sp=250)
@@ -760,15 +770,27 @@ class PipeLineRobot:
         self.stop_motors()
         self.move_timed(how_long=0.5, direction="backwards")
 
-        color_data = self.get_sensor_data("ColorSensor")
-        while "Blue" not in color_data or "Black" not in color_data:
-            self.motors.right.run_forever(speed_sp=-DEFAULT_SPEED)
-            self.motors.left.run_forever(speed_sp=-DEFAULT_SPEED)
-            color_data = self.get_sensor_data("ColorSensor")
+        # while self.get_sensor_data("")
+
+        self.color_sensors[0].mode = "REF-RAW"
+        self.color_sensors[1].mode = "REF-RAW"
+
+        while self.color_sensors[0].value() < 600:
+            self.motors.right.run_forever(speed_sp=-800)
+            self.motors.left.run_forever(speed_sp=-800)
+
+
+        ev3.Sound.beep().wait()
+        self.move_timed(0.5, direction="backwards")
+
+        self.stop_motors()
+
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
 
         self.stop_motors()
         print("Fim de while com blue || black")
-        self.rotate(80, speed=DEFAULT_SPEED)  # talvez isso deveria ser -80 e não 80
+        self.rotate(80, speed=150)  # talvez isso deveria ser -80 e não 80
 
         default_speed = 500
         pid = PID(12, 0, 10, setpoint=15)
@@ -809,8 +831,6 @@ class PipeLineRobot:
         self.stop_motors()
         print("Fim underground")
 
-
-
     def avoid_collision(self):
         if self.get_sensor_data("InfraredSensor")[1] < 40:
             possible_options = ["left", "right "]
@@ -841,7 +861,6 @@ class PipeLineRobot:
             return
 
         return
-
 
     def sensors_verification(self):
         self.stop_motors()
