@@ -386,7 +386,7 @@ class PipeLineRobot:
                 self.rotate(80 * k)
                 k = k * -1
 
-            if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist < 50:
+            if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist < 30:
                 print("blackzada")
                 self.stop_motors()
                 self.color_alignment()  # talvez tenha que alinhar com o black
@@ -416,7 +416,7 @@ class PipeLineRobot:
                 # self.color_alignment("Green")
                 return
 
-            elif self.get_sensor_data("InfraredSensor")[2] >= 55:
+            elif self.get_sensor_data("InfraredSensor")[2] >= 50:
                 color_data = self.get_sensor_data("ColorSensor")
 
                 if color_data[0] == "Black":
@@ -464,7 +464,7 @@ class PipeLineRobot:
 
                             print(color_data, upper_dist)
 
-                            if "Black" in color_data:
+                            if "Black" in color_data and upper_dist < 45:
                                 self.stop_motors()
                                 print("Right side!")
                                 self.color_alignment()
@@ -475,7 +475,7 @@ class PipeLineRobot:
                                 while True:
                                     color_data = self.get_sensor_data("ColorSensor")
 
-                                    if "Green" in color_data and self.get_sensor_data("InfraredSensor")[2] > 55:
+                                    if "Green" in color_data and self.get_sensor_data("InfraredSensor")[2] > 27:
                                         self.color_alignment()
                                         self.move_timed(0.8, direction="backwards", speed=inner_speed)
                                         self.rotate(160, speed=rotation_speed)
@@ -803,12 +803,13 @@ class PipeLineRobot:
 
             print("diagonal sensors", upper_dist)
 
-            if upper_dist >= 70:
+            if upper_dist >= 40:
                 counter += 1
             else:
                 counter = 0
 
-            if counter > 8:
+            if counter > 1:
+
                 break
 
             speed_a = default_speed + control
