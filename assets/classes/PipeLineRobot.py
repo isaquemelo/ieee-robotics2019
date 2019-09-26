@@ -34,6 +34,8 @@ class PipeLineRobot:
         self.gyro_value = 0
 
         self.color_sensors = (ev3.ColorSensor('in1'), ev3.ColorSensor('in4'))
+        self.color_sensors[0].mode = "COL-COLOR"
+        self.color_sensors[1].mode = "COL-COLOR"
         self.dict_colors = {
             0: 'Undefined',
             1: 'Black',
@@ -54,7 +56,7 @@ class PipeLineRobot:
         self.motors.right.polarity = "inversed"
 
         self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outC'))
-        # self.handler.left.run_forever(speed_sp=-150)
+        self.handler.left.run_forever(speed_sp=-150)
 
         # define status
         self.historic = [""]
@@ -88,7 +90,7 @@ class PipeLineRobot:
         self.gyroscope_sensor.mode = 'GYRO-RATE'
         self.gyroscope_sensor.mode = 'GYRO-ANG'
 
-    def get_sensor_data(self, sensor_name, ColorSensorMode="COL-REFLECT"):
+    def get_sensor_data(self, sensor_name, ColorSensorMode="COL-COLOR"):
         # returns the value of a sensor
 
         if sensor_name == "InfraredSensor":
