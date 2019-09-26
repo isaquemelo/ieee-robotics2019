@@ -56,7 +56,7 @@ class PipeLineRobot:
         self.motors.right.polarity = "inversed"
 
         self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outC'))
-        self.handler.left.run_forever(speed_sp=-150)
+        # self.handler.left.run_forever(speed_sp=-150)
 
         # define status
         self.historic = [""]
@@ -385,12 +385,12 @@ class PipeLineRobot:
                 self.rotate(80 * k)
                 k = k * -1
 
-            if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist < 30:
+            if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist <= 42:
                 print("blackzada")
                 self.stop_motors()
                 self.color_alignment()  # talvez tenha que alinhar com o black
                 self.move_timed(0.8, direction="backwards", speed=inner_speed)
-                self.rotate(180, speed=2 * rotation_speed)
+                self.rotate(180, speed=rotation_speed)
                 while True:
 
                     color_data = self.get_sensor_data("ColorSensor")
@@ -417,8 +417,8 @@ class PipeLineRobot:
                     if "Green" in color_data:
                         self.stop_motors()
                         # self.color_alignment()  # talvez alinhar com o verde
-                        self.move_timed(0.6, direction="backwards", speed=inner_speed)
-                        self.rotate(angle=180, speed=150)
+                        # self.move_timed(0.6, direction="backwards", speed=inner_speed)
+                        # self.rotate(angle=180, speed=150)
                         self.underground_position_reset()
                         return
 
@@ -428,8 +428,8 @@ class PipeLineRobot:
                 print("verdezada")
                 self.stop_motors()
                 # talvez tenha que alinhar com o black
-                self.move_timed(0.5, direction="backwards")
-                self.rotate(angle=180, speed=150)
+                # self.move_timed(0.5, direction="backwards")
+                # self.rotate(angle=180, speed=150)
                 self.underground_position_reset()
                 # self.color_alignment("Green")
                 return
@@ -458,8 +458,8 @@ class PipeLineRobot:
 
                     if "Green" in color_data:
                         print("Nao e abismo, me enganei")
-                        self.move_timed(0.5, direction="backwards")
-                        self.rotate(angle=180, speed=150)
+                        # self.move_timed(0.5, direction="backwards")
+                        # self.rotate(angle=180, speed=150)
                         self.underground_position_reset()
 
                     if "Undefined" in color_data:
@@ -491,7 +491,7 @@ class PipeLineRobot:
                                 self.move_timed(0.9, direction="backwards")
                                 self.rotate(-20, speed=rotation_speed)
 
-                            if "Black" in color_data and upper_dist < 40:
+                            if "Black" in color_data and upper_dist <= 42:
                                 self.stop_motors()
                                 print("Right side!")
                                 self.color_alignment()
@@ -512,8 +512,8 @@ class PipeLineRobot:
 
                                     if "Green" in color_data and self.get_sensor_data("InfraredSensor")[2] > 27:
                                         self.color_alignment()
-                                        self.move_timed(0.8, direction="backwards", speed=inner_speed)
-                                        self.rotate(160, speed=rotation_speed)
+                                        # self.move_timed(0.8, direction="backwards", speed=inner_speed)
+                                        # self.rotate(160, speed=rotation_speed)
                                         self.underground_position_reset()
                                         return
 
@@ -523,9 +523,8 @@ class PipeLineRobot:
                             elif "Green" in color_data:
                                 self.stop_motors()
                                 print("Left side!")
-                                self.move_timed(1.4, direction="backwards",
-                                                speed=rotation_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
-                                self.rotate(-160, speed=150)
+                                # self.move_timed(1.4, direction="backwards", speed=rotation_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
+                                # self.rotate(-160, speed=150)
                                 self.underground_position_reset()
                                 return
                                 # else:
@@ -538,8 +537,8 @@ class PipeLineRobot:
                 print("verdezada")
                 self.stop_motors()
                 # talvez tenha que alinhar com o black
-                self.move_timed(0.5, direction="backwards")
-                self.rotate(angle=180, speed=150)
+                # self.move_timed(0.5, direction="backwards")
+                # self.rotate(angle=180, speed=150)
                 self.underground_position_reset()
                 # self.color_alignment("Green")
                 return
@@ -876,11 +875,12 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "REF-RAW"
 
         while self.color_sensors[0].value() < 600:
-            self.motors.right.run_forever(speed_sp=-800)
-            self.motors.left.run_forever(speed_sp=-800)
+            self.motors.right.run_forever(speed_sp=800)
+            self.motors.left.run_forever(speed_sp=800)
 
+        self.stop_motors()
         ev3.Sound.beep().wait()
-        self.move_timed(0.5, direction="backwards")
+        self.move_timed(0.7, direction="forward")
 
         self.stop_motors()
 
@@ -889,7 +889,7 @@ class PipeLineRobot:
 
         self.stop_motors()
         print("Fim de while com blue || black")
-        self.rotate(80, speed=150)  # talvez isso deveria ser -80 e não 80
+        self.rotate(-80, speed=150)  # talvez isso deveria ser -80 e não 80
 
         default_speed = 500
         pid = PID(12, 0, 10, setpoint=15)
