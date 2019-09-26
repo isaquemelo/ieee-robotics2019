@@ -54,7 +54,7 @@ class PipeLineRobot:
         self.motors.right.polarity = "inversed"
 
         self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outC'))
-        self.handler.left.run_forever(speed_sp=-150)
+        # self.handler.left.run_forever(speed_sp=-150)
 
         # define status
         self.historic = [""]
@@ -103,10 +103,10 @@ class PipeLineRobot:
 
         elif sensor_name == "Ultrasonic":
             # return self.ultrasonic_sensor.value() / 10
-            return [self.ultrasonic_sensors['left']/10, self.ultrasonic_sensors['bottom']/10]
+            return [self.ultrasonic_sensors['left'] / 10, self.ultrasonic_sensors['bottom'] / 10]
 
         elif sensor_name == "ColorSensor":
-            if ColorSensorMode == "REF-RAW":
+            if ColorSensorMode != "COL-COLOR":
                 return [self.color_sensors[0].value(), self.color_sensors[1].value()]
 
             return [self.dict_colors[self.color_sensors[0].color], self.dict_colors[self.color_sensors[1].color]]
@@ -128,7 +128,7 @@ class PipeLineRobot:
         self.reset_gyroscope()
 
         start_angle = self.gyroscope_sensor.value()
-#         # print("start_angle:", start_angle)
+        #         # print("start_angle:", start_angle)
         now_angle = start_angle
 
         self.stop_motors()
@@ -261,7 +261,6 @@ class PipeLineRobot:
         speed_a = 0
         speed_b = 0
 
-
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
             front_distance = self.get_sensor_data("Ultrasonic")[1]
@@ -285,7 +284,6 @@ class PipeLineRobot:
 
             speed_a = default_speed + control
             speed_b = default_speed - control
-
 
             if speed_a >= 1000:
                 speed_a = 1000
@@ -361,7 +359,6 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor", ColorSensorMode="REF-RAW")
         self.stop_motors()
 
-
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         return
@@ -391,7 +388,7 @@ class PipeLineRobot:
                 self.stop_motors()
                 self.color_alignment()  # talvez tenha que alinhar com o black
                 self.move_timed(0.8, direction="backwards", speed=inner_speed)
-                self.rotate(180, speed=2*rotation_speed)
+                self.rotate(180, speed=2 * rotation_speed)
                 while True:
 
                     color_data = self.get_sensor_data("ColorSensor")
@@ -417,13 +414,13 @@ class PipeLineRobot:
 
                     if "Green" in color_data:
                         self.stop_motors()
-                        #self.color_alignment()  # talvez alinhar com o verde
+                        # self.color_alignment()  # talvez alinhar com o verde
                         self.move_timed(0.6, direction="backwards", speed=inner_speed)
                         self.rotate(angle=180, speed=150)
                         self.underground_position_reset()
                         return
 
-                        #while self.get_sensor_data("ColorSensor")
+                        # while self.get_sensor_data("ColorSensor")
 
             elif color_data[0] == "Green" or color_data[1] == "Green":
                 print("verdezada")
@@ -524,14 +521,13 @@ class PipeLineRobot:
                             elif "Green" in color_data:
                                 self.stop_motors()
                                 print("Left side!")
-                                self.move_timed(1.4, direction="backwards", speed=rotation_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
+                                self.move_timed(1.4, direction="backwards",
+                                                speed=rotation_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
                                 self.rotate(-160, speed=150)
                                 self.underground_position_reset()
                                 return
                                 # else:
                                 #     self.underground_position_reset(side="right")
-
-
 
                             self.motors.left.run_forever(speed_sp=200)
                             self.motors.right.run_forever(speed_sp=200)
@@ -548,37 +544,38 @@ class PipeLineRobot:
 
             self.motors.left.run_forever(speed_sp=250)
             self.motors.right.run_forever(speed_sp=250)
+
     # anda frente -> procura cor (verde, preto, undefined)
-        # achou cor:
-        # alinha
+    # achou cor:
+    # alinha
 
-        # se ambos undefined:
-        # rezinha
-        # 90 graus
-        # anda frente ate achar cor
-        # achei verde: fim
+    # se ambos undefined:
+    # rezinha
+    # 90 graus
+    # anda frente ate achar cor
+    # achei verde: fim
 
-        # achei preto:
-        # alinha
-        # 90 graus
-        # pid linha preta undefined-undefined
-        # 90 graus
-        # pid undefined ate verde-verde
-        # se preto:
-        # 90 graus
-        # segue preto "PID"
-        # achar undefined:
-        # 90 graus
-        # PID undefined ate achar verde
+    # achei preto:
+    # alinha
+    # 90 graus
+    # pid linha preta undefined-undefined
+    # 90 graus
+    # pid undefined ate verde-verde
+    # se preto:
+    # 90 graus
+    # segue preto "PID"
+    # achar undefined:
+    # 90 graus
+    # PID undefined ate achar verde
 
-        # se verde:
-        # 180 graus
-        # anda ate preto
-        # alinha cor
-        # 90 graus
-        # pid ate undefined-undefined
-        # 90 graus
-        # pid undefined ate verde-verde
+    # se verde:
+    # 180 graus
+    # anda ate preto
+    # alinha cor
+    # 90 graus
+    # pid ate undefined-undefined
+    # 90 graus
+    # pid undefined ate verde-verde
 
     def black_line_routine(self, rotation_speed=150, inner_speed=400):
         self.move_timed(0.5, speed=80)
@@ -880,7 +877,6 @@ class PipeLineRobot:
             self.motors.right.run_forever(speed_sp=-800)
             self.motors.left.run_forever(speed_sp=-800)
 
-
         ev3.Sound.beep().wait()
         self.move_timed(0.5, direction="backwards")
 
@@ -935,7 +931,6 @@ class PipeLineRobot:
         self.stop_motors()
         print("Fim underground")
 
-
     def avoid_collision(self):
         if self.get_sensor_data("InfraredSensor")[1] < 40:
             possible_options = ["left", "right "]
@@ -981,3 +976,63 @@ class PipeLineRobot:
             print(color)
             print(gyro)
             time.sleep(2)
+
+    def black_line_flw(self):
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+        # white_value = 92
+        # black_value = 7
+        # white_black_value = 42
+        # default_speed = 200
+        # max_speed = 400
+        # min_speed = -max_speed
+        #
+        # pid = PID(2, 0, 1, setpoint=40)
+        #
+        # while True:
+        #     color_data = self.get_sensor_data("ColorSensor")
+        #     control = pid(white_black_value - color_data[0])
+        #
+        #     left_speed = default_speed - control
+        #     right_speed = default_speed + control
+        #
+        #     if left_speed > max_speed:
+        #         left_speed = max_speed
+        #     elif left_speed < min_speed:
+        #         left_speed = min_speed
+        #
+        #     if right_speed > max_speed:
+        #         right_speed = max_speed
+        #     elif right_speed < min_speed:
+        #         right_speed = min_speed
+        #
+        #     self.motors.left.run_forever(speed_sp=left_speed)
+        #     self.motors.right.run_forever(speed_sp=right_speed)
+
+        pid = PID(1.025, 0, 0.2, setpoint=39)
+        default = 300
+        max_speed_bound = 500
+        max_control = max_speed_bound - default
+        min_control = max_speed_bound + default
+
+        while True:
+            control = pid(int(self.get_sensor_data("ColorSensor", "C")[0]))
+            print(default - control, default + control)
+
+            speed_a = default + control
+            speed_b = default - control
+
+            if speed_a >= max_speed_bound:
+                speed_a = max_speed_bound
+
+            elif speed_a <= -max_speed_bound:
+                speed_a = -max_speed_bound
+
+            if speed_b >= max_speed_bound:
+                speed_b = max_speed_bound
+            elif speed_b <= -max_speed_bound:
+                speed_b = -max_speed_bound
+
+
+            self.motors.left.run_forever(speed_sp=speed_a)
+            self.motors.right.run_forever(speed_sp=speed_b)
