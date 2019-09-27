@@ -1043,64 +1043,6 @@ class PipeLineRobot:
         return
 
 
-    def meeting_area_initial_setting(self):
-        self.color_sensors[0].mode = "COL-REFLECT"
-        self.color_sensors[1].mode = "COL-REFLECT"
-        default_speed = 400
-        max_speed = 700
-        min_speed = -max_speed
-        expected_side_dist = 30
-        k_to_find_abyss_by_upper_dist = 30
-        k_to_find_green_slope_by_upper_dist = 150
-        # when the sensor upper dist its on the meeting area it finds around 13 preety mush never dibber than 15
-        k_when_sensor_sees_the_flat_ground_by_upper_dist = 15
-        k_min_white_reflect = 50
-
-        while True:
-            left_dist = self.get_sensor_data("InfraredSensor")[0]
-            right_dist = self.get_sensor_data("InfraredSensor")[1]
-            upper_dist = self.get_sensor_data("Ultrasonic")[1]
-            color_data = self.get_sensor_data("ColorSensor", "r")
-
-            # find abyss
-            if upper_dist >= k_to_find_abyss_by_upper_dist:
-                self.stop_motors()
-                ev3.Sound.beep()
-                if upper_dist >= k_to_find_green_slope_by_upper_dist:
-                    print("found green slope")
-                    continue
-                else:
-                    print("found abyss")
-                    continue
-
-            # find robot
-
-            # find black
-            if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
-                self.stop_motors()
-                ev3.Sound.beep()
-                self.alignment_for_meeting_area_initial_setting()
-                if upper_dist <= k_when_sensor_sees_the_flat_ground_by_upper_dist:
-                    print("found black line")
-                elif upper_dist > k_when_sensor_sees_the_flat_ground_by_upper_dist and \
-                    upper_dist < k_to_find_green_slope_by_upper_dist:
-                    print("found abyss")
-                elif upper_dist > k_when_sensor_sees_the_flat_ground_by_upper_dist and \
-                        upper_dist > k_to_find_green_slope_by_upper_dist:
-                    print("found green slope")
-                continue
-
-            if upper_dist < k_when_sensor_sees_the_flat_ground_by_upper_dist:
-                self.motors.left.run_forever(speed_sp=default_speed)
-                self.motors.right.run_forever(speed_sp=default_speed)
-            else:
-                self.motors.left.run_forever(speed_sp=default_speed / 2)
-                self.motors.right.run_forever(speed_sp=default_speed / 2)
-
-        self.color_sensors[0].mode = "COL-COLOR"
-        self.color_sensors[1].mode = "COL-COLOR"
-        return
-
     def alignment_for_meeting_area_initial_setting(self):
         self.stop_motors()
         print("called alignment_for_meeting_area_initial_setting")
@@ -1151,74 +1093,10 @@ class PipeLineRobot:
                 self.stop_motors()
                 break
         self.stop_motors()
-        print("got out")
-        return
-
-    def meeting_area_initial_setting1(self):
-        self.color_sensors[0].mode = "COL-REFLECT"
-        self.color_sensors[1].mode = "COL-REFLECT"
-        default_speed = 400
-        max_speed = 700
-        min_speed = -max_speed
-        expected_left_dist = 25
-        k_to_find_abyss_by_upper_dist = 30
-        k_to_find_green_slope_by_upper_dist = 150
-        # when the sensor upper dist its on the meeting area it finds around 20 preety mush never dibber than 23
-        k_when_sensor_sees_the_flat_ground_by_upper_dist = 23
-        k_min_white_reflect = 50
-        pid = PID(5, 0, 5, setpoint=0)
-
-        while True:
-            left_dist = self.get_sensor_data("InfraredSensor")[0]
-            upper_dist = self.get_sensor_data("Ultrasonic")[1]
-            color_data = self.get_sensor_data("ColorSensor", "r")
-
-            if upper_dist >= k_to_find_abyss_by_upper_dist:
-                self.stop_motors()
-                ev3.Sound.beep()
-                upper_dist >= k_to_find_abyss_by_upper_dist
-                if upper_dist >= k_to_find_green_slope_by_upper_dist:
-                    print("found green slope")
-                elif upper_dist >= k_to_find_abyss_by_upper_dist and upper_dist < k_to_find_green_slope_by_upper_dist:
-                    print("found abbys")
-                continue
-
-            if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
-                self.stop_motors()
-                ev3.Sound.beep()
-                print("found something different from white")
-                color_data = self.get_sensor_data("ColorSensor", "r")
-                self.alignment_for_meeting_area_initial_setting()
-
-            control = pid(expected_left_dist - left_dist)
-            # print(control)
-
-            left_speed = default_speed + control
-            right_speed = default_speed - control
-
-            if left_speed > max_speed:
-                left_speed = max_speed
-            elif left_speed < min_speed:
-                left_speed = min_speed
-
-            if right_speed > max_speed:
-                right_speed = max_speed
-            elif right_speed < min_speed:
-                right_speed = min_speed
-
-            if upper_dist < k_when_sensor_sees_the_flat_ground_by_upper_dist:
-                self.motors.left.run_forever(speed_sp=left_speed)
-                self.motors.right.run_forever(speed_sp=right_speed)
-            else:
-                self.motors.left.run_forever(speed_sp=default_speed / 2)
-                self.motors.right.run_forever(speed_sp=default_speed / 2)
-
-        self.color_sensors[0].mode = "COL-COLOR"
-        self.color_sensors[1].mode = "COL-COLOR"
         return
 
 
-    def meeting_area_initial_setting2(self):
+    def meeting_area_initial_setting(self):
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         default_speed = 300
