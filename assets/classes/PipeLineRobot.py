@@ -1102,21 +1102,57 @@ class PipeLineRobot:
         return
 
     def alignment_for_meeting_area_initial_setting(self):
+        self.stop_motors()
+        print("called alignment_for_meeting_area_initial_setting")
         default_speed = 200
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
         k_min_white_reflect = 50
         color_data = self.get_sensor_data("ColorSensor", "r")
+        k_time = timedelta(0.5)
 
         while color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
 
+            left_back_begin = datetime.now()
             while color_data[0] < k_min_white_reflect:
                 color_data = self.get_sensor_data("ColorSensor", "r")
                 self.motors.left.run_forever(speed_sp=-default_speed)
             self.stop_motors()
+            left_back_end = datetime.now()
 
-            while color_data[1] >= k_min_white_reflect:
-                pass
+            right_back_begin = datetime.now()
+            while color_data[1] < k_min_white_reflect:
+                color_data = self.get_sensor_data("ColorSensor", "r")
+                self.motors.right.run_forever(speed_sp=-default_speed)
             self.stop_motors()
+            right_back_end = datetime.now()
 
+            left_front_begin = datetime.now()
+            while color_data[0] >= k_min_white_reflect:
+                color_data = self.get_sensor_data("ColorSensor", "r")
+                self.motors.left.run_forever(speed_sp=default_speed)
+            self.stop_motors()
+            left_front_end = datetime.now()
+
+            right_front_begin = datetime.now()
+            while color_data[1] >= k_min_white_reflect:
+                color_data = self.get_sensor_data("ColorSensor", "r")
+                self.motors.right.run_forever(speed_sp=default_speed)
+            self.stop_motors()
+            right_front_end = datetime.now()
+
+            max_time = max([left_back_end - left_back_begin , right_back_end - right_back_begin, left_front_end - left_front_begin, right_front_end - right_front_begin])
+
+            if max_time <= k_time:
+                while color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
+                    color_data = self.get_sensor_data("ColorSensor", "r")
+                    self.motors.left.run_forever(speed_sp=-default_speed)
+                    self.motors.right.run_forever(speed_sp=-default_speed)
+                self.stop_motors()
+                break
+        self.stop_motors()
+        print("got out")
+        return
 
     def meeting_area_initial_setting1(self):
         self.color_sensors[0].mode = "COL-REFLECT"
@@ -1127,8 +1163,8 @@ class PipeLineRobot:
         expected_left_dist = 25
         k_to_find_abyss_by_upper_dist = 30
         k_to_find_green_slope_by_upper_dist = 150
-        # when the sensor upper dist its on the meeting area it finds around 13 preety mush never dibber than 15
-        k_when_sensor_sees_the_flat_ground_by_upper_dist = 15
+        # when the sensor upper dist its on the meeting area it finds around 20 preety mush never dibber than 23
+        k_when_sensor_sees_the_flat_ground_by_upper_dist = 23
         k_min_white_reflect = 50
         pid = PID(5, 0, 5, setpoint=0)
 
@@ -1140,15 +1176,22 @@ class PipeLineRobot:
             if upper_dist >= k_to_find_abyss_by_upper_dist:
                 self.stop_motors()
                 ev3.Sound.beep()
+                upper_dist >= k_to_find_abyss_by_upper_dist
                 if upper_dist >= k_to_find_green_slope_by_upper_dist:
                     print("found green slope")
-                else:
+                elif upper_dist >= k_to_find_abyss_by_upper_dist and upper_dist < k_to_find_green_slope_by_upper_dist:
                     print("found abbys")
-
                 continue
 
+            if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
+                self.stop_motors()
+                ev3.Sound.beep()
+                print("found something different from white")
+                color_data = self.get_sensor_data("ColorSensor", "r")
+                self.alignment_for_meeting_area_initial_setting()
+
             control = pid(expected_left_dist - left_dist)
-            print(control)
+            # print(control)
 
             left_speed = default_speed + control
             right_speed = default_speed - control
@@ -1173,3 +1216,95 @@ class PipeLineRobot:
         self.color_sensors[0].mode = "COL-COLOR"
         self.color_sensors[1].mode = "COL-COLOR"
         return
+
+
+    def meeting_area_initial_setting2(self):
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+        default_speed = 300
+        expected_save_side_dist = 30
+        k_to_find_green_slope_by_upper_dist = 150
+        # when the sensor upper dist its on the meeting area it finds around 13 preety mush never dibber than 15
+        k_when_sensor_sees_the_flat_ground_by_upper_dist = 15
+        k_min_white_reflect = 50
+
+        while True:
+            upper_dist = self.get_sensor_data("Ultrasonic")[1]
+            color_data = self.get_sensor_data("ColorSensor", "r")
+
+            if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
+                self.stop_motors()
+                if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect: # double check
+                    ev3.Sound.beep()
+                    print("found something different from white")
+                    color_data = self.get_sensor_data("ColorSensor", "r")
+                    self.alignment_for_meeting_area_initial_setting()
+                    upper_dist = self.get_sensor_data("Ultrasonic")[1]
+                    if upper_dist >= k_to_find_green_slope_by_upper_dist:
+                        its_green_slope = self.verify_green_slope()
+                        if its_green_slope:
+                            print("found green slope")
+                            ev3.Sound.beep()
+                            ev3.Sound.beep()
+                            ev3.Sound.beep()
+                            time.sleep(5)
+                            continue
+                        else:
+                            pass
+                    self.move_timed(how_long=0.8, direction="backward")
+                    left_dist = self.get_sensor_data("InfraredSensor")[0]
+                    right_dist = self.get_sensor_data("InfraredSensor")[1]
+                    if left_dist > expected_save_side_dist and right_dist <= expected_save_side_dist:
+                        self.rotate(-80)
+                    elif right_dist > expected_save_side_dist and left_dist <= expected_save_side_dist:
+                        self.rotate(80)
+                    else:
+                        print("rotation decision is save")
+                        self.rotate(80)
+
+            if upper_dist < k_when_sensor_sees_the_flat_ground_by_upper_dist:
+                self.motors.left.run_forever(speed_sp=default_speed)
+                self.motors.right.run_forever(speed_sp=default_speed)
+            else:
+                self.motors.left.run_forever(speed_sp=default_speed / 2)
+                self.motors.right.run_forever(speed_sp=default_speed / 2)
+
+        self.color_sensors[0].mode = "COL-COLOR"
+        self.color_sensors[1].mode = "COL-COLOR"
+        return
+
+    def verify_green_slope(self):
+        self.stop_motors()
+        rotation_speed = 200
+        print("called verify_green_slope")
+        expected_save_side_dist = 30
+        left_dist = self.get_sensor_data("InfraredSensor")[0]
+        right_dist = self.get_sensor_data("InfraredSensor")[1]
+        self.move_timed(how_long=0.3, direction="backward")
+
+        if left_dist > expected_save_side_dist and right_dist <= expected_save_side_dist:
+            self.rotate(-80, speed=rotation_speed)
+            right_dist = self.get_sensor_data("InfraredSensor")[1]
+            if right_dist > expected_save_side_dist:
+                self.rotate(80, speed=rotation_speed)
+                return True
+            self.rotate(80, speed=rotation_speed)
+
+        elif right_dist > expected_save_side_dist and left_dist <= expected_save_side_dist:
+            self.rotate(80)
+            left_dist = self.get_sensor_data("InfraredSensor")[0]
+            if left_dist > expected_save_side_dist:
+                self.rotate(-80, speed=rotation_speed)
+                return True
+            self.rotate(-80, speed=rotation_speed)
+
+        else:
+            print("rotation is save")
+            self.rotate(80)
+            left_dist = self.get_sensor_data("InfraredSensor")[0]
+            if left_dist > expected_save_side_dist:
+                self.rotate(-80, speed=rotation_speed)
+                return True
+            self.rotate(-80, speed=rotation_speed)
+
+        return False

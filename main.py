@@ -3,7 +3,7 @@
 import ev3dev.ev3 as ev3
 # import math
 # from datetime import datetime, timedelta
-# import time
+from time import sleep
 
 # from simple_pid import PID
 from assets.classes.PipeLineRobot import PipeLineRobot
@@ -25,7 +25,7 @@ def main():
         #robot.rotate(80, axis="own", speed=90)
         #robot.pipeline_support_following()
         #robot.black_line_following()
-        robot.initial_location_reset()
+        robot.meeting_area_initial_setting2()
         #robot.underground_position_reset(side="right")
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
