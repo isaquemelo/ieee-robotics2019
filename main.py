@@ -26,7 +26,7 @@ def main():
         #robot.pipeline_support_following()
         #robot.black_line_following()
         while True:
-            robot.alignment_for_meeting_area_initial_setting()
+            robot.meeting_area_initial_setting()
             sleep(5)
         #robot.underground_position_reset(side="right")
         # while True:

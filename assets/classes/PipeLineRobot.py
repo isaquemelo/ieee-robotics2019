@@ -1049,9 +1049,9 @@ class PipeLineRobot:
         default_speed = 200
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
-        k_min_white_reflect = 90
+        k_min_white_reflect = 50
         color_data = self.get_sensor_data("ColorSensor", "r")
-        k_time = timedelta(0.5)
+        k_time = timedelta(0.7)
         k_rotation = 90
 
         while color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
@@ -1096,7 +1096,7 @@ class PipeLineRobot:
             self.stop_motors()
             right_front_end = datetime.now()
 
-            max_time = max([left_back_end - left_back_begin , right_back_end - right_back_begin, left_front_end - left_front_begin, right_front_end - right_front_begin])
+            max_time = max([left_back_end - left_back_begin, right_back_end - right_back_begin, left_front_end - left_front_begin, right_front_end - right_front_begin])
 
             if max_time <= k_time:
                 while color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
@@ -1119,10 +1119,11 @@ class PipeLineRobot:
         # when the sensor upper dist its on the meeting area it finds around 13 preety mush never dibber than 15
         k_when_sensor_sees_the_flat_ground_by_upper_dist = 15
         k_min_white_reflect = 50
+        k_dist_from_robot = 20
 
         while True:
             upper_dist = self.get_sensor_data("Ultrasonic")[1]
-            bottom_front_dist = self.get_sensor_data("Ultrasonic")[2]
+            bottom_front_dist = self.get_sensor_data("InfraredSensor")[2]
             color_data = self.get_sensor_data("ColorSensor", "r")
 
             if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
@@ -1154,9 +1155,11 @@ class PipeLineRobot:
                         print("rotation decision is save")
                         self.rotate(80)
 
-            if bottom_front_dist:
+            if bottom_front_dist <= k_dist_from_robot:
                 self.stop_motors()
                 print("found robot")
+                ev3.Sound.beep()
+                self.rotate(80)
 
             if upper_dist < k_when_sensor_sees_the_flat_ground_by_upper_dist:
                 self.motors.left.run_forever(speed_sp=default_speed)
