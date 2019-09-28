@@ -256,7 +256,7 @@ class PipeLineRobot:
         pid = PID(12, 0, 6, setpoint=2)
 
         side_k_to_rotate = 20
-        front_k_to_rotate = 5
+        front_k_to_rotate = 2
         rotation_speed = 40
 
         speed_a = 0
@@ -264,14 +264,14 @@ class PipeLineRobot:
 
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
-            front_distance = self.get_sensor_data("Ultrasonic")[1]
-            upper_dist = self.get_sensor_data("InfraredSensor")[2]
+            front_distance = self.get_sensor_data("InfraredSensor")[2]
+            upper_dist = self.get_sensor_data("Ultrasonic")[1]
             control = pid(side_distance)
 
             print(side_distance, front_distance)
             # print("control = ", control)
 
-            if upper_dist > 70:
+            if upper_dist > 15:
                 self.stop_motors()
                 ev3.Sound.beep()
                 print("finished pipeline_support_following couse found the edge")
@@ -866,7 +866,7 @@ class PipeLineRobot:
 
     def underground_position_reset(self):
         self.stop_motors()
-        self.move_timed(how_long=0.5, direction="backwards")
+        self.move_timed(how_long=0.5)
 
         # while self.get_sensor_data("")
 
@@ -981,6 +981,9 @@ class PipeLineRobot:
     def black_line_flw(self):
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
+        found_pipe = False
+        begin = None
+        k_found_pipe = 25
         # white_value = 92
         # black_value = 7
         # white_black_value = 42
@@ -1015,13 +1018,27 @@ class PipeLineRobot:
         max_speed_bound = 500
         max_control = max_speed_bound - default
         min_control = max_speed_bound + default
+        first_time = True
 
         while True:
-            control = pid(int(self.get_sensor_data("ColorSensor", "C")[0]))
+            control = pid(int(self.get_sensor_data("ColorSensor", "C")[1]))
             print(default - control, default + control)
 
-            speed_a = default + control
-            speed_b = default - control
+            bottom_front = self.get_sensor_data("InfraredSensor")[2]
+            if bottom_front <= k_found_pipe and first_time:
+                found_pipe = True
+                first_time = False
+                begin = datetime.now() + timedelta(seconds=2)
+
+                self.stop_motors()
+                self.handler.left.run_forever(speed_sp=500)
+
+            if found_pipe and datetime.now() >= begin:
+                found_pipe = False
+                self.handler.left.run_forever(speed_sp=-1000)
+
+            speed_a = default - control
+            speed_b = default + control
 
             if speed_a >= max_speed_bound:
                 speed_a = max_speed_bound
@@ -1115,7 +1132,7 @@ class PipeLineRobot:
         default_speed = 300
         expected_save_side_dist = 30
         expected_save_front_dist_to_rotate_after_finding_robot = 20
-        k_to_find_green_slope_by_upper_dist = 150
+        k_to_find_green_slope_by_upper_dist = 100
         # when the sensor upper dist its on the meeting area it finds around 13 preety mush never dibber than 15
         k_when_sensor_sees_the_flat_ground_by_upper_dist = 15
         k_min_white_reflect = 50
@@ -1141,7 +1158,7 @@ class PipeLineRobot:
                             ev3.Sound.beep()
                             ev3.Sound.beep()
                             ev3.Sound.beep()
-                            return
+                            self.go_down_green_slope()
                         else:
                             pass
                     self.move_timed(how_long=0.8, direction="backward")
@@ -1179,9 +1196,9 @@ class PipeLineRobot:
         expected_save_side_dist = 30
         left_dist = self.get_sensor_data("InfraredSensor")[0]
         right_dist = self.get_sensor_data("InfraredSensor")[1]
-        self.move_timed(how_long=0.3, direction="backward")
+        self.move_timed(how_long=0.2, direction="backward")
 
-        if left_dist > expected_save_side_dist and right_dist <= expected_save_side_dist:
+        if left_dist > expected_save_side_dist:
             self.rotate(-80, speed=rotation_speed)
             right_dist = self.get_sensor_data("InfraredSensor")[1]
             if right_dist > expected_save_side_dist:
@@ -1189,7 +1206,7 @@ class PipeLineRobot:
                 return True
             self.rotate(80, speed=rotation_speed)
 
-        elif right_dist > expected_save_side_dist and left_dist <= expected_save_side_dist:
+        elif right_dist > expected_save_side_dist:
             self.rotate(80)
             left_dist = self.get_sensor_data("InfraredSensor")[0]
             if left_dist > expected_save_side_dist:
@@ -1207,3 +1224,97 @@ class PipeLineRobot:
             self.rotate(-80, speed=rotation_speed)
 
         return False
+
+    def go_down_green_slope(self):
+        self.stop_motors()
+        print("called go_down_dreen_slope")
+        default_speed = 400
+
+        pid_side = self.adjust_before_go_down_green_slope()
+        max_speed = 500
+        min_speed = -max_speed
+        expected_save_side_dist = 25
+        pid = PID(5, 0, 5, setpoint=0)
+
+        if pid_side == "left":
+            while True:
+                left_dist = self.get_sensor_data("InfraredSensor")[0]
+
+                control = pid(expected_save_side_dist - left_dist)
+
+                left_speed = default_speed + control
+                right_speed = default_speed - control
+
+                if left_speed > max_speed:
+                    left_speed = max_speed
+                elif left_speed < min_speed:
+                    left_speed = min_speed
+
+                if right_speed > max_speed:
+                    right_speed = max_speed
+                elif right_speed < min_speed:
+                    right_speed = min_speed
+
+                self.motors.left.run_forever(speed_sp=left_speed)
+                self.motors.right.run_forever(speed_sp=right_speed)
+
+        elif pid_side == "right":
+            while True:
+                right_dist = self.get_sensor_data("InfraredSensor")[1]
+
+                control = pid(expected_save_side_dist - right_dist)
+
+                left_speed = default_speed - control
+                right_speed = default_speed + control
+
+                if left_speed > max_speed:
+                    left_speed = max_speed
+                elif left_speed < min_speed:
+                    left_speed = min_speed
+
+                if right_speed > max_speed:
+                    right_speed = max_speed
+                elif right_speed < min_speed:
+                    right_speed = min_speed
+
+                self.motors.left.run_forever(speed_sp=left_speed)
+                self.motors.right.run_forever(speed_sp=right_speed)
+
+        elif pid_side is None:
+            while True:
+                self.motors.left.run_forever(speed_sp=default_speed)
+                self.motors.right.run_forever(speed_sp=default_speed)
+
+        self.stop_motors()
+        return
+
+
+    def adjust_before_go_down_green_slope(self):
+        print("called adjust_before_go_down_green_slope")
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+        default_speed = 300
+        k_min_white_reflect = 50
+        expected_save_side_dist = 25
+
+        color_data = self.get_sensor_data("ColorSensor", "r")
+        while color_data[0] > k_min_white_reflect and color_data[1] > k_min_white_reflect:
+            color_data = self.get_sensor_data("ColorSensor", "r")
+            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
+        self.stop_motors()
+
+        self.alignment_for_meeting_area_initial_setting()
+
+        left_dist = self.get_sensor_data("InfraredSensor")[0]
+        right_dist = self.get_sensor_data("InfraredSensor")[1]
+
+        if left_dist > expected_save_side_dist:
+            print("pid with left side to make sure the does not fall")
+            return "left"
+        if right_dist > expected_save_side_dist:
+            print("pid with right side to make sure the does not fall")
+            return "right"
+
+        print("pid is not necessary")
+        return None

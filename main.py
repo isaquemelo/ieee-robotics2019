@@ -25,9 +25,13 @@ def main():
         #robot.rotate(80, axis="own", speed=90)
         #robot.pipeline_support_following()
         #robot.black_line_following()
-        while True:
-            robot.meeting_area_initial_setting()
-            sleep(5)
+
+
+        robot.meeting_area_initial_setting()
+        # robot.underground_position_reset()
+        # robot.black_line_flw()
+        # robot.go_down_green_slope()
+
         #robot.underground_position_reset(side="right")
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
