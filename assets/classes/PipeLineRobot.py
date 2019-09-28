@@ -1049,9 +1049,10 @@ class PipeLineRobot:
         default_speed = 200
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
-        k_min_white_reflect = 50
+        k_min_white_reflect = 90
         color_data = self.get_sensor_data("ColorSensor", "r")
         k_time = timedelta(0.5)
+        k_rotation = 90
 
         while color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
 
@@ -1069,15 +1070,27 @@ class PipeLineRobot:
             self.stop_motors()
             right_back_end = datetime.now()
 
+            self.reset_gyroscope()
             left_front_begin = datetime.now()
             while color_data[0] >= k_min_white_reflect:
+                if self.get_sensor_data("GyroSensor") > k_rotation:
+                    self.stop_motors()
+                    print("alignment failed")
+                    self.move_timed(how_long=0.3, direction="backward")
+                    return
                 color_data = self.get_sensor_data("ColorSensor", "r")
                 self.motors.left.run_forever(speed_sp=default_speed)
             self.stop_motors()
             left_front_end = datetime.now()
 
+            self.reset_gyroscope()
             right_front_begin = datetime.now()
             while color_data[1] >= k_min_white_reflect:
+                if self.get_sensor_data("GyroSensor") < -k_rotation:
+                    self.stop_motors()
+                    print("alignment failed")
+                    self.move_timed(how_long=0.3, direction="backward")
+                    return
                 color_data = self.get_sensor_data("ColorSensor", "r")
                 self.motors.right.run_forever(speed_sp=default_speed)
             self.stop_motors()
@@ -1109,9 +1122,8 @@ class PipeLineRobot:
 
         while True:
             upper_dist = self.get_sensor_data("Ultrasonic")[1]
+            bottom_front_dist = self.get_sensor_data("Ultrasonic")[2]
             color_data = self.get_sensor_data("ColorSensor", "r")
-
-
 
             if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
                 self.stop_motors()
@@ -1141,6 +1153,10 @@ class PipeLineRobot:
                     else:
                         print("rotation decision is save")
                         self.rotate(80)
+
+            if bottom_front_dist:
+                self.stop_motors()
+                print("found robot")
 
             if upper_dist < k_when_sensor_sees_the_flat_ground_by_upper_dist:
                 self.motors.left.run_forever(speed_sp=default_speed)
