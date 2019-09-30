@@ -25,7 +25,7 @@ def main():
         #robot.rotate(80, axis="own", speed=90)
         #robot.pipeline_support_following()
         #robot.black_line_following()
-
+        print("testing")
 
         robot.meeting_area_initial_setting()
         # robot.underground_position_reset()
