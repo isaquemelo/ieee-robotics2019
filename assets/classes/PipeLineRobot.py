@@ -1159,6 +1159,7 @@ class PipeLineRobot:
                             ev3.Sound.beep()
                             ev3.Sound.beep()
                             self.go_down_green_slope()
+                            self.go_to_position_before_pipeline()
                         else:
                             pass
                     self.move_timed(how_long=0.8, direction="backward")
@@ -1223,8 +1224,9 @@ class PipeLineRobot:
 
     def go_down_green_slope(self):
         self.stop_motors()
-        print("called go_down_dreen_slope")
+        print("called go_down_green_slope")
         default_speed = 400
+        k_green_slope = 100
 
         pid_side = self.adjust_before_go_down_green_slope()
         max_speed = 500
@@ -1234,6 +1236,10 @@ class PipeLineRobot:
 
         if pid_side == "left":
             while True:
+                upper_dist = self.get_sensor_data("Ultrasonic")[1]
+                if upper_dist < k_green_slope:
+                    break
+
                 left_dist = self.get_sensor_data("InfraredSensor")[0]
 
                 control = pid(expected_save_side_dist - left_dist)
@@ -1256,6 +1262,10 @@ class PipeLineRobot:
 
         elif pid_side == "right":
             while True:
+                upper_dist = self.get_sensor_data("Ultrasonic")[1]
+                if upper_dist < k_green_slope:
+                    break
+
                 right_dist = self.get_sensor_data("InfraredSensor")[1]
 
                 control = pid(expected_save_side_dist - right_dist)
@@ -1278,11 +1288,14 @@ class PipeLineRobot:
 
         elif pid_side is None:
             while True:
+                upper_dist = self.get_sensor_data("Ultrasonic")[1]
+                if upper_dist < k_green_slope:
+                    break
+
                 self.motors.left.run_forever(speed_sp=default_speed)
                 self.motors.right.run_forever(speed_sp=default_speed)
 
         self.stop_motors()
-        return
 
 
     def adjust_before_go_down_green_slope(self):
@@ -1314,3 +1327,52 @@ class PipeLineRobot:
 
         print("pid is not necessary")
         return None
+
+    def go_to_position_before_pipeline(self):
+        print("called go_to_position_before_pipeline")
+        k_green_slope = 100
+
+        while self.color_sensors[0].value() >= k_green_slope:
+            self.motors.right.run_forever(speed_sp=800)
+            self.motors.left.run_forever(speed_sp=800)
+        self.stop_motors()
+
+        ev3.Sound.beep().wait()
+        self.move_timed(0.7, direction="forward")
+
+        self.stop_motors()
+        self.rotate(-80, speed=150)  # talvez isso deveria ser -80 e não 80
+
+        default_speed = 500
+        pid = PID(12, 0, 5, setpoint=15)
+
+        k_to_find_end_by_color = 0
+        while True:
+            # upper_dist = self.get_sensor_data("Ultrasonic")[1]
+            left_distance = self.get_sensor_data("InfraredSensor")[0]
+            control = pid(left_distance)
+            color_data = self.get_sensor_data("ColorSensor", "r")
+
+            if k_to_find_end_by_color in color_data:
+                self.stop_motors()
+                self.move_timed(how_long=0.5, direction="backwards", speed=1000)
+                break
+
+            speed_a = default_speed + control
+            speed_b = default_speed - control
+
+            if speed_a >= 1000:
+                speed_a = 1000
+            elif speed_a <= -1000:
+                speed_a = -1000
+
+            if speed_b >= 1000:
+                speed_b = 1000
+            elif speed_b <= -1000:
+                speed_b = -1000
+
+            self.motors.left.run_forever(speed_sp=speed_a)
+            self.motors.right.run_forever(speed_sp=speed_b)
+
+        self.stop_motors()
+        ev3.Sound.beep().wait()
