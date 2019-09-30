@@ -1178,12 +1178,8 @@ class PipeLineRobot:
                 ev3.Sound.beep()
                 self.rotate(80)
 
-            if upper_dist < k_when_sensor_sees_the_flat_ground_by_upper_dist:
-                self.motors.left.run_forever(speed_sp=default_speed)
-                self.motors.right.run_forever(speed_sp=default_speed)
-            else:
-                self.motors.left.run_forever(speed_sp=default_speed / 2)
-                self.motors.right.run_forever(speed_sp=default_speed / 2)
+            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
 
         self.color_sensors[0].mode = "COL-COLOR"
         self.color_sensors[1].mode = "COL-COLOR"
