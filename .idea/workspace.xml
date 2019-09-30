@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e33d40b6-f1d9-43d1-a073-691af46b2087" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -17,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
-              <caret line="30" column="44" lean-forward="true" selection-start-line="30" selection-start-column="44" selection-end-line="30" selection-end-column="44" />
+            <state relative-caret-position="435">
+              <caret line="29" column="19" selection-start-line="29" selection-start-column="19" selection-end-line="29" selection-end-column="19" />
               <folding>
                 <element signature="e#24#48#0" expanded="true" />
               </folding>
@@ -29,14 +30,12 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="1268" lean-forward="true" selection-start-line="1268" selection-end-line="1268" />
+            <state relative-caret-position="213">
+              <caret line="72" column="36" selection-start-line="72" selection-start-column="36" selection-end-line="72" selection-end-column="36" />
               <folding>
-                <element signature="e#23#57#0" expanded="true" />
                 <element signature="e#370#438#0" />
                 <element signature="e#507#524#0" />
-                <element signature="e#48051#48168#0" />
-                <element signature="e#48203#48333#0" />
+                <element signature="e#971#1175#0" />
               </folding>
             </state>
           </provider>
@@ -65,10 +64,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>on_mess</find>
-      <find>on_message</find>
-      <find>print</find>
-      <find>on</find>
       <find>print(&quot;control</find>
       <find>initial</find>
       <find>abismo</find>
@@ -95,6 +90,10 @@
       <find>.now</find>
       <find>move_Time</find>
       <find>verify</find>
+      <find>self.go_</find>
+      <find>go_to_position_before_pipeline</find>
+      <find>go_do</find>
+      <find>go_down</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -196,6 +195,28 @@
     </option>
   </component>
   <component name="RunManager">
+    <configuration name="PipeLineRobot" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ieee-robotics2019" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/assets/classes" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.PipeLineRobot" />
@@ -238,11 +259,13 @@
       <workItem from="1569426451112" duration="9719000" />
       <workItem from="1569514364679" duration="14741000" />
       <workItem from="1569602419011" duration="32942000" />
+      <workItem from="1569853595290" duration="2419000" />
+      <workItem from="1569870285501" duration="3991000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="239875000" />
+    <option name="totallyTimeSpent" value="249551000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -254,7 +277,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-3" y="0" width="1372" height="738" extended-state="6" />
+    <frame x="0" y="-1" width="1366" height="740" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.20543806" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -268,9 +292,9 @@
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49924242" weight="0.32994923" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32884902" />
-      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.321489" />
+      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" visible="true" weight="0.31993568" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.49242425" visible="true" weight="0.88324875" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49242425" weight="0.5096463" />
       <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.50757575" side_tool="true" weight="0.7461929" />
       <window_info anchor="bottom" id="Python Console" order="13" weight="0.32884902" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -396,8 +420,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="30" column="44" lean-forward="true" selection-start-line="30" selection-start-column="44" selection-end-line="30" selection-end-column="44" />
+        <state relative-caret-position="435">
+          <caret line="29" column="19" selection-start-line="29" selection-start-column="19" selection-end-line="29" selection-end-column="19" />
           <folding>
             <element signature="e#24#48#0" expanded="true" />
           </folding>
@@ -406,14 +430,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="1268" lean-forward="true" selection-start-line="1268" selection-end-line="1268" />
+        <state relative-caret-position="213">
+          <caret line="72" column="36" selection-start-line="72" selection-start-column="36" selection-end-line="72" selection-end-column="36" />
           <folding>
-            <element signature="e#23#57#0" expanded="true" />
             <element signature="e#370#438#0" />
             <element signature="e#507#524#0" />
-            <element signature="e#48051#48168#0" />
-            <element signature="e#48203#48333#0" />
+            <element signature="e#971#1175#0" />
           </folding>
         </state>
       </provider>

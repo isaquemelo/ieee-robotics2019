@@ -56,7 +56,7 @@ class PipeLineRobot:
         self.motors.right.polarity = "inversed"
 
         self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outC'))
-        self.handler.left.run_forever(speed_sp=-150)
+        # self.handler.left.run_forever(speed_sp=-150)
 
         # define status
         self.historic = [""]
@@ -65,13 +65,62 @@ class PipeLineRobot:
         self.has_pipe = False
         self.current_pipe_size = 10  # [10, 15, 20]
         self.status = "pipeRescue"  # [placingPipe, findingHole, waitingForMasterRescue, pipeTransfering, initialPositionReset]
-        self.server_ip = "172.169.0.254"
-        self.secondary_brick_ip = "10.42.0.3"
+
+        self.secondary_brick_ip = "101.42.0.36"
         self.client = mqtt.Client()
         self.client.connect(self.secondary_brick_ip, 1883, 60)
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.loop_start()
+
+        # sever settings
+        self.local_ip = "localhost"
+        self.receiver = mqtt.Client()
+        self.receiver.connect(self.local_ip, 1883, 60)
+        self.receiver.on_connect = self.receiver_on_client_connect
+        self.receiver.on_message = self.receiver_on_client_message
+        self.receiver.loop_start()
+
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
+
+    def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
+        # print("data published")
+        pass
+
+    def publisher_on_client_message(self, client, userdata, message):
+        print("message received: ", end="")
+        payload = unpack("i", message.payload)
+        print(payload[0])
+
+    def publisher_on_client_connect(self, client, userdata, flags, rc):
+        print("The bluetooth bricks are connected with result code", str(rc))
+        client.subscribe("topic/status")
+
+    def receiver_on_client_message(self, client, userdata, message):
+        print("message received: ", end="")
+        payload = unpack("i", message.payload)
+
+        # self.ultrasonic_sensors['left'] = payload[0]
+        # self.ultrasonic_sensors['right'] = payload[1]
+        # self.infrared_sensors['front'] = payload[2]
+        # self.infrared_sensors['left'] = payload[3]
+
+        print(payload)
+
+    def receiver_on_client_connect(self, client, userdata, flags, rc):
+        print("The bluetooth bricks are connected with result code", str(rc))
+        client.subscribe("topic/PipeLineRobot")
+
+    def publish_data(self):
+        message = pack("i", self.status)
+        self.publisher.publish("topic/status", message, qos=0)
+        print("dado publicado:", unpack("i", message))
 
     def on_message(self, client, userdata, message):
         # print("info received")
@@ -1365,9 +1414,8 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor", "r")
 
             if k_to_find_end_by_color == color_data[0] and k_to_find_end_by_color == color_data[1]:
-                self.stop_motors()
-                print("found undefined on both color_sensors")
                 self.move_timed(how_long=0.5, direction="backwards", speed=1000)
+                print("found undefined on both color_sensors")
                 break
 
             speed_a = default_speed + control
@@ -1388,3 +1436,10 @@ class PipeLineRobot:
 
         self.stop_motors()
         ev3.Sound.beep().wait()
+
+
+robot = PipeLineRobot()
+while True:
+    msg = input()
+    robot.status = int(msg)
+    robot.publish_data()
