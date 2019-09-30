@@ -1332,16 +1332,19 @@ class PipeLineRobot:
         print("called go_to_position_before_pipeline")
         k_green_slope = 100
 
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+
         while self.color_sensors[0].value() >= k_green_slope:
             self.motors.right.run_forever(speed_sp=800)
             self.motors.left.run_forever(speed_sp=800)
         self.stop_motors()
 
         ev3.Sound.beep().wait()
-        self.move_timed(0.7, direction="forward")
+        self.move_timed(0.8, direction="forward")
 
         self.stop_motors()
-        self.rotate(-80, speed=150)  # talvez isso deveria ser -80 e não 80
+        self.rotate(-80, speed=500)  # talvez isso deveria ser -80 e não 80
 
         default_speed = 500
         pid = PID(12, 0, 5, setpoint=15)
@@ -1353,8 +1356,9 @@ class PipeLineRobot:
             control = pid(left_distance)
             color_data = self.get_sensor_data("ColorSensor", "r")
 
-            if k_to_find_end_by_color in color_data:
+            if k_to_find_end_by_color == color_data[0] and k_to_find_end_by_color == color_data[1]:
                 self.stop_motors()
+                print("found undefined on both color_sensors")
                 self.move_timed(how_long=0.5, direction="backwards", speed=1000)
                 break
 
