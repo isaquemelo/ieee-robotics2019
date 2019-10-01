@@ -1204,6 +1204,7 @@ class PipeLineRobot:
                 if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:  # double check
                     ev3.Sound.beep()
                     print("found something different from white")
+                    self.get_out_of_color()
                     self.alignment_for_meeting_area_initial_setting()
                     its_green_slope = self.verify_green_slope()
                     if its_green_slope:
@@ -1250,36 +1251,6 @@ class PipeLineRobot:
             self.color_sensors[0].mode = "COL-REFLECT"
             self.color_sensors[1].mode = "COL-REFLECT"
             return True
-        # rotation_speed = 200
-        # expected_save_side_dist = 30
-        # left_dist = self.get_sensor_data("InfraredSensor")[0]
-        # right_dist = self.get_sensor_data("InfraredSensor")[1]
-        # self.move_timed(how_long=0.2, direction="backward")
-        #
-        # if left_dist > expected_save_side_dist:
-        #     self.rotate(-80, speed=rotation_speed)
-        #     right_dist = self.get_sensor_data("InfraredSensor")[1]
-        #     if right_dist > expected_save_side_dist:
-        #         self.rotate(80, speed=rotation_speed)
-        #         return True
-        #     self.rotate(80, speed=rotation_speed)
-        #
-        # elif right_dist > expected_save_side_dist:
-        #     self.rotate(80)
-        #     left_dist = self.get_sensor_data("InfraredSensor")[0]
-        #     if left_dist > expected_save_side_dist:
-        #         self.rotate(-80, speed=rotation_speed)
-        #         return True
-        #     self.rotate(-80, speed=rotation_speed)
-        #
-        # else:
-        #     print("rotation is save")
-        #     self.rotate(80)
-        #     left_dist = self.get_sensor_data("InfraredSensor")[0]
-        #     if left_dist > expected_save_side_dist:
-        #         self.rotate(-80, speed=rotation_speed)
-        #         return True
-        #     self.rotate(-80, speed=rotation_speed)
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         return False
@@ -1435,6 +1406,28 @@ class PipeLineRobot:
 
         self.stop_motors()
         ev3.Sound.beep().wait()
+
+    def get_out_of_color(self):
+        self.stop_motors()
+        default_speed = 200
+        print("called get_out_of_color")
+
+        self.color_sensors[0].mode = "COL-COLOR"
+        self.color_sensors[1].mode = "COL-COLOR"
+
+        color_data = self.get_sensor_data("ColorSensor")
+        if color_data[0] in ["Blue", "Brown", "Red", "Yellow"] or color_data[1] in ["Blue", "Brown", "Red", "Yellow"]:
+            print("got into a the color = ", color_data)
+            while color_data[0] != "White" and color_data[1] != "White":
+                print(color_data)
+                self.motors.left.run_forever(speed_sp=-default_speed)
+                self.motors.right.run_forever(speed_sp=-default_speed)
+                color_data = self.get_sensor_data("ColorSensor")
+
+        self.stop_motors()
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+        return
 
 
 # robot = PipeLineRobot()
