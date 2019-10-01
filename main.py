@@ -27,7 +27,9 @@ def main():
         #robot.black_line_following()
         while True:
             robot.meeting_area_initial_setting()
+            ev3.Sound.speak("END!")
             sleep(3)
+
         # robot.underground_position_reset()
         # robot.black_line_flw()
         # robot.go_down_green_slope()
