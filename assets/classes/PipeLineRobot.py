@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from simple_pid import PID
 # import json
 import time
+from time import sleep
 
 from calibrated_consts import black_line_following
 import paho.mqtt.client as mqtt
@@ -56,7 +57,7 @@ class PipeLineRobot:
         self.motors.right.polarity = "inversed"
 
         self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outC'))
-        # self.handler.left.run_forever(speed_sp=-150)
+        self.handler.left.run_forever(speed_sp=-50)
 
         # define status
         self.historic = [""]
@@ -255,85 +256,70 @@ class PipeLineRobot:
             self.handler.left.run_forever(speed_sp=vel)
         self.handler.left.stop()
 
-    # def pipeline_support_following(self):
-    #     default_speed = 350
-    #     pid = PID(12, 0, 2, setpoint=4)
-    #     side_k_to_rotate = 15
-    #     front_k_to_rotate = 5
-    #     rotation_speed = 40
-    #
-    #     speed_a = 0
-    #     speed_b = 0
-    #
-    #     while True:
-    #         side_distance = self.infrared_sensors['side'].value()
-    #         front_distance = self.infrared_sensors['frontal'].value()
-    #         control = pid(side_distance)
-    #
-    #         if side_distance > side_k_to_rotate:
-    #             self.stop_motors()
-    #             self.move_timed(0.9, speed=-500)
-    #             self.rotate(-80, axis="own", speed=90)
-    #
-    #         if front_distance < front_k_to_rotate:
-    #             self.stop_motors()
-    #             self.rotate(80, axis="own", speed=90)
-    #
-    #         speed_a = control - default_speed
-    #         speed_b = -control - default_speed
-    #
-    #         if speed_a >= 1000:
-    #             speed_a = 1000
-    #         elif speed_a <= -1000:
-    #             speed_a = -1000
-    #
-    #         if speed_b >= 1000:
-    #             speed_b = 1000
-    #         elif speed_b <= -1000:
-    #             speed_b = -1000
-    #
-    #         self.motors.left.run_forever(speed_sp=speed_a)
-    #         self.motors.right.run_forever(speed_sp=speed_b)
-
     def pipeline_support_following(self):
-        print("called pipeline_support_following")
-        default_speed = 350
-        max_speed = 1000
-        min_speed = -1000
-        set = None
-        expected_dist = None
-        pid = PID(12, 0, 6, setpoint=2)
+        self.stop_motors()
+        print("pipeline_support_following")
+        default_speed = 150
 
-        side_k_to_rotate = 20
-        front_k_to_rotate = 2
-        rotation_speed = 40
+        pid = PID(12, 0, 6, setpoint=2)
+        front_distance_to_rotate = 2
 
         speed_a = 0
         speed_b = 0
 
+        border_situation = False
+        time = 0
+
         while True:
-            side_distance = self.get_sensor_data("InfraredSensor")[0]
+            side_distance = self.get_sensor_data("InfraredSensor")[1]
             front_distance = self.get_sensor_data("InfraredSensor")[2]
             upper_dist = self.get_sensor_data("Ultrasonic")[1]
             control = pid(side_distance)
 
-            print(side_distance, front_distance)
+            # print(side_distance, front_distance)
             # print("control = ", control)
 
-            if upper_dist > 15:
+            if upper_dist >= 23:
                 self.stop_motors()
                 ev3.Sound.beep()
                 print("finished pipeline_support_following couse found the edge")
+                return
 
-            if front_distance < front_k_to_rotate:
+            if front_distance < front_distance_to_rotate:
                 self.stop_motors()
                 print("rotating cause it found small front dist")
                 ev3.Sound.beep().wait()
-                # self.move_timed(how_long=0.3, direction="backwards")
-                self.rotate(80, axis="own", speed=90)
+
+
+                if border_situation is not None:
+                    if border_situation is False:
+                        print("cruva sem risco")
+                        sleep(3)
+                        self.move_timed(how_long=0.3, direction="backwards")
+                        self.rotate(-80, axis="own", speed=90)
+                        time = datetime.now()
+                        border_situation = True
+                    elif border_situation:
+                        border_situation = None
+                        print("curva com provavel risco")
+                        if datetime.now() - time <= timedelta(seconds=1.7):
+                            print("realmente havia risco")
+                            self.rotate(-80, axis="own", speed=90)
+                        else:
+                            print("na verdade nao havia risco")
+                            self.move_timed(how_long=0.3, direction="backwards")
+                            self.rotate(-80, axis="own", speed=90)
+                        sleep(3)
+                elif border_situation is None:
+                    print("curva sem risco")
+                    sleep(3)
+                    self.move_timed(how_long=0.3, direction="backwards")
+                    self.rotate(-80, axis="own", speed=90)
 
             speed_a = default_speed + control
             speed_b = default_speed - control
+
+            print(control)
 
             if speed_a >= 1000:
                 speed_a = 1000
@@ -345,8 +331,8 @@ class PipeLineRobot:
             elif speed_b <= -1000:
                 speed_b = -1000
 
-            self.motors.left.run_forever(speed_sp=speed_a)
-            self.motors.right.run_forever(speed_sp=speed_b)
+            self.motors.left.run_forever(speed_sp=speed_b)
+            self.motors.right.run_forever(speed_sp=speed_a)
 
     def adjust_corner_to_go_green(self):
         self.rotate(angle=-80)
@@ -1108,7 +1094,6 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-COLOR"
         return
 
-
     def alignment_for_meeting_area_initial_setting(self, aligment_with_color=False):
         self.stop_motors()
         print("called alignment_for_meeting_area_initial_setting")
@@ -1182,7 +1167,6 @@ class PipeLineRobot:
                 color_data = self.get_sensor_data("ColorSensor", "r")
         self.stop_motors()
         return
-
 
     def meeting_area_initial_setting(self):
         self.color_sensors[0].mode = "COL-REFLECT"
@@ -1330,7 +1314,6 @@ class PipeLineRobot:
                 self.motors.right.run_forever(speed_sp=default_speed)
 
         self.stop_motors()
-
 
     def adjust_before_go_down_green_slope(self):
         print("called adjust_before_go_down_green_slope")

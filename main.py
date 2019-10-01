@@ -26,7 +26,7 @@ def main():
         #robot.pipeline_support_following()
         #robot.black_line_following()
         while True:
-            robot.meeting_area_initial_setting()
+            robot.pipeline_support_following()
             ev3.Sound.speak("END!")
             sleep(3)
 
