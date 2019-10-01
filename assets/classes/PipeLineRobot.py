@@ -1211,8 +1211,8 @@ class PipeLineRobot:
                         ev3.Sound.beep()
                         ev3.Sound.beep()
                         ev3.Sound.beep()
-                        # self.go_down_green_slope()
-                        # self.go_to_position_before_pipeline()
+                        self.go_down_green_slope()
+                        self.go_to_position_before_pipeline()
                         break
                     else:
                         pass
@@ -1245,7 +1245,8 @@ class PipeLineRobot:
         self.color_sensors[0].mode = "COL-COLOR"
         self.color_sensors[1].mode = "COL-COLOR"
         print("called verify_green_slope")
-        if "Green" in self.get_sensor_data("ColorSensor"):
+        color_data = self.get_sensor_data("ColorSensor")
+        if (color_data[0] == "Green" and color_data[1] != "Undefined") or (color_data[1] == "Green" and color_data[0] != "Undefined"):
             self.color_sensors[0].mode = "COL-REFLECT"
             self.color_sensors[1].mode = "COL-REFLECT"
             return True
@@ -1287,8 +1288,7 @@ class PipeLineRobot:
         self.stop_motors()
         print("called go_down_green_slope")
         default_speed = 400
-        k_green_slope = 100
-        k_time = 1
+        k_time = 3.5
 
         pid_side = self.adjust_before_go_down_green_slope()
         max_speed = 500
@@ -1302,8 +1302,7 @@ class PipeLineRobot:
         if pid_side == "left":
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
-                upper_dist = self.get_sensor_data("Ultrasonic")[1]
-                if upper_dist < k_green_slope and datetime.now() > minimum_time_before_stop:
+                if datetime.now() > minimum_time_before_stop:
                     break
 
                 left_dist = self.get_sensor_data("InfraredSensor")[0]
@@ -1329,8 +1328,7 @@ class PipeLineRobot:
         elif pid_side == "right":
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
-                upper_dist = self.get_sensor_data("Ultrasonic")[1]
-                if upper_dist < k_green_slope and datetime.now() > minimum_time_before_stop:
+                if datetime.now() > minimum_time_before_stop:
                     break
 
                 right_dist = self.get_sensor_data("InfraredSensor")[1]
@@ -1354,10 +1352,10 @@ class PipeLineRobot:
                 self.motors.right.run_forever(speed_sp=right_speed)
 
         elif pid_side is None:
+            k_time = k_time - 0.5
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
-                upper_dist = self.get_sensor_data("Ultrasonic")[1]
-                if upper_dist < k_green_slope and datetime.now() > minimum_time_before_stop:
+                if datetime.now() > minimum_time_before_stop:
                     break
 
                 self.motors.left.run_forever(speed_sp=default_speed)
@@ -1372,7 +1370,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         default_speed = 300
         k_min_white_reflect = 50
-        expected_save_side_dist = 30
+        expected_save_side_dist = 40
 
         color_data = self.get_sensor_data("ColorSensor", "r")
         while color_data[0] > k_min_white_reflect and color_data[1] > k_min_white_reflect:
@@ -1382,7 +1380,7 @@ class PipeLineRobot:
         self.stop_motors()
 
         self.alignment_for_meeting_area_initial_setting()
-        self.move_timed(how_long=0.1, direction="backward")
+        self.move_timed(how_long=0.2, direction="backward")
         left_dist = self.get_sensor_data("InfraredSensor")[0]
         right_dist = self.get_sensor_data("InfraredSensor")[1]
 
@@ -1398,18 +1396,9 @@ class PipeLineRobot:
 
     def go_to_position_before_pipeline(self):
         print("called go_to_position_before_pipeline")
-        k_green_slope = 100
-
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
 
-        while self.color_sensors[0].value() >= k_green_slope:
-            self.motors.right.run_forever(speed_sp=800)
-            self.motors.left.run_forever(speed_sp=800)
-        self.stop_motors()
-
-        ev3.Sound.beep().wait()
-        self.move_timed(0.8, direction="forward")
 
         self.stop_motors()
         self.rotate(-80, speed=500)  # talvez isso deveria ser -80 e não 80
@@ -1419,7 +1408,6 @@ class PipeLineRobot:
 
         k_to_find_end_by_color = 0
         while True:
-            # upper_dist = self.get_sensor_data("Ultrasonic")[1]
             left_distance = self.get_sensor_data("InfraredSensor")[0]
             control = pid(left_distance)
             color_data = self.get_sensor_data("ColorSensor", "r")
