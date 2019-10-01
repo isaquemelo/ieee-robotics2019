@@ -1109,7 +1109,7 @@ class PipeLineRobot:
         return
 
 
-    def alignment_for_meeting_area_initial_setting(self):
+    def alignment_for_meeting_area_initial_setting(self, aligment_with_color=False):
         self.stop_motors()
         print("called alignment_for_meeting_area_initial_setting")
         default_speed = 200
@@ -1173,12 +1173,13 @@ class PipeLineRobot:
                 break
 
         self.stop_motors()
-        color_data = self.get_sensor_data("ColorSensor", "r")
-        end_time = datetime.now() + timedelta(seconds=1)
-        while (color_data[0] >= k_min_white_reflect or color_data[1] >= k_min_white_reflect) and (end_time >= datetime.now()):
-            self.motors.left.run_forever(speed_sp=default_speed)
-            self.motors.right.run_forever(speed_sp=default_speed)
+        if aligment_with_color:
             color_data = self.get_sensor_data("ColorSensor", "r")
+            end_time = datetime.now() + timedelta(seconds=1)
+            while (color_data[0] >= k_min_white_reflect or color_data[1] >= k_min_white_reflect) and (end_time >= datetime.now()):
+                self.motors.left.run_forever(speed_sp=default_speed)
+                self.motors.right.run_forever(speed_sp=default_speed)
+                color_data = self.get_sensor_data("ColorSensor", "r")
         self.stop_motors()
         return
 
@@ -1188,10 +1189,6 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         default_speed = 300
         expected_save_side_dist = 30
-        expected_save_front_dist_to_rotate_after_finding_robot = 20
-        k_to_find_green_slope_by_upper_dist = 100
-        # when the sensor upper dist its on the meeting area it finds around 13 preety mush never dibber than 15
-        k_when_sensor_sees_the_flat_ground_by_upper_dist = 15
         k_min_white_reflect = 50
         k_dist_from_robot = 20
 
@@ -1204,8 +1201,8 @@ class PipeLineRobot:
                 if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:  # double check
                     ev3.Sound.beep()
                     print("found something different from white")
-                    self.get_out_of_color()
-                    self.alignment_for_meeting_area_initial_setting()
+                    needs_to_be_on_color = self.get_out_of_color()
+                    self.alignment_for_meeting_area_initial_setting(aligment_with_color=needs_to_be_on_color)
                     its_green_slope = self.verify_green_slope()
                     if its_green_slope:
                         print("found green slope")
@@ -1411,14 +1408,16 @@ class PipeLineRobot:
         self.stop_motors()
         default_speed = 200
         print("called get_out_of_color")
+        may_be_green_slope = True
 
         self.color_sensors[0].mode = "COL-COLOR"
         self.color_sensors[1].mode = "COL-COLOR"
 
         color_data = self.get_sensor_data("ColorSensor")
         if color_data[0] in ["Blue", "Brown", "Red", "Yellow"] or color_data[1] in ["Blue", "Brown", "Red", "Yellow"]:
+            may_be_green_slope = False
             print("got into a the color = ", color_data)
-            while color_data[0] != "White" and color_data[1] != "White":
+            while color_data[0] != "White" or color_data[1] != "White":
                 print(color_data)
                 self.motors.left.run_forever(speed_sp=-default_speed)
                 self.motors.right.run_forever(speed_sp=-default_speed)
@@ -1427,7 +1426,7 @@ class PipeLineRobot:
         self.stop_motors()
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
-        return
+        return may_be_green_slope
 
 
 # robot = PipeLineRobot()
