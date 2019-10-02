@@ -64,7 +64,12 @@ class PipeLineRobot:
         # watter server settings
         self.has_pipe = False
         self.current_pipe_size = 10  # [10, 15, 20]
-        self.status = "pipeRescue"  # [placingPipe, findingHole, waitingForMasterRescue, pipeTransfering, initialPositionReset]
+
+        self.status_dictionary = {"initialPositionReset": 0, "doneInitialPositionReset": 1, "rescuedPipe": 2, "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5}
+        self.robot_dictionary = {0: "waitingForWatterRobotToAlign", 1: "initialPositionReset", 2: "pipeRescuing", 3: "pipeInPositionToRescue"}
+
+        self.status = self.status_dictionary["initialPositionReset"]
+        self.robot_status = 0
 
         self.secondary_brick_ip = "101.42.0.36"
         self.client = mqtt.Client()
@@ -105,7 +110,7 @@ class PipeLineRobot:
     def receiver_on_client_message(self, client, userdata, message):
         print("message received: ", end="")
         payload = unpack("i", message.payload)
-
+        self.robot_status = self.robot_dictionary[int(payload[0])]
         # self.ultrasonic_sensors['left'] = payload[0]
         # self.ultrasonic_sensors['right'] = payload[1]
         # self.infrared_sensors['front'] = payload[2]
@@ -406,186 +411,186 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         return
 
-    def initial_location_reset(self):
-        k = -1
-        self.stop_motors()
-
-        inner_speed = 400  # > 150
-        rotation_speed = 150  # > 50
-        while True:
-            color_data = self.get_sensor_data("ColorSensor")
-            front_dist = self.infrared_sensors['frontal']
-            upper_dist = self.get_sensor_data("InfraredSensor")[2]
-            # print((self.color_sensors[0].red, self.color_sensors[0].green, self.color_sensors[0].blue))
-
-            print(front_dist, upper_dist)
-            if front_dist < 25:
-                self.stop_motors()
-                print("found robot")
-                ev3.Sound.beep()
-                self.rotate(80 * k)
-                k = k * -1
-
-            if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist <= 42:
-                print("blackzada")
-                self.stop_motors()
-                self.color_alignment()  # talvez tenha que alinhar com o black
-                self.move_timed(0.8, direction="backwards", speed=inner_speed)
-                self.rotate(180, speed=rotation_speed)
-                while True:
-
-                    color_data = self.get_sensor_data("ColorSensor")
-
-                    if self.infrared_sensors['frontal'] < 25:
-                        self.stop_motors()
-                        print("It found a robot - black while")
-                        ev3.Sound.beep()
-                        self.rotate(80 * k)
-                        k = k * -1
-
-                    if color_data[0] == "Undefined":
-                        self.move_timed(0.9, direction="backwards")
-                        self.rotate(20, speed=rotation_speed)
-
-                    elif color_data[1] == "Undefined":
-                        self.move_timed(0.9, direction="backwards")
-                        self.rotate(-20, speed=rotation_speed)
-
-                    self.motors.left.run_forever(speed_sp=inner_speed)
-                    self.motors.right.run_forever(speed_sp=inner_speed)
-                    color_data = self.get_sensor_data("ColorSensor")
-
-                    if "Green" in color_data:
-                        self.stop_motors()
-                        # self.color_alignment()  # talvez alinhar com o verde
-                        # self.move_timed(0.6, direction="backwards", speed=inner_speed)
-                        # self.rotate(angle=180, speed=150)
-                        self.underground_position_reset()
-                        return
-
-                        # while self.get_sensor_data("ColorSensor")
-
-            elif color_data[0] == "Green" or color_data[1] == "Green":
-                print("verdezada")
-                self.stop_motors()
-                # talvez tenha que alinhar com o black
-                # self.move_timed(0.5, direction="backwards")
-                # self.rotate(angle=180, speed=150)
-                self.underground_position_reset()
-                # self.color_alignment("Green")
-                return
-
-            elif self.get_sensor_data("InfraredSensor")[2] >= 40 or color_data[0] == "Undefined":
-                color_data = self.get_sensor_data("ColorSensor")
-
-                if color_data[0] == "Black":
-                    self.stop_motors()
-                    self.rotate(angle=20)
-                    continue
-                if color_data[1] == "Black":
-                    self.stop_motors()
-                    self.rotate(angle=-20)
-                    continue
-
-                print("Abismo")
-
-                while True:
-                    self.motors.left.run_forever(speed_sp=100)
-                    self.motors.right.run_forever(speed_sp=100)
-                    color_data = self.get_sensor_data("ColorSensor")
-
-                    upper_dist = self.get_sensor_data("InfraredSensor")[2]
-                    print(upper_dist)
-
-                    if "Green" in color_data:
-                        print("Nao e abismo, me enganei")
-                        # self.move_timed(0.5, direction="backwards")
-                        # self.rotate(angle=180, speed=150)
-                        self.underground_position_reset()
-
-                    if "Undefined" in color_data:
-                        self.stop_motors()
-                        print("Found undefined")
-                        self.color_alignment()
-                        self.move_timed(0.7, speed=inner_speed, direction="backwards")
-                        self.rotate(80, speed=rotation_speed)
-                        # time.sleep(1)
-
-                        default_speed = 300
-                        set = 20
-                        pid = PID(5, 0, 2, setpoint=-20)
-
-                        while True:
-
-                            side_distance = self.get_sensor_data("InfraredSensor")[0]
-                            color_data = self.get_sensor_data("ColorSensor")
-                            upper_dist = self.get_sensor_data("InfraredSensor")[2]
-                            control = pid(set - side_distance)
-
-                            print(color_data, upper_dist)
-
-                            if color_data[0] == "Undefined":
-                                self.move_timed(0.9, direction="backwards")
-                                self.rotate(20, speed=rotation_speed)
-
-                            elif color_data[1] == "Undefined":
-                                self.move_timed(0.9, direction="backwards")
-                                self.rotate(-20, speed=rotation_speed)
-
-                            if "Black" in color_data and upper_dist <= 42:
-                                self.stop_motors()
-                                print("Right side!")
-                                self.color_alignment()
-                                # self.color_alignment()
-                                self.move_timed(0.5, direction="backwards", speed=inner_speed)
-                                self.rotate(160, speed=rotation_speed)
-
-                                while True:
-                                    color_data = self.get_sensor_data("ColorSensor")
-
-                                    if color_data[0] == "Undefined":
-                                        self.move_timed(0.9, direction="backwards")
-                                        self.rotate(20, speed=rotation_speed)
-
-                                    elif color_data[1] == "Undefined":
-                                        self.move_timed(0.9, direction="backwards")
-                                        self.rotate(-20, speed=rotation_speed)
-
-                                    if "Green" in color_data and self.get_sensor_data("InfraredSensor")[2] > 27:
-                                        self.color_alignment()
-                                        # self.move_timed(0.8, direction="backwards", speed=inner_speed)
-                                        # self.rotate(160, speed=rotation_speed)
-                                        self.underground_position_reset()
-                                        return
-
-                                    self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
-                                    self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
-
-                            elif "Green" in color_data:
-                                self.stop_motors()
-                                print("Left side!")
-                                # self.move_timed(1.4, direction="backwards", speed=rotation_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
-                                # self.rotate(-160, speed=150)
-                                self.underground_position_reset()
-                                return
-                                # else:
-                                #     self.underground_position_reset(side="right")
-
-                            self.motors.left.run_forever(speed_sp=200)
-                            self.motors.right.run_forever(speed_sp=200)
-
-            elif color_data[0] == "Green" or color_data[1] == "Green":
-                print("verdezada")
-                self.stop_motors()
-                # talvez tenha que alinhar com o black
-                # self.move_timed(0.5, direction="backwards")
-                # self.rotate(angle=180, speed=150)
-                self.underground_position_reset()
-                # self.color_alignment("Green")
-                return
-
-            self.motors.left.run_forever(speed_sp=250)
-            self.motors.right.run_forever(speed_sp=250)
+    # def initial_location_reset(self):
+    #     k = -1
+    #     self.stop_motors()
+    #
+    #     inner_speed = 400  # > 150
+    #     rotation_speed = 150  # > 50
+    #     while True:
+    #         color_data = self.get_sensor_data("ColorSensor")
+    #         front_dist = self.infrared_sensors['frontal']
+    #         upper_dist = self.get_sensor_data("InfraredSensor")[2]
+    #         # print((self.color_sensors[0].red, self.color_sensors[0].green, self.color_sensors[0].blue))
+    #
+    #         print(front_dist, upper_dist)
+    #         if front_dist < 25:
+    #             self.stop_motors()
+    #             print("found robot")
+    #             ev3.Sound.beep()
+    #             self.rotate(80 * k)
+    #             k = k * -1
+    #
+    #         if color_data[0] == "Black" or color_data[1] == "Black" and upper_dist <= 42:
+    #             print("blackzada")
+    #             self.stop_motors()
+    #             self.color_alignment()  # talvez tenha que alinhar com o black
+    #             self.move_timed(0.8, direction="backwards", speed=inner_speed)
+    #             self.rotate(180, speed=rotation_speed)
+    #             while True:
+    #
+    #                 color_data = self.get_sensor_data("ColorSensor")
+    #
+    #                 if self.infrared_sensors['frontal'] < 25:
+    #                     self.stop_motors()
+    #                     print("It found a robot - black while")
+    #                     ev3.Sound.beep()
+    #                     self.rotate(80 * k)
+    #                     k = k * -1
+    #
+    #                 if color_data[0] == "Undefined":
+    #                     self.move_timed(0.9, direction="backwards")
+    #                     self.rotate(20, speed=rotation_speed)
+    #
+    #                 elif color_data[1] == "Undefined":
+    #                     self.move_timed(0.9, direction="backwards")
+    #                     self.rotate(-20, speed=rotation_speed)
+    #
+    #                 self.motors.left.run_forever(speed_sp=inner_speed)
+    #                 self.motors.right.run_forever(speed_sp=inner_speed)
+    #                 color_data = self.get_sensor_data("ColorSensor")
+    #
+    #                 if "Green" in color_data:
+    #                     self.stop_motors()
+    #                     # self.color_alignment()  # talvez alinhar com o verde
+    #                     # self.move_timed(0.6, direction="backwards", speed=inner_speed)
+    #                     # self.rotate(angle=180, speed=150)
+    #                     self.underground_position_reset()
+    #                     return
+    #
+    #                     # while self.get_sensor_data("ColorSensor")
+    #
+    #         elif color_data[0] == "Green" or color_data[1] == "Green":
+    #             print("verdezada")
+    #             self.stop_motors()
+    #             # talvez tenha que alinhar com o black
+    #             # self.move_timed(0.5, direction="backwards")
+    #             # self.rotate(angle=180, speed=150)
+    #             self.underground_position_reset()
+    #             # self.color_alignment("Green")
+    #             return
+    #
+    #         elif self.get_sensor_data("InfraredSensor")[2] >= 40 or color_data[0] == "Undefined":
+    #             color_data = self.get_sensor_data("ColorSensor")
+    #
+    #             if color_data[0] == "Black":
+    #                 self.stop_motors()
+    #                 self.rotate(angle=20)
+    #                 continue
+    #             if color_data[1] == "Black":
+    #                 self.stop_motors()
+    #                 self.rotate(angle=-20)
+    #                 continue
+    #
+    #             print("Abismo")
+    #
+    #             while True:
+    #                 self.motors.left.run_forever(speed_sp=100)
+    #                 self.motors.right.run_forever(speed_sp=100)
+    #                 color_data = self.get_sensor_data("ColorSensor")
+    #
+    #                 upper_dist = self.get_sensor_data("InfraredSensor")[2]
+    #                 print(upper_dist)
+    #
+    #                 if "Green" in color_data:
+    #                     print("Nao e abismo, me enganei")
+    #                     # self.move_timed(0.5, direction="backwards")
+    #                     # self.rotate(angle=180, speed=150)
+    #                     self.underground_position_reset()
+    #
+    #                 if "Undefined" in color_data:
+    #                     self.stop_motors()
+    #                     print("Found undefined")
+    #                     self.color_alignment()
+    #                     self.move_timed(0.7, speed=inner_speed, direction="backwards")
+    #                     self.rotate(80, speed=rotation_speed)
+    #                     # time.sleep(1)
+    #
+    #                     default_speed = 300
+    #                     set = 20
+    #                     pid = PID(5, 0, 2, setpoint=-20)
+    #
+    #                     while True:
+    #
+    #                         side_distance = self.get_sensor_data("InfraredSensor")[0]
+    #                         color_data = self.get_sensor_data("ColorSensor")
+    #                         upper_dist = self.get_sensor_data("InfraredSensor")[2]
+    #                         control = pid(set - side_distance)
+    #
+    #                         print(color_data, upper_dist)
+    #
+    #                         if color_data[0] == "Undefined":
+    #                             self.move_timed(0.9, direction="backwards")
+    #                             self.rotate(20, speed=rotation_speed)
+    #
+    #                         elif color_data[1] == "Undefined":
+    #                             self.move_timed(0.9, direction="backwards")
+    #                             self.rotate(-20, speed=rotation_speed)
+    #
+    #                         if "Black" in color_data and upper_dist <= 42:
+    #                             self.stop_motors()
+    #                             print("Right side!")
+    #                             self.color_alignment()
+    #                             # self.color_alignment()
+    #                             self.move_timed(0.5, direction="backwards", speed=inner_speed)
+    #                             self.rotate(160, speed=rotation_speed)
+    #
+    #                             while True:
+    #                                 color_data = self.get_sensor_data("ColorSensor")
+    #
+    #                                 if color_data[0] == "Undefined":
+    #                                     self.move_timed(0.9, direction="backwards")
+    #                                     self.rotate(20, speed=rotation_speed)
+    #
+    #                                 elif color_data[1] == "Undefined":
+    #                                     self.move_timed(0.9, direction="backwards")
+    #                                     self.rotate(-20, speed=rotation_speed)
+    #
+    #                                 if "Green" in color_data and self.get_sensor_data("InfraredSensor")[2] > 27:
+    #                                     self.color_alignment()
+    #                                     # self.move_timed(0.8, direction="backwards", speed=inner_speed)
+    #                                     # self.rotate(160, speed=rotation_speed)
+    #                                     self.underground_position_reset()
+    #                                     return
+    #
+    #                                 self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
+    #                                 self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
+    #
+    #                         elif "Green" in color_data:
+    #                             self.stop_motors()
+    #                             print("Left side!")
+    #                             # self.move_timed(1.4, direction="backwards", speed=rotation_speed)  # talvez precise andar pra traz até para so fazer a rotação encima da meeting area
+    #                             # self.rotate(-160, speed=150)
+    #                             self.underground_position_reset()
+    #                             return
+    #                             # else:
+    #                             #     self.underground_position_reset(side="right")
+    #
+    #                         self.motors.left.run_forever(speed_sp=200)
+    #                         self.motors.right.run_forever(speed_sp=200)
+    #
+    #         elif color_data[0] == "Green" or color_data[1] == "Green":
+    #             print("verdezada")
+    #             self.stop_motors()
+    #             # talvez tenha que alinhar com o black
+    #             # self.move_timed(0.5, direction="backwards")
+    #             # self.rotate(angle=180, speed=150)
+    #             self.underground_position_reset()
+    #             # self.color_alignment("Green")
+    #             return
+    #
+    #         self.motors.left.run_forever(speed_sp=250)
+    #         self.motors.right.run_forever(speed_sp=250)
 
     # anda frente -> procura cor (verde, preto, undefined)
     # achou cor:
@@ -682,6 +687,7 @@ class PipeLineRobot:
     #
     #         self.motors.left.run_forever(speed_sp=l_speed)
     #         self.motors.right.run_forever(speed_sp=r_speed)
+
     def black_line_following(self):
         default_speed = 300
         reduce_speed = 150
@@ -1175,7 +1181,7 @@ class PipeLineRobot:
         self.stop_motors()
         return
 
-    def meeting_area_initial_setting(self):
+    def initial_location_reset(self):
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         default_speed = 300
@@ -1417,10 +1423,3 @@ class PipeLineRobot:
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         return may_be_green_slope
-
-
-# robot = PipeLineRobot()
-# while True:
-#     msg = input()
-#     robot.status = int(msg)
-#     robot.publish_data()
