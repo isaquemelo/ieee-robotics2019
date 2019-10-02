@@ -8,7 +8,6 @@ from simple_pid import PID
 import time
 from time import sleep
 
-from calibrated_consts import black_line_following
 import paho.mqtt.client as mqtt
 from struct import *
 
@@ -158,11 +157,12 @@ class PipeLineRobot:
 
         elif sensor_name == "ColorSensor":
             if ColorSensorMode != "COL-COLOR":
-                return [self.color_sensors[0].value(), self.color_sensors[1].value()]
+                return- [self.color_sensors[0].value(), self.color_sensors[1].value()]
 
             return [self.dict_colors[self.color_sensors[0].color], self.dict_colors[self.color_sensors[1].color]]
 
     def rotate(self, angle, axis="own", speed=DEFAULT_SPEED):
+
         print("rotating ", angle, "deg at ", speed, " speed")
         if angle == 0:
             # print("Rotate 0 deg does not make sense")
@@ -268,10 +268,11 @@ class PipeLineRobot:
         speed_b = 0
 
         border_situation = False
+        initial_time = datetime.now()
         time = 0
 
         while True:
-            side_distance = self.get_sensor_data("InfraredSensor")[1]
+            side_distance = self.get_sensor_data("InfraredSensor")[0]
             front_distance = self.get_sensor_data("InfraredSensor")[2]
             upper_dist = self.get_sensor_data("Ultrasonic")[1]
             control = pid(side_distance)
@@ -294,27 +295,33 @@ class PipeLineRobot:
                 if border_situation is not None:
                     if border_situation is False:
                         print("cruva sem risco")
-                        sleep(3)
-                        self.move_timed(how_long=0.3, direction="backwards")
-                        self.rotate(-80, axis="own", speed=90)
+                        # sleep(3)
+                        self.move_timed(how_long=0.2, direction="backwards")
+                        self.rotate(80, axis="own", speed=90)
                         time = datetime.now()
                         border_situation = True
-                    elif border_situation:
+                    elif border_situation and not (datetime.now() - initial_time > timedelta(seconds=3)):
                         border_situation = None
                         print("curva com provavel risco")
                         if datetime.now() - time <= timedelta(seconds=1.7):
                             print("realmente havia risco")
-                            self.rotate(-80, axis="own", speed=90)
+                            self.rotate(80, axis="own", speed=90)
                         else:
                             print("na verdade nao havia risco")
-                            self.move_timed(how_long=0.3, direction="backwards")
-                            self.rotate(-80, axis="own", speed=90)
-                        sleep(3)
+                            self.move_timed(how_long=0.2, direction="backwards")
+                            self.rotate(80, axis="own", speed=90)
+                        # sleep(3)
+                    elif border_situation and (datetime.now() - initial_time > timedelta(seconds=3)):
+                        border_situation = None
+                        print("curva sem risco")
+                        # sleep(3)
+                        self.move_timed(how_long=0.2, direction="backwards")
+                        self.rotate(80, axis="own", speed=90)
                 elif border_situation is None:
                     print("curva sem risco")
-                    sleep(3)
-                    self.move_timed(how_long=0.3, direction="backwards")
-                    self.rotate(-80, axis="own", speed=90)
+                    # sleep(3)
+                    self.move_timed(how_long=0.2, direction="backwards")
+                    self.rotate(80, axis="own", speed=90)
 
             speed_a = default_speed + control
             speed_b = default_speed - control
@@ -331,8 +338,8 @@ class PipeLineRobot:
             elif speed_b <= -1000:
                 speed_b = -1000
 
-            self.motors.left.run_forever(speed_sp=speed_b)
-            self.motors.right.run_forever(speed_sp=speed_a)
+            self.motors.left.run_forever(speed_sp=speed_a)
+            self.motors.right.run_forever(speed_sp=speed_b)
 
     def adjust_corner_to_go_green(self):
         self.rotate(angle=-80)
