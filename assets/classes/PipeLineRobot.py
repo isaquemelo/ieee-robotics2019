@@ -162,7 +162,7 @@ class PipeLineRobot:
 
         elif sensor_name == "ColorSensor":
             if ColorSensorMode != "COL-COLOR":
-                return- [self.color_sensors[0].value(), self.color_sensors[1].value()]
+                return [self.color_sensors[0].value(), self.color_sensors[1].value()]
 
             return [self.dict_colors[self.color_sensors[0].color], self.dict_colors[self.color_sensors[1].color]]
 

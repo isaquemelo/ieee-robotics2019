@@ -30,9 +30,10 @@ def main():
             robot.status = robot.status_dictionary["doneInitialPositionReset"]
             robot.publish_data()
 
-            while robot.robot_status != "pipeInPositionToRescue": pass
+            while robot.robot_status != "pipeInPositionToRescue": print(robot.robot_status)
             print("RECEBI MENSAGEM MANDANDO SUBIRRRRR")
             sleep(8)
+            robot.black_line_flw()
             # robot.pipeline_support_following()
             # ev3.Sound.speak("END!")
             # sleep(3)
