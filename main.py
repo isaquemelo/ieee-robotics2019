@@ -33,7 +33,7 @@ def main():
             while robot.robot_status != "pipeInPositionToRescue": print(robot.robot_status)
             print("RECEBI MENSAGEM MANDANDO SUBIRRRRR")
             sleep(8)
-            robot.black_line_flw()
+            robot.climb_green_slope()
             # robot.pipeline_support_following()
             # ev3.Sound.speak("END!")
             # sleep(3)

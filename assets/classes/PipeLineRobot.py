@@ -1026,7 +1026,7 @@ class PipeLineRobot:
             print(gyro)
             time.sleep(2)
 
-    def black_line_flw(self):
+    def black_line_flw(self, side):
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         found_pipe = False
@@ -1423,3 +1423,133 @@ class PipeLineRobot:
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         return may_be_green_slope
+
+    def climb_green_slope(self, side):
+        self.stop_motors()
+        print("called climb_green_slope")
+        k_min_white_reflect = 50
+        time = None
+        can_break = False
+        expected_save_side_dist = 30
+        pid = PID(5, 0, 5, setpoint=expected_save_side_dist)
+        default_speed = 400
+        max_control = 200
+
+        if side == "left":
+            side = 0
+        else:
+            side = 1
+
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+
+        while True:
+            color_data = self.get_sensor_data("ColorSensor", "r")
+
+            if color_data[0] >= k_min_white_reflect or color_data[1] >= k_min_white_reflect:
+                can_break = True
+                time = datetime.now()
+
+            if can_break and datetime.now() > time + timedelta(seconds=2):
+                self.stop_motors()
+                break
+
+            side_dist = self.get_sensor_data("InfraredSensor")[side]
+            control = pid(side_dist)
+
+            if control > max_control:
+                control = max_control
+            elif control < -max_control:
+                control = -max_control
+
+            left_speed = default_speed - control
+            right_speed = default_speed + control
+
+            if side == 0:
+                self.motors.left.run_forever(speed_sp=left_speed)
+                self.motors.right.run_forever(speed_sp=right_speed)
+
+            else:
+                self.motors.left.run_forever(speed_sp=right_speed)
+                self.motors.right.run_forever(speed_sp=left_speed)
+
+        self.get_on_position_before_black_line_flw(side)
+
+    def get_on_position_before_black_line_flw(self, side):
+        self.stop_motors()
+        print("called get_on_position_before_black_line_flw")
+        k_min_white_reflect = 50
+        expected_save_side_dist = 30
+        pid = PID(5, 0, 5, setpoint=expected_save_side_dist)
+        default_speed = 400
+        max_control = 200
+
+        if side == "left":
+            side = 0
+        else:
+            side = 1
+
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+
+        while True:
+            color_data = self.get_sensor_data("ColorSensor", "r")
+
+            if color_data[0] >= k_min_white_reflect or color_data[1] >= k_min_white_reflect:
+                self.stop_motors()
+                break
+
+            side_dist = self.get_sensor_data("InfraredSensor")[side]
+            control = pid(side_dist)
+
+            if control > max_control:
+                control = max_control
+            elif control < -max_control:
+                control = -max_control
+
+            left_speed = default_speed - control
+            right_speed = default_speed + control
+
+            if side == 0:
+                self.motors.left.run_forever(speed_sp=left_speed)
+                self.motors.right.run_forever(speed_sp=right_speed)
+
+            else:
+                self.motors.left.run_forever(speed_sp=right_speed)
+                self.motors.right.run_forever(speed_sp=left_speed)
+
+        needs_to_be_on_color = self.get_out_of_color()
+        self.alignment_for_meeting_area_initial_setting(aligment_with_color=needs_to_be_on_color)
+
+        color_data = self.get_sensor_data("ColorSensor", "r")
+        while color_data[side] >= k_min_white_reflect:
+            self.motors.left.run_forever(speed_sp=200)
+            self.motors.right.run_forever(speed_sp=200)
+            color_data = self.get_sensor_data("ColorSensor", "r")
+        self.stop_motors()
+
+        self.adjust_before_black_line_flw(side)
+
+    def adjust_before_black_line_flw(self, side):
+        self.stop_motors()
+        print("called adjust_before_black_line_flw")
+        k_min_white_reflect = 50
+        default_speed = 200
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
+
+        color_data = self.get_sensor_data("ColorSensor", "r")
+
+        if side == "left":
+            while color_data[0] < k_min_white_reflect:
+                self.motors.right.run_forever(speed_sp=-default_speed)
+                color_data = self.get_sensor_data("ColorSensor", "r")
+            self.stop_motors()
+
+        else:
+            while color_data[1] < k_min_white_reflect:
+                self.motors.left.run_forever(speed_sp=-default_speed)
+                color_data = self.get_sensor_data("ColorSensor", "r")
+            self.stop_motors()
+
+        self.black_line_flw()
