@@ -25,15 +25,16 @@ def main():
         # robot.rotate(80, axis="own", speed=90)
         # robot.pipeline_support_following()
         # robot.black_line_following()
-        while True:
-            robot.initial_location_reset()
-            robot.status = robot.status_dictionary["doneInitialPositionReset"]
-            robot.publish_data()
-
-            while robot.robot_status != "pipeInPositionToRescue": print(robot.robot_status)
-            print("RECEBI MENSAGEM MANDANDO SUBIRRRRR")
-            sleep(8)
-            robot.climb_green_slope()
+        # while True:
+        #     robot.initial_location_reset()
+        #     robot.status = robot.status_dictionary["doneInitialPositionReset"]
+        #     robot.publish_data()
+        #
+        #     while robot.robot_status != "pipeInPositionToRescue": print(robot.robot_status)
+        #     print("RECEBI MENSAGEM MANDANDO SUBIRRRRR")
+        #     sleep(8)
+        #     robot.climb_green_slope("right")
+        robot.get_on_position_before_black_line_flw("left")
             # robot.pipeline_support_following()
             # ev3.Sound.speak("END!")
             # sleep(3)
