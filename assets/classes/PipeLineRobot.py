@@ -1352,7 +1352,7 @@ class PipeLineRobot:
         self.rotate(-80, speed=500)  # talvez isso deveria ser -80 e não 80
 
         default_speed = 500
-        pid = PID(12, 0, 10, setpoint=15)
+        pid = PID(12, 0, 10, setpoint=20)
 
         k_to_find_end_by_color = 0
         while True:
@@ -1408,7 +1408,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         return may_be_green_slope
 
-    def climb_green_slope(self, side):
+    def climb_green_slope(self):
         self.stop_motors()
         print("called climb_green_slope")
         default_speed = 400
@@ -1434,8 +1434,6 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=default_speed)
             self.motors.right.run_forever(speed_sp=default_speed)
 
-        # self.get_on_position_before_black_line_flw(side)
-        return
 
     def get_on_position_before_black_line_flw(self, side):
         self.stop_motors()
@@ -1477,8 +1475,6 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor", "r")
         self.stop_motors()
 
-        # self.adjust_before_black_line_flw(side)
-        return
 
     def adjust_before_black_line_flw(self, side):
         self.stop_motors()
@@ -1518,4 +1514,23 @@ class PipeLineRobot:
                     self.stop_motors()
                     self.rotate(angle=-3, speed=150)
                     break
-        # self.black_line_flw(side)
+
+    def go_grab_pipe_routine(self, side):
+        self.stop_motors()
+        print("called go_grab_pipe_routine")
+        if side == "left":
+            print("using left side")
+            self.move_timed(how_long=0.5, direction="backward")
+            self.rotate(angle=-80)
+
+        else:
+            print("using right side")
+            self.rotate(angle=-80)
+            self.move_timed(how_long=0.3, direction="backward")
+            self.rotate(angle=80)
+            self.rotate(angle=80)
+
+        self.climb_green_slope()
+        self.get_on_position_before_black_line_flw(side)
+        self.adjust_before_black_line_flw(side)
+        self.black_line_flw(side)
