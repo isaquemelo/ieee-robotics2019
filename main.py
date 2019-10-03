@@ -34,7 +34,11 @@ def main():
         #     print("RECEBI MENSAGEM MANDANDO SUBIRRRRR")
         #     sleep(8)
         #     robot.climb_green_slope("right")
-        robot.get_on_position_before_black_line_flw("left")
+        while True:
+            # robot.climb_green_slope("left")
+            robot.get_on_position_before_black_line_flw("right")
+            robot.adjust_before_black_line_flw("right")
+            robot.black_line_flw("right")
             # robot.pipeline_support_following()
             # ev3.Sound.speak("END!")
             # sleep(3)

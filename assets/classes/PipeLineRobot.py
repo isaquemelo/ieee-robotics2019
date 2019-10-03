@@ -1092,10 +1092,9 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-COLOR"
         return
 
-    def alignment_for_meeting_area_initial_setting(self, aligment_with_color=False):
+    def alignment_for_meeting_area_initial_setting(self, aligment_with_color=False, default_speed=200):
         self.stop_motors()
         print("called alignment_for_meeting_area_initial_setting")
-        default_speed = 200
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         k_min_white_reflect = 50
@@ -1412,19 +1411,8 @@ class PipeLineRobot:
     def climb_green_slope(self, side):
         self.stop_motors()
         print("called climb_green_slope")
-        k_min_white_reflect = 50
-        time = None
-        can_break = False
-        expected_save_side_dist = 30
-        pid = PID(5, 0, 5, setpoint=expected_save_side_dist)
-        default_speed = 800
-        max_control = 100
+        default_speed = 400
         counter = 0
-
-        if side == "left":
-            side = 0
-        else:
-            side = 1
 
         self.color_sensors[0].mode = "COL-COLOR"
         self.color_sensors[1].mode = "COL-COLOR"
@@ -1443,45 +1431,18 @@ class PipeLineRobot:
                 self.stop_motors()
                 break
 
-            side_dist = self.get_sensor_data("InfraredSensor")[side]
-            control = pid(side_dist)
+            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
 
-            if control > max_control:
-                control = max_control
-            elif control < -max_control:
-                control = -max_control
-
-            left_speed = default_speed - control
-            right_speed = default_speed + control
-
-            if side == 0:
-                self.motors.left.run_forever(speed_sp=default_speed)
-                self.motors.right.run_forever(speed_sp=default_speed)
-
-            else:
-                self.motors.left.run_forever(speed_sp=default_speed)
-                self.motors.right.run_forever(speed_sp=default_speed)
-
-        if side == 0:
-            side = "left"
-        else:
-            side = "right"
-        self.get_on_position_before_black_line_flw(side)
+        # self.get_on_position_before_black_line_flw(side)
+        return
 
     def get_on_position_before_black_line_flw(self, side):
         self.stop_motors()
         ev3.Sound.beep()
         print("called get_on_position_before_black_line_flw")
         k_min_white_reflect = 50
-        expected_save_side_dist = 30
-        pid = PID(5, 0, 5, setpoint=expected_save_side_dist)
-        default_speed = 150
-        max_control = 150
-
-        if side == "left":
-            side = 0
-        else:
-            side = 1
+        default_speed = 100
 
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
@@ -1491,62 +1452,70 @@ class PipeLineRobot:
 
             if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:
                 self.stop_motors()
+                needs_to_be_on_color = self.get_out_of_color()
+                if not needs_to_be_on_color:
+                    self.move_timed(how_long=0.2, direction="backward")
+                    if default_speed - 100 >= 100:
+                        default_speed -= 100
+                        pass
+                    continue
                 break
 
-            side_dist = self.get_sensor_data("InfraredSensor")[side]
-            control = pid(side_dist)
+            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
 
-            if control > max_control:
-                control = max_control
-            elif control < -max_control:
-                control = -max_control
-
-            left_speed = default_speed - control
-            right_speed = default_speed + control
-
-            if side == 0:
-                self.motors.left.run_forever(speed_sp=default_speed)
-                self.motors.right.run_forever(speed_sp=default_speed)
-
-            else:
-                self.motors.left.run_forever(speed_sp=default_speed)
-                self.motors.right.run_forever(speed_sp=default_speed)
-
-        needs_to_be_on_color = self.get_out_of_color()
-        self.alignment_for_meeting_area_initial_setting(aligment_with_color=needs_to_be_on_color)
+        self.alignment_for_meeting_area_initial_setting(aligment_with_color=True, default_speed=100)
 
         color_data = self.get_sensor_data("ColorSensor", "r")
+        if side == "left":
+            side = 0
+        else:
+            side = 1
         while color_data[side] >= k_min_white_reflect:
-            self.motors.left.run_forever(speed_sp=200)
-            self.motors.right.run_forever(speed_sp=200)
+            self.motors.left.run_forever(speed_sp=100)
+            self.motors.right.run_forever(speed_sp=100)
             color_data = self.get_sensor_data("ColorSensor", "r")
         self.stop_motors()
 
-        if side == 0:
-            side = "left"
-        else:
-            side = "right"
-        self.adjust_before_black_line_flw(side)
+        # self.adjust_before_black_line_flw(side)
+        return
 
     def adjust_before_black_line_flw(self, side):
         self.stop_motors()
         print("called adjust_before_black_line_flw")
         default_speed = 200
-        self.color_sensors[0].mode = "COL-COLOR"
-        self.color_sensors[1].mode = "COL-COLOR"
 
-        color_data = self.get_sensor_data("ColorSensor")
+        self.reset_gyroscope()
+        gyro = self.get_sensor_data("GyroSensor")
 
         if side == "left":
-            while color_data[0] != "White":
+            while gyro < 71:
                 self.motors.right.run_forever(speed_sp=-default_speed)
-                color_data = self.get_sensor_data("ColorSensor", "r")
+                gyro = self.get_sensor_data("GyroSensor")
             self.stop_motors()
 
         else:
-            while color_data[1] != "White":
+            while gyro > -71:
                 self.motors.left.run_forever(speed_sp=-default_speed)
-                color_data = self.get_sensor_data("ColorSensor", "r")
+                gyro = self.get_sensor_data("GyroSensor")
             self.stop_motors()
         sleep(3)
-        self.black_line_flw(side)
+
+        while True:
+            color_date = self.get_sensor_data("ColorSensor", "r")
+
+            if side == "left":
+                self.motors.left.run_forever(speed_sp=200)
+                self.motors.right.run_forever(speed_sp=200 + 20)
+                if color_date[0] < 50:
+                    self.stop_motors()
+                    self.rotate(angle=3, speed=150)
+                    break
+            else:
+                self.motors.left.run_forever(speed_sp=200 + 20)
+                self.motors.right.run_forever(speed_sp=200)
+                if color_date[1] < 50:
+                    self.stop_motors()
+                    self.rotate(angle=-3, speed=150)
+                    break
+        # self.black_line_flw(side)
