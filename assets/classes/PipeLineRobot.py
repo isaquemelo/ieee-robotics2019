@@ -293,32 +293,32 @@ class PipeLineRobot:
             # print(side_distance, front_distance)
             # print("control = ", control)
 
-            # if upper_dist >= 23:
-            #     self.stop_motors()
-            #     ev3.Sound.beep()
-            #     print("finished pipeline_support_following couse found the edge")
-            #     return
-            #
+            if upper_distance >= 23:
+                self.stop_motors()
+                print("finished pipeline_support_following 'cause found the edge")
+                return
 
             if pipe_distance > 40 and abs(pipe_distance - last_pipe_distance) < 10:
-                self.rotate(-90, speed=90)
+                self.align_with_hole()
                 has_pipe_already = self.has_pipe_check()
 
                 if has_pipe_already is False:
-                    print("PLACE PIPE!")
+                    print("Hole detect! Placing pipe ")
                     self.move_timed(2, speed=150)
-                    self.move_handler(3, speed=100)
+                    self.move_handler(7, speed=10)
                     self.move_timed(0.5, direction="backwards", speed=300)
-                    self.handler.left.run_forever(speed_sp=50)
+                    self.move_handler(1, direction="top", speed=1000)
+                    self.handler.left.run_forever(speed_sp=-150)
                     self.rotate(90, speed=90)
 
                 elif has_pipe_already is True:
-                    print("ALREADY HAS PIPE! MISSGUIDED DETECTION")
+                    print("Already has pipe! Misguided sensor info")
                     self.rotate(90, speed=90)
                     continue
                 elif has_pipe_already is None:
-                    print("ERROR! IT WASNT ABLE TO DETECT ANYTHING")
-                    return
+                    print("Info not reliable at all!")
+                    self.rotate(90, speed=90)
+                    continue
 
             if front_distance < front_distance_to_rotate:
                 self.stop_motors()
@@ -389,12 +389,63 @@ class PipeLineRobot:
 
         print(top_values)
         if top_values[0] < top_values[2] and top_values[1] < top_values[2]:
-            if top_values[0] < 9:
+            if top_values[0] <= 9:
                 return True
-            elif top_values[0] > 12:
+            elif top_values[0] >= 11:
                 return False
             else:
                 return None
+
+    def align_with_hole(self) -> int:
+        self.stop_motors()
+        default_speed = 150
+
+        pid = PID(12, 0, 6, setpoint=2)
+
+        speed_a = 0
+        speed_b = 0
+
+        initial_time = datetime.now()
+
+
+        while True:
+            side_distance = self.get_sensor_data("InfraredSensor")[0]
+            front_distance = self.get_sensor_data("InfraredSensor")[2]
+            pipe_distance = self.get_sensor_data("Ultrasonic")[0]
+            upper_distance = self.get_sensor_data("Ultrasonic")[1]
+            control = pid(side_distance)
+
+            # print(side_distance, front_distance)
+            # print("control = ", control)
+
+            if pipe_distance < 20:
+                # self.move_timed(0.3, speed=300)
+                self.stop_motors()
+                end_hole_time = datetime.now()
+                delta_time = (end_hole_time - initial_time)/2
+                print(delta_time.seconds + delta_time.microseconds/10**6)
+                self.move_timed(delta_time.seconds + delta_time.microseconds/10**6, direction="backwards", speed=150)
+                self.rotate(-90, speed=100)
+                return
+
+            speed_a = default_speed + control
+            speed_b = default_speed - control
+
+            # print(control)
+
+            if speed_a >= 1000:
+                speed_a = 1000
+            elif speed_a <= -1000:
+                speed_a = -1000
+
+            if speed_b >= 1000:
+                speed_b = 1000
+            elif speed_b <= -1000:
+                speed_b = -1000
+
+            self.motors.left.run_forever(speed_sp=speed_a)
+            self.motors.right.run_forever(speed_sp=speed_b)
+
 
     def adjust_corner_to_go_green(self):
         self.rotate(angle=-80)
