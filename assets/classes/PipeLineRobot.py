@@ -56,7 +56,9 @@ class PipeLineRobot:
         self.motors.right.polarity = "inversed"
 
         self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outC'))
-        self.handler.left.run_forever(speed_sp=-50)
+
+        self.move_handler(3, direction="top", speed=1000)
+        self.handler.left.run_forever(speed_sp=-1000)
 
         # define status
         self.historic = [""]
@@ -251,7 +253,7 @@ class PipeLineRobot:
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         pass
 
-    def move_handler(self, how_long=7, direction="down", speed=1000):
+    def move_handler(self, how_long=7, direction="down", speed=50):
         end_time = datetime.now() + timedelta(seconds=how_long)
 
         vel = speed
@@ -298,14 +300,18 @@ class PipeLineRobot:
             #     return
             #
 
-            print(self.motors.left.)
             if pipe_distance > 40 and abs(pipe_distance - last_pipe_distance) < 10:
                 self.rotate(-90, speed=90)
                 has_pipe_already = self.has_pipe_check()
 
                 if has_pipe_already is False:
                     print("PLACE PIPE!")
-                    return
+                    self.move_timed(2, speed=150)
+                    self.move_handler(3, speed=100)
+                    self.move_timed(0.5, direction="backwards", speed=300)
+                    self.handler.left.run_forever(speed_sp=50)
+                    self.rotate(90, speed=90)
+
                 elif has_pipe_already is True:
                     print("ALREADY HAS PIPE! MISSGUIDED DETECTION")
                     self.rotate(90, speed=90)
@@ -1036,8 +1042,10 @@ class PipeLineRobot:
                 self.handler.left.run_forever(speed_sp=-1000)
 
                 c = 0
+                value = 10 if side == "right" else -10
+
                 while c < 5:
-                    self.rotate(10, speed=200)
+                    self.rotate(value, speed=200)
                     self.move_timed(0.3, speed=200)
                     c += 1
 
@@ -1527,3 +1535,6 @@ class PipeLineRobot:
         self.get_on_position_before_black_line_flw(side)
         self.adjust_before_black_line_flw(side)
         self.black_line_following(side)
+
+
+

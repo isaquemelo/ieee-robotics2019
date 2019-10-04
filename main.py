@@ -31,11 +31,10 @@ def main():
         #     robot.publish_data()
         #
         #     while robot.robot_status != "pipeInPositionToRescue": print(robot.robot_status)
-        #     print("RECEBI MENSAGEM MANDANDO SUBIRRRRR")
-        #     sleep(8)
         #     robot.go_grab_pipe_routine(side="right")
-        #     ev3.Sound.speak("END!")
-        #     sleep(3)
+        #     robot.status = robot.status_dictionary["rescuedPipe"]
+        #     robot.publish_data()
+        #     break
 
         # while True:
         #     robot.initial_location_reset()
@@ -44,6 +43,7 @@ def main():
         # robot.underground_position_reset()
         # robot.black_line_flw()
         # robot.go_down_green_slope()
+
         robot.pipeline_support_following()
         # robot.black_line_following("left")
 
