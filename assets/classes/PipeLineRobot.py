@@ -428,6 +428,14 @@ class PipeLineRobot:
                 self.rotate(-90, speed=100)
                 return
 
+            if time.now() == initial_time + timedelta(seconds=1.5):
+                print("Alignment took to long, canceling...")
+                end_hole_time = datetime.now()
+                delta_time = (end_hole_time - initial_time)
+                self.move_timed(delta_time.seconds + delta_time.microseconds / 10 ** 6, direction="backwards",
+                                speed=150)
+                break
+
             speed_a = default_speed + control
             speed_b = default_speed - control
 
