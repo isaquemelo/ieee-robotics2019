@@ -1254,9 +1254,9 @@ class PipeLineRobot:
                     left_dist = self.get_sensor_data("InfraredSensor")[0]
                     right_dist = self.get_sensor_data("InfraredSensor")[1]
                     if left_dist > expected_save_side_dist:
-                        self.rotate(-80)
+                        self.get_out_of_risk_edge_situation(side="left")
                     elif right_dist > expected_save_side_dist:
-                        self.rotate(80)
+                        self.get_out_of_risk_edge_situation(side="right")
                     else:
                         print("rotation decision is save")
                         self.rotate(80)
@@ -1588,4 +1588,24 @@ class PipeLineRobot:
         self.black_line_following(side)
 
 
+    def get_out_of_risk_edge_situation(self, side):
+        self.stop_motors()
+        print("get_out_of_risk_edge_situation, with side", side)
+        default_speed = 200
+        k_angle = 45
+        self.reset_gyroscope()
+        gyro = self.get_sensor_data("GyroSensor")
 
+        if side == "left":
+            while gyro > -k_angle:
+                self.motors.left.run_forever(speed_sp=-default_speed)
+                gyro = self.get_sensor_data("GyroSensor")
+
+        else:
+            while gyro < k_angle:
+                self.motors.right.run_forever(speed_sp=-default_speed)
+                gyro = self.get_sensor_data("GyroSensor")
+
+        self.stop_motors()
+        self.move_timed(how_long=0.3, direction="backward")
+        self.rotate(angle=160)
