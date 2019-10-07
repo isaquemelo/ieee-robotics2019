@@ -283,6 +283,8 @@ class PipeLineRobot:
         last_pipe_distance = self.get_sensor_data("Ultrasonic")[0]
         last_last_pipe_distance = 255
 
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
             front_distance = self.get_sensor_data("InfraredSensor")[2]
@@ -293,19 +295,21 @@ class PipeLineRobot:
             # print(side_distance, front_distance)
             # print("control = ", control)
 
-            if upper_distance >= 23:
+            color_data = self.get_sensor_data("ColorSensor", "r")
+            if color_data[0] == 0 or color_data[1] == 0:
                 self.stop_motors()
-                print("finished pipeline_support_following 'cause found the edge")
-                return
+                if self.get_sensor_data("Ultrasonic")[1] > 23:
+                    print("finished pipeline_support_following 'cause found the edge upper_dist =", upper_distance)
+                    return
 
             if pipe_distance > 40 and abs(pipe_distance - last_pipe_distance) < 10:
                 self.align_with_hole()
                 has_pipe_already = self.has_pipe_check()
 
-                if has_pipe_already is False:
+                if has_pipe_already is False:  # and robot is with pipe
                     print("Hole detect! Placing pipe ")
                     self.move_timed(2, speed=150)
-                    self.move_handler(7, speed=10)
+                    self.move_handler(10, speed=10)
                     self.move_timed(0.5, direction="backwards", speed=300)
                     self.move_handler(1, direction="top", speed=1000)
                     self.handler.left.run_forever(speed_sp=-150)
@@ -399,6 +403,8 @@ class PipeLineRobot:
     def align_with_hole(self) -> int:
         self.stop_motors()
         default_speed = 150
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
 
         pid = PID(12, 0, 6, setpoint=2)
 
@@ -407,13 +413,20 @@ class PipeLineRobot:
 
         initial_time = datetime.now()
 
-
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
             front_distance = self.get_sensor_data("InfraredSensor")[2]
             pipe_distance = self.get_sensor_data("Ultrasonic")[0]
             upper_distance = self.get_sensor_data("Ultrasonic")[1]
             control = pid(side_distance)
+
+            color_data = self.get_sensor_data("ColorSensor", "r")
+            if color_data[0] == 0 or color_data[1] == 0:
+                self.stop_motors()
+                if self.get_sensor_data("Ultrasonic")[1] > 23:
+                    ev3.Sound.beep()
+                    print("found end of the pipeline")
+                    return
 
             # print(side_distance, front_distance)
             # print("control = ", control)
@@ -428,13 +441,13 @@ class PipeLineRobot:
                 self.rotate(-90, speed=100)
                 return
 
-            if time.now() == initial_time + timedelta(seconds=1.5):
+            if datetime.now() == initial_time + timedelta(seconds=1.5):
                 print("Alignment took to long, canceling...")
                 end_hole_time = datetime.now()
-                delta_time = (end_hole_time - initial_time)
-                self.move_timed(delta_time.seconds + delta_time.microseconds / 10 ** 6, direction="backwards",
-                                speed=150)
-                break
+                # delta_time = (end_hole_time - initial_time)
+                # self.move_timed(delta_time.seconds + delta_time.microseconds / 10 ** 6, direction="backwards",
+                #                 speed=150)
+                # break
 
             speed_a = default_speed + control
             speed_b = default_speed - control
