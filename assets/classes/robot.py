@@ -230,7 +230,6 @@ class Robot:
         # print(sensor_data)
         self.rotate(-90)
 
-
     def get_in_position_to_grab_pipe(self):
         # get close to the pipe with PID
         pid = PID(54, 0, 25, setpoint=0)
