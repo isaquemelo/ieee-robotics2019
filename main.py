@@ -44,9 +44,9 @@ def main():
         # robot.black_line_flw()
         # robot.go_down_green_slope()
         #robot.initial_location_reset()
-        robot.pipeline_support_following()
+        #robot.pipeline_support_following()
         # robot.black_line_following("left")
-
+        robot.pipe_10()
         # robot.underground_position_reset(side="right")
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
