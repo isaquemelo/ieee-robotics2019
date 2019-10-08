@@ -50,8 +50,6 @@ def main():
             robot.pipe_15()
             sleep(3)
             ev3.Sound.beep()
-            robot.move_handler(4, speed=100)
-            robot.move_timed(0.8, direction="back")
             robot.move_handler(how_long=2, direction="up", speed=1000)
             robot.handler.left.run_forever(speed_sp=-150)
         # robot.underground_position_reset(side="right")
@@ -75,6 +73,7 @@ def main():
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()
+        robot.handler.left.reset()
         robot.handler.left.stop()
         robot.motors.alternative.stop()
 

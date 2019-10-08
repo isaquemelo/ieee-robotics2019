@@ -397,19 +397,40 @@ class PipeLineRobot:
     def pipe_15(self):
         self.stop_motors()
         self.handler.left.stop_action = "hold"
-        counter = 0
-        inverse = 1
-        while counter < 3:
-            k_time = datetime.now() + timedelta(seconds=4)
-            while datetime.now() < k_time:
-                self.move_handler(how_long=0.2, direction="down", speed=50)
-                self.move_handler(how_long=0.3, direction="up", speed=150)
-            counter += 1
-            self.move_timed(how_long=0.5, direction="forward", speed=100)
-            self.move_timed(how_long=0.3, direction="backward", speed=200)
-            self.rotate(angle=3 * inverse, speed=90)
-            inverse *= -1
-        return
+
+        for i in range(4):
+            self.move_handler(how_long=0.5, direction="down", speed=50)
+            self.move_handler(how_long=0.2, direction="up", speed=200)
+
+        self.move_timed(how_long=0.4, direction="backward", speed=100)
+        self.move_handler(how_long=0.2, direction="down", speed=100)
+        self.rotate(angle=3, speed=90)
+        self.move_timed(how_long=0.4, direction="forward", speed=100)
+
+        for i in range(2):
+            self.move_handler(how_long=0.4, direction="up", speed=100)
+            self.move_handler(how_long=0.2, direction="down", speed=100)
+
+        self.move_timed(how_long=0.4, direction="backward", speed=100)
+        self.rotate(angle=-3, speed=90)
+        self.move_timed(how_long=0.4, direction="forward", speed=100)
+
+        for i in range(2):
+            self.move_handler(how_long=0.4, direction="up", speed=100)
+            self.move_handler(how_long=0.2, direction="down", speed=100)
+
+        # for i in range(3):
+        #     self.move_handler(how_long=0.2, direction="down", speed=50)
+        #     self.move_handler(how_long=0.2, direction="up", speed=150)
+        # self.move_timed(how_long=0.5, direction="forward", speed=100)
+        # self.move_timed(how_long=0.3, direction="backward", speed=200)
+        # self.rotate(angle=3, speed=90)
+        # for i in range(3):
+        #     self.move_handler(how_long=0.2, direction="down", speed=50)
+        #     self.move_handler(how_long=0.2, direction="up", speed=150)
+        # self.move_timed(how_long=0.5, direction="forward", speed=100)
+        # self.move_timed(how_long=0.3, direction="backward", speed=200)
+        # return
 
     def place_pipe(self):
         inverse = -1
