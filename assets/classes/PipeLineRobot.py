@@ -68,9 +68,9 @@ class PipeLineRobot:
         self.current_pipe_size = 10  # [10, 15, 20]
 
         self.status_dictionary = {"initialPositionReset": 0, "doneInitialPositionReset": 1, "rescuedPipe": 2,
-                                  "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5}
+                                  "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5, "want10pipe": 6, "want20pipe": 7, "want15pipe": 8}
         self.robot_dictionary = {0: "waitingForWatterRobotToAlign", 1: "initialPositionReset", 2: "pipeRescuing",
-                                 3: "pipeInPositionToRescue"}
+                                 3: "pipeInPositionToRescue-10", 4: "pipeInPositionToRescue-20", 5: "pipeInPositionToRescue-15"}
 
         self.status = self.status_dictionary["initialPositionReset"]
         self.robot_status = 0
@@ -308,9 +308,6 @@ class PipeLineRobot:
 
                 if has_pipe_already is False:  # and robot is with pipe
                     print("Hole detect! Placing pipe ")
-
-
-
                     # self.move_handler(10, speed=10)
                     self.move_timed(0.5, direction="backwards", speed=300)
                     self.move_handler(1, direction="top", speed=1000)
