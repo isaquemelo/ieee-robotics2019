@@ -47,11 +47,13 @@ def main():
         # robot.pipeline_support_following()
         # robot.black_line_following("left")
         while True:
-            robot.pipe_15()
-            sleep(3)
-            ev3.Sound.beep()
-            robot.move_handler(how_long=2, direction="up", speed=1000)
-            robot.handler.left.run_forever(speed_sp=-150)
+            robot.pipeline_support_following()
+            sleep(6)
+            # robot.pipe_15()
+            # sleep(3)
+            # ev3.Sound.beep()
+            # robot.move_handler(how_long=2, direction="up", speed=1000)
+            # robot.handler.left.run_forever(speed_sp=-150)
         # robot.underground_position_reset(side="right")
         # while True:
         #     print(robot.get_sensor_data("ColorSensor"))
@@ -69,7 +71,6 @@ def main():
         #     robot.stop_motors()
         #     break
 
-        robot.handler.left.stop()
     except KeyboardInterrupt:
         robot.motors.right.stop()
         robot.motors.left.stop()

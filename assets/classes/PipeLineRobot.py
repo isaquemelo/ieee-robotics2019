@@ -294,7 +294,7 @@ class PipeLineRobot:
 
             # print(side_distance, front_distance)
             # print("control = ", control)
-
+            print(pipe_distance)
             color_data = self.get_sensor_data("ColorSensor", "r")
             if color_data[0] == 0 or color_data[1] == 0:
                 self.stop_motors()
@@ -302,13 +302,14 @@ class PipeLineRobot:
                     print("finished pipeline_support_following 'cause found the edge upper_dist =", upper_distance)
                     return
 
-            if pipe_distance > 40 and abs(pipe_distance - last_pipe_distance) < 10:
-                self.align_with_hole()
+            if pipe_distance > 40:
+                pipe_size = self.align_with_hole()
                 has_pipe_already = self.has_pipe_check()
 
-                if has_pipe_already is False:  # and robot is with pipe
+                if has_pipe_already is False or pipe_size == 20:  # and robot is with pipe
                     print("Hole detect! Placing pipe ")
-                    # self.move_handler(10, speed=10)
+                    self.move_timed(1, speed=500)
+                    self.place_pipe(pipe_size)
                     self.move_timed(0.5, direction="backwards", speed=300)
                     self.move_handler(1, direction="top", speed=1000)
                     self.handler.left.run_forever(speed_sp=-150)
@@ -378,72 +379,56 @@ class PipeLineRobot:
             last_last_pipe_distance = last_pipe_distance
             last_pipe_distance = pipe_distance
 
-    def pipe_10(self):
-        k = 6.7
-        inverse = -1
-        self.handler.left.stop_action = "hold"
-        self.handler.left.stop()
-        while True:
-            self.move_handler(how_long=0.2, direction="down", speed=50)
+    def place_pipe(self, size):
+        if size == 15 or size == 20:
+            self.stop_motors()
+            self.handler.left.stop_action = "hold"
+
+            for i in range(4):
+                self.move_handler(how_long=0.5, direction="down", speed=50)
+                self.move_handler(how_long=0.2, direction="up", speed=200)
+
+            self.move_timed(how_long=0.4, direction="backward", speed=100)
+            self.move_handler(how_long=0.2, direction="down", speed=100)
+            self.rotate(angle=3, speed=90)
+            self.move_timed(how_long=0.4, direction="forward", speed=100)
+
+            for i in range(2):
+                self.move_handler(how_long=0.4, direction="up", speed=100)
+                self.move_handler(how_long=0.2, direction="down", speed=100)
+
+            self.move_timed(how_long=0.4, direction="backward", speed=100)
+            self.move_handler(how_long=0.2, direction="down", speed=100)
+            self.rotate(angle=-3, speed=90)
+            self.move_timed(how_long=0.4, direction="forward", speed=100)
+
+            for i in range(2):
+                self.move_handler(how_long=0.4, direction="up", speed=100)
+                self.move_handler(how_long=0.2, direction="down", speed=100)
+
+            self.move_timed(how_long=0.4, direction="backward", speed=100)
+            self.move_handler(how_long=0.2, direction="down", speed=100)
+            self.rotate(angle=-3, speed=90)
+            self.move_timed(how_long=0.4, direction="forward", speed=100)
+
+            for i in range(2):
+                self.move_handler(how_long=0.4, direction="up", speed=100)
+                self.move_handler(how_long=0.2, direction="down", speed=100)
+        elif size == 10:
+            k = 6.7
+            inverse = -1
+            self.handler.left.stop_action = "hold"
             self.handler.left.stop()
-            for i in range(3):
-                self.rotate(3 if inverse == -1 else 6, speed=90)
-                self.rotate(-3 if inverse == 1 else -6, speed=90)
-                self.move_handler(how_long=0.2, direction="up", speed=50)
-                self.move_handler(how_long=0.1, direction="down", speed=50)
-                inverse *= -1
-        ev3.Sound.beep()
-
-    def pipe_15(self):
-        self.stop_motors()
-        self.handler.left.stop_action = "hold"
-
-        for i in range(4):
-            self.move_handler(how_long=0.5, direction="down", speed=50)
-            self.move_handler(how_long=0.2, direction="up", speed=200)
-
-        self.move_timed(how_long=0.4, direction="backward", speed=100)
-        self.move_handler(how_long=0.2, direction="down", speed=100)
-        self.rotate(angle=3, speed=90)
-        self.move_timed(how_long=0.4, direction="forward", speed=100)
-
-        for i in range(2):
-            self.move_handler(how_long=0.4, direction="up", speed=100)
-            self.move_handler(how_long=0.2, direction="down", speed=100)
-
-        self.move_timed(how_long=0.4, direction="backward", speed=100)
-        self.rotate(angle=-3, speed=90)
-        self.move_timed(how_long=0.4, direction="forward", speed=100)
-
-        for i in range(2):
-            self.move_handler(how_long=0.4, direction="up", speed=100)
-            self.move_handler(how_long=0.2, direction="down", speed=100)
-
-        # for i in range(3):
-        #     self.move_handler(how_long=0.2, direction="down", speed=50)
-        #     self.move_handler(how_long=0.2, direction="up", speed=150)
-        # self.move_timed(how_long=0.5, direction="forward", speed=100)
-        # self.move_timed(how_long=0.3, direction="backward", speed=200)
-        # self.rotate(angle=3, speed=90)
-        # for i in range(3):
-        #     self.move_handler(how_long=0.2, direction="down", speed=50)
-        #     self.move_handler(how_long=0.2, direction="up", speed=150)
-        # self.move_timed(how_long=0.5, direction="forward", speed=100)
-        # self.move_timed(how_long=0.3, direction="backward", speed=200)
-        # return
-
-    def place_pipe(self):
-        inverse = -1
-        self.move_handler(how_long=2.2, speed=20)
-        self.handler.left.stop_action = "hold"
-        self.handler.left.stop()
-        while True:
-            self.rotate(3 if inverse == -1 else 6, speed=90)
-            self.move_timed(0.1, speed=300)
-            self.rotate(-3 if inverse == 1 else -6, speed=90)
-            self.move_timed(0.1, speed=300)
-
-            inverse *= -1
+            while True:
+                self.move_handler(how_long=0.2, direction="down", speed=50)
+                self.handler.left.stop()
+                for i in range(3):
+                    self.rotate(3 if inverse == -1 else 6, speed=90)
+                    self.rotate(-3 if inverse == 1 else -6, speed=90)
+                    self.move_handler(how_long=0.2, direction="up", speed=50)
+                    self.move_handler(how_long=0.1, direction="down", speed=50)
+                    inverse *= -1
+            ev3.Sound.beep()
 
     def has_pipe_check(self) -> bool:
         top_values = []
@@ -478,6 +463,7 @@ class PipeLineRobot:
         speed_b = 0
 
         initial_time = datetime.now()
+        initial_pos = (self.motors.left.position, self.motors.right.position)
 
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
@@ -501,11 +487,14 @@ class PipeLineRobot:
                 # self.move_timed(0.3, speed=300)
                 self.stop_motors()
                 end_hole_time = datetime.now()
+                end_hole_position = (self.motors.left.position, self.motors.right.position)
+
                 delta_time = (end_hole_time - initial_time)/2
-                print(delta_time.seconds + delta_time.microseconds/10**6)
+                print("took me", delta_time.seconds + delta_time.microseconds/10**6, "cycles", end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1])
+                print("pipe size", self.pipe_size([end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1]]))
                 self.move_timed(delta_time.seconds + delta_time.microseconds/10**6, direction="backwards", speed=150)
                 self.rotate(-90, speed=100)
-                return
+                return self.pipe_size([end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1]])
 
             if datetime.now() == initial_time + timedelta(seconds=1.5):
                 print("Alignment took to long, canceling...")
@@ -532,6 +521,17 @@ class PipeLineRobot:
 
             self.motors.left.run_forever(speed_sp=speed_a)
             self.motors.right.run_forever(speed_sp=speed_b)
+
+    def pipe_size(self, cycles) -> int:
+        if 15 <= cycles[0] <= 90 and 15 <= cycles[1] <= 90:
+            return 10
+        elif 290 <= cycles[0] <= 420 and 250 <= cycles[1] <= 420:
+            return 20
+
+        elif cycles[0] <= 13 and cycles[1] <= 13:
+            return "Invalid"
+        else:
+            return 15
 
     def adjust_corner_to_go_green(self):
         self.rotate(angle=-80)
