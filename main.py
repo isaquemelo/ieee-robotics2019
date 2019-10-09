@@ -22,59 +22,7 @@ robot = PipeLineRobot()
 
 def main():
     try:
-        # robot.rotate(80, axis="own", speed=90)
-        # robot.pipeline_support_following()
-        # robot.black_line_following()
-        # while True:
-        #     robot.initial_location_reset()
-        #     robot.status = robot.status_dictionary["doneInitialPositionReset"]
-        #     robot.publish_data()
-        #
-        #     while robot.robot_status != "pipeInPositionToRescue": print(robot.robot_status)
-        #     robot.go_grab_pipe_routine(side="right")
-        #     robot.status = robot.status_dictionary["rescuedPipe"]
-        #     robot.publish_data()
-        #     break
-        # while True:
-        #     if robot.infrared_sensors['front'] < 60:
-        #         print(robot.infrared_sensors['front'])
-        #     else:
-        #         print("burco")
-        #         sleep(3)
-                # while True:
-        #     robot.initial_location_reset()
-        #     robot.go_grab_pipe_routine("right")
-        #     sleep(5)
-        # robot.underground_position_reset()
-        # robot.black_line_flw()
-        # robot.go_down_green_slope()
-        # robot.initial_location_reset()
-        robot.pipeline_support_following()
-        # robot.black_line_following("left")
-        while True:
-            print(robot.get_sensor_data("Ultrasonic")[0])
-            #sleep(6)
-            # robot.pipe_15()
-            # sleep(3)
-            # ev3.Sound.beep()
-            # robot.move_handler(how_long=2, direction="up", speed=1000)
-            # robot.handler.left.run_forever(speed_sp=-150)
-        # robot.underground_position_reset(side="right")
-        # while True:
-        #     print(robot.get_sensor_data("ColorSensor"))
-        # robot.pipe_rescue(15)
-        # robot.initial_location_reset()
-        # robot.get_in_position_to_grab_pipe()
-        # time.sleep(8)
-        # break
-
-        # robot.motors.left.run_forever(speed_sp=speed)
-        # robot.motors.right.run_forever(speed_sp=speed)
-        # colors = robot.get_sensor_data("ColorSensor")
-        # print(colors)
-        # if colors[0] != "Blue" and colors[1] != "Blue":
-        #     robot.stop_motors()
-        #     break
+       robot.pipeline_support_following()
 
     except KeyboardInterrupt:
         robot.motors.right.stop()

@@ -23,6 +23,7 @@ client.on_publish = on_publish
 client.connect("localhost", 1883, 60)
 
 ultrasonic_sensors = Duo(0, ev3.UltrasonicSensor("in2"))
+
 infrared_sensors = {"left": ev3.InfraredSensor('in3'), "right": ev3.InfraredSensor('in4'), "frontal": ev3.InfraredSensor("in1")}
 
 client.loop_start()
