@@ -270,7 +270,7 @@ class PipeLineRobot:
         print("pipeline_support_following")
         default_speed = 150
 
-        pid = PID(12, 0, 6, setpoint=2)
+        pid = PID(12, 0, 6, setpoint=4)
         front_distance_to_rotate = 2
 
         speed_a = 0

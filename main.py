@@ -52,8 +52,8 @@ def main():
         robot.pipeline_support_following()
         # robot.black_line_following("left")
         while True:
-            robot.pipeline_support_following()
-            sleep(6)
+            print(robot.get_sensor_data("Ultrasonic")[0])
+            #sleep(6)
             # robot.pipe_15()
             # sleep(3)
             # ev3.Sound.beep()
