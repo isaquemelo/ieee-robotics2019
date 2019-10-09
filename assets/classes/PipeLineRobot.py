@@ -523,7 +523,7 @@ class PipeLineRobot:
             if self.get_sensor_data("InfraredSensor")[2] <= 1:
                 print("found the wall")
                 self.rotate(angle=80, speed=90)
-                return
+                return 0
 
             if datetime.now() >= initial_time + timedelta(seconds=1.5):
                 print("Alignment took to long, canceling...")
