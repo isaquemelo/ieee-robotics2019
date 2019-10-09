@@ -302,7 +302,7 @@ class PipeLineRobot:
                     print("finished pipeline_support_following 'cause found the edge upper_dist =", upper_distance)
                     return
 
-            if pipe_distance > 40:
+            if pipe_distance > 15: # 40
                 pipe_size = self.align_with_hole()
                 has_pipe_already = self.has_pipe_check()
 
@@ -312,7 +312,7 @@ class PipeLineRobot:
                     self.place_pipe(pipe_size)
                     self.move_timed(0.5, direction="backwards", speed=300)
                     self.move_handler(1, direction="top", speed=1000)
-                    self.handler.left.run_forever(speed_sp=-150)
+                    self.handler.left.run_forever(speed_sp=-50)
                     self.rotate(90, speed=90)
 
                 elif has_pipe_already is True:
@@ -483,7 +483,7 @@ class PipeLineRobot:
             # print(side_distance, front_distance)
             # print("control = ", control)
 
-            if pipe_distance < 20:
+            if pipe_distance < 15: # 20
                 # self.move_timed(0.3, speed=300)
                 self.stop_motors()
                 end_hole_time = datetime.now()
@@ -492,6 +492,7 @@ class PipeLineRobot:
                 delta_time = (end_hole_time - initial_time)/2
                 print("took me", delta_time.seconds + delta_time.microseconds/10**6, "cycles", end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1])
                 print("pipe size", self.pipe_size([end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1]]))
+
                 self.move_timed(delta_time.seconds + delta_time.microseconds/10**6, direction="backwards", speed=150)
                 self.rotate(-90, speed=100)
                 return self.pipe_size([end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1]])

@@ -35,8 +35,13 @@ def main():
         #     robot.status = robot.status_dictionary["rescuedPipe"]
         #     robot.publish_data()
         #     break
-
         # while True:
+        #     if robot.infrared_sensors['front'] < 60:
+        #         print(robot.infrared_sensors['front'])
+        #     else:
+        #         print("burco")
+        #         sleep(3)
+                # while True:
         #     robot.initial_location_reset()
         #     robot.go_grab_pipe_routine("right")
         #     sleep(5)
@@ -44,7 +49,7 @@ def main():
         # robot.black_line_flw()
         # robot.go_down_green_slope()
         # robot.initial_location_reset()
-        # robot.pipeline_support_following()
+        robot.pipeline_support_following()
         # robot.black_line_following("left")
         while True:
             robot.pipeline_support_following()
