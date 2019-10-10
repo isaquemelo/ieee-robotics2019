@@ -22,7 +22,28 @@ robot = PipeLineRobot()
 
 def main():
     try:
-       robot.pipeline_support_following()
+        while True:
+            robot.initial_location_reset()
+            robot.status = robot.status_dictionary["doneInitialPositionReset"]
+            robot.publish_data()
+
+            robot.status = robot.status_dictionary["want10pipe"]
+            robot.publish_data()
+
+            while robot.robot_status != "pipeInPositionToRescue-10": print(robot.robot_status)
+            robot.go_grab_pipe_routine(side="right")
+            robot.status = robot.status_dictionary["rescuedPipe"]
+            robot.publish_data()
+
+            robot.status = robot.status_dictionary["want10pipe"]
+            robot.publish_data()
+
+            robot.pipeline_support_diving()
+            robot.pipeline_support_following()
+
+            break
+        # robot.pipeline_support_diving()
+        # robot.pipeline_support_following()
 
     except KeyboardInterrupt:
         robot.motors.right.stop()

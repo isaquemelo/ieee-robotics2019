@@ -90,13 +90,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        # self.external_ip = "192.168.0.1"
-        # self.publisher = mqtt.Client()
-        # self.publisher.connect(self.external_ip, 1883, 60)
-        # self.publisher.on_connect = self.publisher_on_client_connect
-        # # self.publisher.on_message = self.publisher_on_client_message
-        # self.publisher.on_publish = self.publisher_on_client_publish
-        # self.publisher.loop_start()
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -320,7 +320,7 @@ class PipeLineRobot:
                     self.move_handler(1, direction="top", speed=1000)
                     self.handler.left.run_forever(speed_sp=-50)
                     self.rotate(90, speed=90)
-                    sleep(5)
+                    # sleep(5)
 
                 elif has_pipe_already is True:
                     print("Already has pipe! Misguided sensor info")
@@ -483,9 +483,8 @@ class PipeLineRobot:
 
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
-            front_distance = self.get_sensor_data("InfraredSensor")[2]
             pipe_distance = self.get_sensor_data("Ultrasonic")[0]
-            upper_distance = self.get_sensor_data("Ultrasonic")[1]
+
             control = pid(side_distance)
 
             color_data = self.get_sensor_data("ColorSensor", "r")
@@ -494,7 +493,7 @@ class PipeLineRobot:
                 if self.get_sensor_data("Ultrasonic")[1] > 23:
                     ev3.Sound.beep()
                     print("found end of the pipeline")
-                    return
+                    return 0
 
             # print(side_distance, front_distance)
             # print("control = ", control)
@@ -525,7 +524,7 @@ class PipeLineRobot:
                 self.rotate(angle=80, speed=90)
                 return 0
 
-            if datetime.now() >= initial_time + timedelta(seconds=1.5):
+            if datetime.now() >= initial_time + timedelta(seconds=3):
                 print("Alignment took to long, canceling...")
                 end_hole_time = datetime.now()
                 delta_time = (end_hole_time - initial_time)
@@ -1376,3 +1375,39 @@ class PipeLineRobot:
         self.stop_motors()
         self.move_timed(how_long=0.3, direction="backward")
         self.rotate(angle=160)
+
+    def pipeline_support_diving(self):
+        self.stop_motors()
+        print("called pipeline_support_diving")
+        default_speed = 300
+        pid = PID(12, 0, 6, setpoint=23)
+
+        while True:
+            side_distance = self.get_sensor_data("InfraredSensor")[0]
+            front_distance = self.get_sensor_data("InfraredSensor")[2]
+
+            if front_distance <= 2:
+                self.stop_motors()
+                self.move_timed(how_long=0.5, direction="backward", speed=200)
+                self.rotate(angle=80, speed=100)
+                return
+
+            control = pid(side_distance)
+
+            speed_a = default_speed - control
+            speed_b = default_speed + control
+
+            # print(control)
+
+            if speed_a >= 1000:
+                speed_a = 1000
+            elif speed_a <= -1000:
+                speed_a = -1000
+
+            if speed_b >= 1000:
+                speed_b = 1000
+            elif speed_b <= -1000:
+                speed_b = -1000
+
+            self.motors.left.run_forever(speed_sp=speed_a)
+            self.motors.right.run_forever(speed_sp=speed_b)
