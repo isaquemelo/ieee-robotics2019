@@ -300,38 +300,42 @@ class PipeLineRobot:
                 self.stop_motors()
                 if self.get_sensor_data("Ultrasonic")[1] > 23:
                     print("finished pipeline_support_following 'cause found the edge upper_dist =", upper_distance)
+                    # self.color_alignment(aligment_with_color=True)
+                    self.move_timed(how_long=0.5
+                                    , direction="backwards", speed=300)
+                    self.rotate(80, speed=150)
                     return
 
-            if pipe_distance > 15:  # 40
-                self.stop_motors()
-                pipe_size = self.align_with_hole()
-                has_pipe_already = "Invalid"
-                # sleep(5)
-                print(pipe_size)
-
-                if pipe_size != 0:
-                    has_pipe_already = self.has_pipe_check()
-
-                if has_pipe_already is False or pipe_size == 20:  # and robot is with pipe
-                    print("Hole detect! Placing pipe ")
-                    self.move_timed(1, speed=500)
-                    self.place_pipe(pipe_size)
-                    self.move_timed(0.5, direction="backwards", speed=300)
-                    self.move_handler(1, direction="top", speed=1000)
-                    self.handler.left.run_forever(speed_sp=-50)
-                    self.rotate(90, speed=90)
-                    # sleep(5)
-
-                elif has_pipe_already is True:
-                    print("Already has pipe! Misguided sensor info")
-                    self.rotate(90, speed=90)
-                    continue
-                elif has_pipe_already is None:
-                    print("Info not reliable at all!")
-                    self.rotate(90, speed=90)
-                    continue
-                elif has_pipe_already == "Invalid":
-                    continue
+            # if pipe_distance > 15:  # 40
+            #     self.stop_motors()
+            #     pipe_size = self.align_with_hole()
+            #     has_pipe_already = "Invalid"
+            #     # sleep(5)
+            #     print(pipe_size)
+            #
+            #     if pipe_size != 0:
+            #         has_pipe_already = self.has_pipe_check()
+            #
+            #     if has_pipe_already is False or pipe_size == 20:  # and robot is with pipe
+            #         print("Hole detect! Placing pipe ")
+            #         self.move_timed(1, speed=500)
+            #         self.place_pipe(pipe_size)
+            #         self.move_timed(0.5, direction="backwards", speed=300)
+            #         self.move_handler(1, direction="top", speed=1000)
+            #         self.handler.left.run_forever(speed_sp=-50)
+            #         self.rotate(90, speed=90)
+            #         # sleep(5)
+            #
+            #     elif has_pipe_already is True:
+            #         print("Already has pipe! Misguided sensor info")
+            #         self.rotate(90, speed=90)
+            #         continue
+            #     elif has_pipe_already is None:
+            #         print("Info not reliable at all!")
+            #         self.rotate(90, speed=90)
+            #         continue
+            #     elif has_pipe_already == "Invalid":
+            #         continue
 
             if front_distance < front_distance_to_rotate:
                 self.stop_motors()
@@ -1408,7 +1412,7 @@ class PipeLineRobot:
 
                 return
 
-            print(self.get_sensor_data("ColorSensor"), side)
+            # print(self.get_sensor_data("ColorSensor"), side)
 
             if "Green" in self.get_sensor_data("ColorSensor") and side == 1:
                 self.stop_motors()
