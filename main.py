@@ -43,9 +43,9 @@ def main():
         #
         #     break
         # robot.black_line_following("right")
-        robot.slope_following()
+        # robot.initial_location_reset()
         # robot.pipeline_support_diving()
-        # robot.pipeline_support_following()
+        robot.pipeline_support_conection_meeting_area("right")
 
     except KeyboardInterrupt:
         robot.motors.right.stop()

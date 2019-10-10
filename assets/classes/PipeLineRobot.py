@@ -1383,26 +1383,42 @@ class PipeLineRobot:
         self.move_timed(how_long=0.3, direction="backward")
         self.rotate(angle=160)
 
-    def pipeline_support_diving(self):
+    def pipeline_support_conection_meeting_area(self, side="left"):
         self.stop_motors()
         print("called pipeline_support_diving")
         default_speed = 300
-        pid = PID(12, 0, 6, setpoint=23)
+        pid = PID(12, 0, 6, setpoint=30)
+        k_to_stop = 2
+
+        if side == "right":
+            self.color_sensors[0].mode = "COL-COLOR"
+            self.color_sensors[1].mode = "COL-COLOR"
+            side = 1
+
+        else: side = 0
 
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
             front_distance = self.get_sensor_data("InfraredSensor")[2]
 
-            if front_distance <= 2:
+            if side == 0 and front_distance <= k_to_stop:
                 self.stop_motors()
                 self.move_timed(how_long=0.5, direction="backward", speed=200)
                 self.rotate(angle=80, speed=100)
+
+                return
+
+            print(self.get_sensor_data("ColorSensor"), side)
+
+            if "Green" in self.get_sensor_data("ColorSensor") and side == 1:
+                self.stop_motors()
+                self.move_timed(how_long=0.5, direction="backward", speed=200)
                 return
 
             control = pid(side_distance)
 
-            speed_a = default_speed - control
-            speed_b = default_speed + control
+            speed_a = default_speed + control
+            speed_b = default_speed - control
 
             # print(control)
 
@@ -1416,5 +1432,5 @@ class PipeLineRobot:
             elif speed_b <= -1000:
                 speed_b = -1000
 
-            self.motors.left.run_forever(speed_sp=speed_a)
-            self.motors.right.run_forever(speed_sp=speed_b)
+            self.motors.left.run_forever(speed_sp=speed_b)
+            self.motors.right.run_forever(speed_sp=speed_a)
