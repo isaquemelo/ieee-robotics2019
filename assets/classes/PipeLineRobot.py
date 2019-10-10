@@ -1017,7 +1017,7 @@ class PipeLineRobot:
                         break
                     else:
                         pass
-                    self.move_timed(how_long=0.4, direction="backward")
+                    self.move_timed(how_long=0.2, direction="backward")
                     left_dist = self.get_sensor_data("InfraredSensor")[0]
                     right_dist = self.get_sensor_data("InfraredSensor")[1]
                     if left_dist > expected_save_side_dist:
@@ -1026,6 +1026,7 @@ class PipeLineRobot:
                         self.get_out_of_risk_edge_situation(side="right")
                     else:
                         print("rotation decision is save")
+                        self.move_timed(how_long=0.2, direction="backward")
                         self.rotate(80)
 
             if bottom_front_dist <= k_dist_from_robot:
@@ -1173,12 +1174,13 @@ class PipeLineRobot:
         self.stop_motors()
         self.rotate(-60, speed=500)  # talvez isso deveria ser -80 e não 80
 
-        default_speed = 300
+        default_speed = 500
         pid = PID(12, 0, 10, setpoint=12)
 
         k_to_find_end_by_color = 0
         while True:
             left_distance = self.get_sensor_data("InfraredSensor")[0]
+            upper_dist = self.get_sensor_data("Ultrasonic")[1]
             control = pid(left_distance)
             color_data = self.get_sensor_data("ColorSensor", "r")
 
@@ -1200,8 +1202,13 @@ class PipeLineRobot:
             elif speed_b <= -1000:
                 speed_b = -1000
 
-            self.motors.left.run_forever(speed_sp=speed_a)
-            self.motors.right.run_forever(speed_sp=speed_b)
+            if upper_dist >= 23:
+                self.motors.left.run_forever(speed_sp=100)
+                self.motors.right.run_forever(speed_sp=100)
+
+            else:
+                self.motors.left.run_forever(speed_sp=speed_a)
+                self.motors.right.run_forever(speed_sp=speed_b)
 
         self.stop_motors()
         ev3.Sound.beep().wait()
@@ -1358,7 +1365,7 @@ class PipeLineRobot:
         self.stop_motors()
         print("get_out_of_risk_edge_situation, with side", side)
         default_speed = 200
-        k_angle = 45
+        k_angle = 60
         self.reset_gyroscope()
         gyro = self.get_sensor_data("GyroSensor")
 

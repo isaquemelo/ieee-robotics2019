@@ -43,7 +43,7 @@ def main():
         #
         #     break
         # robot.black_line_following("right")
-        robot.initial_location_reset()
+        robot.slope_following()
         # robot.pipeline_support_diving()
         # robot.pipeline_support_following()
 
