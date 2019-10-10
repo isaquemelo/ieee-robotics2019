@@ -21,32 +21,35 @@ robot = PipeLineRobot()
 # 110 frente
 
 def main():
+    robot.black_line_following(side="left")
+    return
     try:
-        # while True:
-        #     robot.initial_location_reset()
-        #     robot.status = robot.status_dictionary["doneInitialPositionReset"]
-        #     robot.publish_data()
-        #
-        #     robot.status = robot.status_dictionary["want10pipe"]
-        #     robot.publish_data()
-        #
-        #     while robot.robot_status != "pipeInPositionToRescue-10": print(robot.robot_status)
-        #     robot.go_grab_pipe_routine(side="right")
-        #     robot.status = robot.status_dictionary["rescuedPipe"]
-        #     robot.publish_data()
-        #
-        #     robot.status = robot.status_dictionary["want10pipe"]
-        #     robot.publish_data()
-        #
-        #     robot.pipeline_support_diving()
-        #     robot.pipeline_support_following()
-        #
-        #     break
-        # robot.black_line_following("right")
-        # robot.initial_location_reset()
-        # robot.pipeline_support_diving()
-        robot.pipeline_support_following()
-        robot.pipeline_support_conection_meeting_area("right")
+        while True:
+            robot.initial_location_reset()
+            # robot.status = robot.status_dictionary["doneInitialPositionReset"]
+            # robot.publish_data()
+
+            # robot.status = robot.status_dictionary["want10pipe"]
+            # robot.publish_data()
+
+            # while robot.robot_status != "pipeInPositionToRescue-10": print(robot.robot_status)
+            robot.go_grab_pipe_routine(side="right")
+
+            # se nao pegou o cano (usar fncao de verificar se esta com cano) pede um nvo cano
+            # robot.status = robot.status_dictionary["rescuedPipe"]
+            # robot.publish_data()
+
+            # robot.status = robot.status_dictionary["want10pipe"]
+            # robot.publish_data()
+
+            robot.pipeline_support_conection_meeting_area("left")
+            robot.pipeline_support_following()
+            # so dps do amiguinho por o cano para pegar
+            robot.pipeline_support_conection_meeting_area("right")
+            robot.go_grab_pipe_routine(side="left")
+
+            break
+
 
     except KeyboardInterrupt:
         robot.motors.right.stop()

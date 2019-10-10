@@ -51,7 +51,7 @@ class PipeLineRobot:
         self.infrared_sensors = {"right": 50, "left": 50, "front": 100}
 
         # define motors
-        self.motors = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outD'))
+        self.motors = Duo(ev3.LargeMotor('outA'), ev3.LargeMotor('outD'))
         self.motors.left.polarity = "inversed"
         self.motors.right.polarity = "inversed"
 
@@ -832,7 +832,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         found_pipe = False
         begin = None
-        k_found_pipe = 25
+        k_found_pipe = 30
 
         pid = PID(1.025, 0, 0.2, setpoint=39)
         default = 300
@@ -861,10 +861,11 @@ class PipeLineRobot:
 
             if found_pipe and datetime.now() >= begin:
                 found_pipe = False
+                self.move_handler(how_long=1, direction="up", speed=1000)
                 self.handler.left.run_forever(speed_sp=-1000)
 
                 c = 0
-                value = 10 if side == "right" else -10
+                value = 10 if side == 0 else -10
 
                 while c < 5:
                     self.rotate(value, speed=200)
@@ -877,12 +878,13 @@ class PipeLineRobot:
                     color_data = self.get_sensor_data("ColorSensor", "r")
 
                     if color_data[0] < 50 or color_data[1] < 50:
-                        self.color_alignment(True)
-                        self.green_slope()
-                        self.slope_following()
-                        self.rotate(80, speed=150)
-                        return
-                        break
+                        if self.verify_green_slope():
+                            self.color_alignment(True)
+                            self.green_slope()
+                            self.slope_following()
+                            self.rotate(80, speed=150)
+                            return
+                        continue
 
                     self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
                     self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
@@ -1326,7 +1328,7 @@ class PipeLineRobot:
                 self.motors.left.run_forever(speed_sp=-default_speed)
                 gyro = self.get_sensor_data("GyroSensor")
             self.stop_motors()
-        sleep(3)
+        # sleep(3)
 
         while True:
             color_date = self.get_sensor_data("ColorSensor", "r")
