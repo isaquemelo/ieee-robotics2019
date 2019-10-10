@@ -90,13 +90,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        self.external_ip = "192.168.0.1"
-        self.publisher = mqtt.Client()
-        self.publisher.connect(self.external_ip, 1883, 60)
-        self.publisher.on_connect = self.publisher_on_client_connect
-        # self.publisher.on_message = self.publisher_on_client_message
-        self.publisher.on_publish = self.publisher_on_client_publish
-        self.publisher.loop_start()
+        # self.external_ip = "192.168.0.1"
+        # self.publisher = mqtt.Client()
+        # self.publisher.connect(self.external_ip, 1883, 60)
+        # self.publisher.on_connect = self.publisher_on_client_connect
+        # # self.publisher.on_message = self.publisher_on_client_message
+        # self.publisher.on_publish = self.publisher_on_client_publish
+        # self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -990,7 +990,7 @@ class PipeLineRobot:
     def initial_location_reset(self):
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
-        default_speed = 300
+        default_speed = 200
         expected_save_side_dist = 30
         k_min_white_reflect = 50
         k_dist_from_robot = 20
@@ -1171,7 +1171,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
 
         self.stop_motors()
-        self.rotate(-80, speed=500)  # talvez isso deveria ser -80 e não 80
+        self.rotate(-60, speed=500)  # talvez isso deveria ser -80 e não 80
 
         default_speed = 300
         pid = PID(12, 0, 10, setpoint=12)
