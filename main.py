@@ -21,8 +21,6 @@ robot = PipeLineRobot()
 # 110 frente
 
 def main():
-    robot.black_line_following(side="left")
-    return
     try:
         while True:
             robot.initial_location_reset()
@@ -49,6 +47,10 @@ def main():
             robot.go_grab_pipe_routine(side="left")
 
             break
+        robot.black_line_following()
+        robot.get_on_position_before_black_line_flw(side="right")
+        robot.adjust_before_black_line_flw("right")
+        robot.black_line_following("right")
 
 
     except KeyboardInterrupt:

@@ -832,7 +832,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         found_pipe = False
         begin = None
-        k_found_pipe = 30
+        k_found_pipe = 28
 
         pid = PID(1.025, 0, 0.2, setpoint=39)
         default = 300
@@ -1023,16 +1023,19 @@ class PipeLineRobot:
                         break
                     else:
                         pass
-                    self.move_timed(how_long=0.2, direction="backward")
+                    self.move_timed(how_long=0.4, direction="backward")
                     left_dist = self.get_sensor_data("InfraredSensor")[0]
                     right_dist = self.get_sensor_data("InfraredSensor")[1]
                     if left_dist > expected_save_side_dist:
+                        print("risk situation, left_dist = ", left_dist)
+                        sleep(2)
                         self.get_out_of_risk_edge_situation(side="left")
                     elif right_dist > expected_save_side_dist:
+                        print("risk situation, right_dist = ", right_dist)
+                        sleep(2)
                         self.get_out_of_risk_edge_situation(side="right")
                     else:
                         print("rotation decision is save")
-                        self.move_timed(how_long=0.2, direction="backward")
                         self.rotate(80)
 
             if bottom_front_dist <= k_dist_from_robot:
@@ -1065,7 +1068,7 @@ class PipeLineRobot:
 
     def green_slope(self):
         self.stop_motors()
-        print("called go_down_green_slope")
+        print("called green_slope to go down")
         default_speed = 400
         k_time = 3.5
 
@@ -1178,7 +1181,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
 
         self.stop_motors()
-        self.rotate(-60, speed=500)  # talvez isso deveria ser -80 e não 80
+        self.rotate(-60, speed=500)  # talvez isso deveria ser -80 e nao 80
 
         default_speed = 500
         pid = PID(12, 0, 10, setpoint=12)
@@ -1289,7 +1292,6 @@ class PipeLineRobot:
                     self.move_timed(how_long=0.2, direction="backward")
                     if default_speed - 100 >= 100:
                         default_speed -= 100
-                        pass
                     continue
                 break
 
@@ -1310,7 +1312,13 @@ class PipeLineRobot:
         self.stop_motors()
 
     def adjust_before_black_line_flw(self, side):
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
         self.stop_motors()
+
+        # while True:
+        #     print(self.get_sensor_data("ColorSensor", "asda"))
+
         print("called adjust_before_black_line_flw")
         default_speed = 200
 
@@ -1318,17 +1326,16 @@ class PipeLineRobot:
         gyro = self.get_sensor_data("GyroSensor")
 
         if side == "left":
-            while gyro < 71:
+            while gyro < 74:
                 self.motors.right.run_forever(speed_sp=-default_speed)
                 gyro = self.get_sensor_data("GyroSensor")
             self.stop_motors()
 
         else:
-            while gyro > -71:
+            while gyro > -74:
                 self.motors.left.run_forever(speed_sp=-default_speed)
                 gyro = self.get_sensor_data("GyroSensor")
             self.stop_motors()
-        # sleep(3)
 
         while True:
             color_date = self.get_sensor_data("ColorSensor", "r")
@@ -1338,14 +1345,14 @@ class PipeLineRobot:
                 self.motors.right.run_forever(speed_sp=200 + 20)
                 if color_date[0] < 50:
                     self.stop_motors()
-                    self.rotate(angle=3, speed=150)
+                    self.rotate(angle=4, speed=150)
                     break
             else:
                 self.motors.left.run_forever(speed_sp=200 + 20)
                 self.motors.right.run_forever(speed_sp=200)
                 if color_date[1] < 50:
                     self.stop_motors()
-                    self.rotate(angle=-3, speed=150)
+                    self.rotate(angle=-4, speed=150)
                     break
 
     def go_grab_pipe_routine(self, side):
@@ -1440,3 +1447,13 @@ class PipeLineRobot:
 
             self.motors.left.run_forever(speed_sp=speed_b)
             self.motors.right.run_forever(speed_sp=speed_a)
+
+    def actually_got_pipe(self):
+        self.handler.left.stop_action = "hold"
+        self.move_handler(how_long=2, direction="down", speed=100)
+
+        if self.get_sensor_data("Ultrasonic")[1] <= 6:
+            self.move_handler(how_long=3, direction="up", speed=100)
+            return True
+        self.move_handler(how_long=3, direction="up", speed=100)
+        return False
