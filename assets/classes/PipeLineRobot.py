@@ -1454,9 +1454,15 @@ class PipeLineRobot:
 
     def take_pipe_again(self):
         self.stop_motors()
-        print("tryinng to cath pipe again")
+        print("cathing pipe again")
+        default_speed = 200
         k_time = datetime.now() + timedelta(seconds=2)
 
         while datetime.now() < k_time:
-            self.motors.left.run_forever(speed_sp)
+            self.motors.left.run_forever(speed_sp=default_speed)
+            self.motors.right.run_forever(speed_sp=default_speed)
+        self.stop_motors()
 
+        self.move_handler(how_long=2, direction="up", speed=500)
+        self.handler.left.run_forever(speed_sp=-1000)
+        return

@@ -23,6 +23,7 @@ robot = PipeLineRobot()
 def main():
     try:
         print(robot.still_have_pipe())
+        robot.take_pipe_again()
         # while True:
         #     robot.initial_location_reset()
         #     robot.status = robot.status_dictionary["doneInitialPositionReset"]
