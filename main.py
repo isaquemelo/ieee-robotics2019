@@ -22,35 +22,35 @@ robot = PipeLineRobot()
 
 def main():
     try:
-        while True:
-            robot.initial_location_reset()
-            # robot.status = robot.status_dictionary["doneInitialPositionReset"]
-            # robot.publish_data()
-
-            # robot.status = robot.status_dictionary["want10pipe"]
-            # robot.publish_data()
-
-            # while robot.robot_status != "pipeInPositionToRescue-10": print(robot.robot_status)
-            robot.go_grab_pipe_routine(side="right")
-
-            # se nao pegou o cano (usar fncao de verificar se esta com cano) pede um nvo cano
-            # robot.status = robot.status_dictionary["rescuedPipe"]
-            # robot.publish_data()
-
-            # robot.status = robot.status_dictionary["want10pipe"]
-            # robot.publish_data()
-
-            robot.pipeline_support_conection_meeting_area("left")
-            robot.pipeline_support_following()
-            # so dps do amiguinho por o cano para pegar
-            robot.pipeline_support_conection_meeting_area("right")
-            robot.go_grab_pipe_routine(side="left")
-
-            break
-        robot.black_line_following()
-        robot.get_on_position_before_black_line_flw(side="right")
-        robot.adjust_before_black_line_flw("right")
-        robot.black_line_following("right")
+        print(robot.still_have_pipe())
+        # while True:
+        #     robot.initial_location_reset()
+        #     robot.status = robot.status_dictionary["doneInitialPositionReset"]
+        #     robot.publish_data()
+        #
+        #     robot.status = robot.status_dictionary["want10pipe"]
+        #     robot.publish_data()
+        #
+        #     while True:
+        #         print(robot.robot_status)
+        #         if robot.robot_status == "pipeInPositionToRescue-10":
+        #             robot.go_grab_pipe_routine(side="right")
+        #
+        #
+        #     # se nao pegou o cano (usar fncao de verificar se esta com cano) pede um nvo cano
+        #     # robot.status = robot.status_dictionary["rescuedPipe"]
+        #     # robot.publish_data()
+        #
+        #     # robot.status = robot.status_dictionary["want10pipe"]
+        #     # robot.publish_data()
+        #
+        #     robot.pipeline_support_conection_meeting_area("left")
+        #     robot.pipeline_support_following()
+        #     # so dps do amiguinho por o cano para pegar
+        #     robot.pipeline_support_conection_meeting_area("right")
+        #     robot.go_grab_pipe_routine(side="left")
+        #
+        #     break
 
 
     except KeyboardInterrupt:

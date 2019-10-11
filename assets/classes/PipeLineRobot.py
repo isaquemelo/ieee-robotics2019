@@ -306,36 +306,36 @@ class PipeLineRobot:
                     self.rotate(80, speed=150)
                     return
 
-            # if pipe_distance > 15:  # 40
-            #     self.stop_motors()
-            #     pipe_size = self.align_with_hole()
-            #     has_pipe_already = "Invalid"
-            #     # sleep(5)
-            #     print(pipe_size)
-            #
-            #     if pipe_size != 0:
-            #         has_pipe_already = self.has_pipe_check()
-            #
-            #     if has_pipe_already is False or pipe_size == 20:  # and robot is with pipe
-            #         print("Hole detect! Placing pipe ")
-            #         self.move_timed(1, speed=500)
-            #         self.place_pipe(pipe_size)
-            #         self.move_timed(0.5, direction="backwards", speed=300)
-            #         self.move_handler(1, direction="top", speed=1000)
-            #         self.handler.left.run_forever(speed_sp=-50)
-            #         self.rotate(90, speed=90)
-            #         # sleep(5)
-            #
-            #     elif has_pipe_already is True:
-            #         print("Already has pipe! Misguided sensor info")
-            #         self.rotate(90, speed=90)
-            #         continue
-            #     elif has_pipe_already is None:
-            #         print("Info not reliable at all!")
-            #         self.rotate(90, speed=90)
-            #         continue
-            #     elif has_pipe_already == "Invalid":
-            #         continue
+            if pipe_distance > 15:  # 40
+                self.stop_motors()
+                pipe_size = self.align_with_hole()
+                has_pipe_already = "Invalid"
+                # sleep(5)
+                print(pipe_size)
+
+                if pipe_size != 0:
+                    has_pipe_already = self.has_pipe_check()
+
+                if has_pipe_already is False or pipe_size == 20:  # and robot is with pipe
+                    print("Hole detect! Placing pipe ")
+                    self.move_timed(1, speed=500)
+                    self.place_pipe(pipe_size)
+                    self.move_timed(0.5, direction="backwards", speed=300)
+                    self.move_handler(1, direction="top", speed=1000)
+                    self.handler.left.run_forever(speed_sp=-50)
+                    self.rotate(90, speed=90)
+                    # sleep(5)
+
+                elif has_pipe_already is True:
+                    print("Already has pipe! Misguided sensor info")
+                    self.rotate(90, speed=90)
+                    continue
+                elif has_pipe_already is None:
+                    print("Info not reliable at all!")
+                    self.rotate(90, speed=90)
+                    continue
+                elif has_pipe_already == "Invalid":
+                    continue
 
             if front_distance < front_distance_to_rotate:
                 self.stop_motors()
@@ -1026,6 +1026,9 @@ class PipeLineRobot:
                     self.move_timed(how_long=0.4, direction="backward")
                     left_dist = self.get_sensor_data("InfraredSensor")[0]
                     right_dist = self.get_sensor_data("InfraredSensor")[1]
+                    sleep(2)
+                    left_dist = self.get_sensor_data("InfraredSensor")[0]
+                    right_dist = self.get_sensor_data("InfraredSensor")[1]
                     if left_dist > expected_save_side_dist:
                         print("risk situation, left_dist = ", left_dist)
                         sleep(2)
@@ -1070,78 +1073,53 @@ class PipeLineRobot:
         self.stop_motors()
         print("called green_slope to go down")
         default_speed = 400
-        k_time = 3.5
+        k_time = 1
 
         pid_side = self.adjust_before_go_down_green_slope()
+        k_speed_adjust = 100
         max_speed = 500
         min_speed = -max_speed
         if pid_side == "right":
-            expected_save_side_dist = 35
+            expected_save_side_dist = 30
         else:
             expected_save_side_dist = 30
         pid = PID(5, 0, 5, setpoint=expected_save_side_dist)
 
         if pid_side == "left":
+            self.rotate(angle=-180, speed=150)
+
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
                 if datetime.now() > minimum_time_before_stop:
-                    break
+                    if "Green" not in self.get_sensor_data("ColorSensor"):
+                        break
 
-                left_dist = self.get_sensor_data("InfraredSensor")[0]
-
-                control = pid(left_dist)
-
-                left_speed = default_speed - control
-                right_speed = default_speed + control
-
-                if left_speed > max_speed:
-                    left_speed = max_speed
-                elif left_speed < min_speed:
-                    left_speed = min_speed
-
-                if right_speed > max_speed:
-                    right_speed = max_speed
-                elif right_speed < min_speed:
-                    right_speed = min_speed
-
-                self.motors.left.run_forever(speed_sp=left_speed)
-                self.motors.right.run_forever(speed_sp=right_speed)
+                self.motors.left.run_forever(speed_sp=-default_speed)
+                self.motors.right.run_forever(speed_sp=-default_speed - k_speed_adjust)
 
         elif pid_side == "right":
+            self.rotate(angle=180, speed=150)
+
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
                 if datetime.now() > minimum_time_before_stop:
-                    break
+                    if "Green" not in self.get_sensor_data("ColorSensor"):
+                        break
 
-                right_dist = self.get_sensor_data("InfraredSensor")[1]
-
-                control = pid(right_dist)
-
-                left_speed = default_speed + control
-                right_speed = default_speed - control
-
-                if left_speed > max_speed:
-                    left_speed = max_speed
-                elif left_speed < min_speed:
-                    left_speed = min_speed
-
-                if right_speed > max_speed:
-                    right_speed = max_speed
-                elif right_speed < min_speed:
-                    right_speed = min_speed
-
-                self.motors.left.run_forever(speed_sp=left_speed)
-                self.motors.right.run_forever(speed_sp=right_speed)
+                self.motors.left.run_forever(speed_sp=-default_speed - k_speed_adjust)
+                self.motors.right.run_forever(speed_sp=-default_speed)
 
         elif pid_side is None:
-            k_time = k_time - 0.5
+            self.rotate(angle=180, speed=150)
+
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
                 if datetime.now() > minimum_time_before_stop:
-                    break
+                    if "Green" not in self.get_sensor_data("ColorSensor"):
+                        break
 
-                self.motors.left.run_forever(speed_sp=default_speed)
-                self.motors.right.run_forever(speed_sp=default_speed)
+                self.motors.left.run_forever(speed_sp=-default_speed)
+                self.motors.right.run_forever(speed_sp=-default_speed)
 
         self.stop_motors()
 
@@ -1181,10 +1159,10 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
 
         self.stop_motors()
-        self.rotate(-60, speed=500)  # talvez isso deveria ser -80 e nao 80
+        self.rotate(90, speed=150)  # talvez isso deveria ser -80 e nao 80
 
         default_speed = 500
-        pid = PID(12, 0, 10, setpoint=12)
+        pid = PID(12, 0, 10, setpoint=22)
 
         k_to_find_end_by_color = 0
         while True:
@@ -1400,10 +1378,11 @@ class PipeLineRobot:
         self.stop_motors()
         print("called pipeline_support_diving")
         default_speed = 300
-        pid = PID(12, 0, 6, setpoint=30)
+        pid = PID(12, 0, 6, setpoint=41)
         k_to_stop = 2
 
         if side == "right":
+            pid = PID(12, 0, 3, setpoint=41)
             self.color_sensors[0].mode = "COL-COLOR"
             self.color_sensors[1].mode = "COL-COLOR"
             side = 1
@@ -1457,3 +1436,27 @@ class PipeLineRobot:
             return True
         self.move_handler(how_long=3, direction="up", speed=100)
         return False
+
+    def still_have_pipe(self) -> bool:
+        self.handler.left.stop_action = "hold"
+
+        for i in range(3):
+            self.move_handler(how_long=0.5, direction="down", speed=50)
+            self.move_handler(how_long=0.2, direction="up", speed=150)
+
+        self.move_handler(how_long=0.5, direction="down", speed=50)
+
+        if self.get_sensor_data("Ultrasonic")[1] < 15:
+
+            return True
+        else:
+            return False
+
+    def take_pipe_again(self):
+        self.stop_motors()
+        print("tryinng to cath pipe again")
+        k_time = datetime.now() + timedelta(seconds=2)
+
+        while datetime.now() < k_time:
+            self.motors.left.run_forever(speed_sp)
+
