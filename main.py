@@ -23,34 +23,38 @@ robot = PipeLineRobot()
 def main():
     try:
         print(robot.still_have_pipe())
-        # while True:
-        #     robot.initial_location_reset()
-        #     robot.status = robot.status_dictionary["doneInitialPositionReset"]
-        #     robot.publish_data()
-        #
-        #     robot.status = robot.status_dictionary["want10pipe"]
-        #     robot.publish_data()
-        #
-        #     while True:
-        #         print(robot.robot_status)
-        #         if robot.robot_status == "pipeInPositionToRescue-10":
-        #             robot.go_grab_pipe_routine(side="right")
-        #
-        #
-        #     # se nao pegou o cano (usar fncao de verificar se esta com cano) pede um nvo cano
-        #     # robot.status = robot.status_dictionary["rescuedPipe"]
-        #     # robot.publish_data()
-        #
-        #     # robot.status = robot.status_dictionary["want10pipe"]
-        #     # robot.publish_data()
-        #
-        #     robot.pipeline_support_conection_meeting_area("left")
-        #     robot.pipeline_support_following()
-        #     # so dps do amiguinho por o cano para pegar
-        #     robot.pipeline_support_conection_meeting_area("right")
-        #     robot.go_grab_pipe_routine(side="left")
-        #
-        #     break
+        robot.initial_location_reset()
+        robot.status = robot.status_dictionary["doneInitialPositionReset"]
+        robot.publish_data()
+
+        slope_side = "right"
+
+        while True:
+            robot.status = robot.status_dictionary["want10pipe"]
+            robot.publish_data()
+
+            while True:
+                print(robot.robot_status)
+                if robot.robot_status in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
+                    robot.go_grab_pipe_routine(side=slope_side, pipe_being_taken=robot.robot_status)
+                    break
+
+            if robot.still_have_pipe():
+                robot.status = robot.status_dictionary["rescuedPipe"]
+                robot.publish_data()
+
+                robot.pipeline_support_conection_meeting_area("left")
+                robot.pipeline_support_following()
+                robot.pipeline_support_conection_meeting_area("right")
+
+                slope_side = "left"
+
+            else:
+                robot.status = robot.status_dictionary["want10pipe"]
+                robot.publish_data()
+                continue
+
+            break
 
 
     except KeyboardInterrupt:

@@ -21,12 +21,8 @@ def map_values(n, start1, stop1, start2, stop2):
 class PipeLineRobot:
     ev3.Sound.speak("Robot started...")
 
-    # CRUCIAL METHODS
-    # DO NOT UPDATE
     def __init__(self):
         self.DEFAULT_SPEED = 400
-
-        self.pipe = None
 
         # define sensors
         self.gyroscope_sensor = ev3.GyroSensor('in2')
@@ -62,6 +58,7 @@ class PipeLineRobot:
 
         # define status
         self.historic = [""]
+        self.first_pipe_place = True
 
         # watter server settings
         self.has_pipe = False
@@ -308,22 +305,29 @@ class PipeLineRobot:
 
             if pipe_distance > 15:  # 40
                 self.stop_motors()
-                pipe_size = self.align_with_hole()
+                hole_size = self.align_with_hole()
                 has_pipe_already = "Invalid"
                 # sleep(5)
-                print(pipe_size)
+                print("hole_size:", hole_size)
 
-                if pipe_size != 0:
+                if hole_size != 0:
                     has_pipe_already = self.has_pipe_check()
 
-                if has_pipe_already is False or pipe_size == 20:  # and robot is with pipe
-                    print("Hole detect! Placing pipe ")
+                if has_pipe_already is False or hole_size == 20 and (
+                        self.current_pipe_size == hole_size
+                        or (self.first_pipe_place and hole_size > self.current_pipe_size)):
+
+                    print("Hole detect and matches pipe! Placing pipe...")
                     self.move_timed(1, speed=500)
-                    self.place_pipe(pipe_size)
+                    self.place_pipe(hole_size)
                     self.move_timed(0.5, direction="backwards", speed=300)
                     self.move_handler(1, direction="top", speed=1000)
                     self.handler.left.run_forever(speed_sp=-50)
                     self.rotate(90, speed=90)
+
+                    if not self.still_have_pipe():
+                        self.first_pipe_place = False
+
                     # sleep(5)
 
                 elif has_pipe_already is True:
@@ -1333,7 +1337,9 @@ class PipeLineRobot:
                     self.rotate(angle=-4, speed=150)
                     break
 
-    def go_grab_pipe_routine(self, side):
+    def go_grab_pipe_routine(self, side, pipe_being_taken):
+        self.current_pipe_size = int(pipe_being_taken.split('-')[1])
+
         self.stop_motors()
         print("called go_grab_pipe_routine")
         if side == "left":
@@ -1351,6 +1357,10 @@ class PipeLineRobot:
         self.get_on_position_before_black_line_flw(side)
         self.adjust_before_black_line_flw(side)
         self.black_line_following(side)
+
+
+
+
 
     def get_out_of_risk_edge_situation(self, side):
         self.stop_motors()
