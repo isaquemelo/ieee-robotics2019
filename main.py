@@ -21,6 +21,10 @@ robot = PipeLineRobot()
 # 110 frente
 
 def main():
+    robot.green_slope()
+    sleep(3)
+    robot.slope_following()
+    return
     try:
         print(robot.still_have_pipe())
         robot.initial_location_reset()

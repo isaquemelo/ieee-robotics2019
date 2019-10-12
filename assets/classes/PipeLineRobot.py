@@ -1077,55 +1077,70 @@ class PipeLineRobot:
         self.stop_motors()
         print("called green_slope to go down")
         default_speed = 400
-        k_time = 1
+        k_time = 3.5
 
         pid_side = self.adjust_before_go_down_green_slope()
-        k_speed_adjust = 100
         max_speed = 500
         min_speed = -max_speed
         if pid_side == "right":
-            expected_save_side_dist = 30
+            expected_save_side_dist = 35
         else:
             expected_save_side_dist = 30
         pid = PID(5, 0, 5, setpoint=expected_save_side_dist)
-
         if pid_side == "left":
-            self.rotate(angle=-180, speed=150)
-
+            k_time += 0.5
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
                 if datetime.now() > minimum_time_before_stop:
-                    if "Green" not in self.get_sensor_data("ColorSensor"):
-                        break
-
-                self.motors.left.run_forever(speed_sp=-default_speed)
-                self.motors.right.run_forever(speed_sp=-default_speed - k_speed_adjust)
-
+                    self.stop_motors()
+                    self.rotate(-110, speed=150)
+                    break
+                left_dist = self.get_sensor_data("InfraredSensor")[0]
+                control = pid(left_dist)
+                left_speed = default_speed - control
+                right_speed = default_speed + control
+                if left_speed > max_speed:
+                    left_speed = max_speed
+                elif left_speed < min_speed:
+                    left_speed = min_speed
+                if right_speed > max_speed:
+                    right_speed = max_speed
+                elif right_speed < min_speed:
+                    right_speed = min_speed
+                self.motors.left.run_forever(speed_sp=left_speed)
+                self.motors.right.run_forever(speed_sp=right_speed)
         elif pid_side == "right":
-            self.rotate(angle=180, speed=150)
-
+            k_time += 0.5
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
                 if datetime.now() > minimum_time_before_stop:
-                    if "Green" not in self.get_sensor_data("ColorSensor"):
-                        break
-
-                self.motors.left.run_forever(speed_sp=-default_speed - k_speed_adjust)
-                self.motors.right.run_forever(speed_sp=-default_speed)
-
+                    self.stop_motors()
+                    self.rotate(-60, speed=150)
+                    break
+                right_dist = self.get_sensor_data("InfraredSensor")[1]
+                control = pid(right_dist)
+                left_speed = default_speed + control
+                right_speed = default_speed - control
+                if left_speed > max_speed:
+                    left_speed = max_speed
+                elif left_speed < min_speed:
+                    left_speed = min_speed
+                if right_speed > max_speed:
+                    right_speed = max_speed
+                elif right_speed < min_speed:
+                    right_speed = min_speed
+                self.motors.left.run_forever(speed_sp=left_speed)
+                self.motors.right.run_forever(speed_sp=right_speed)
         elif pid_side is None:
-            self.rotate(angle=180, speed=150)
-
             minimum_time_before_stop = datetime.now() + timedelta(seconds=k_time)
             while True:
                 if datetime.now() > minimum_time_before_stop:
-                    if "Green" not in self.get_sensor_data("ColorSensor"):
-                        break
+                    self.stop_motors()
+                    self.rotate(-90, speed=150)
+                    break
+                self.motors.left.run_forever(speed_sp=default_speed)
+                self.motors.right.run_forever(speed_sp=default_speed)
 
-                self.motors.left.run_forever(speed_sp=-default_speed)
-                self.motors.right.run_forever(speed_sp=-default_speed)
-
-        self.stop_motors()
 
     def adjust_before_go_down_green_slope(self):
         print("called adjust_before_go_down_green_slope")
@@ -1163,7 +1178,6 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
 
         self.stop_motors()
-        self.rotate(90, speed=150)  # talvez isso deveria ser -80 e nao 80
 
         default_speed = 500
         pid = PID(12, 0, 10, setpoint=22)
