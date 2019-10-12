@@ -303,50 +303,50 @@ class PipeLineRobot:
                     self.rotate(80, speed=150)
                     return
 
-            if pipe_distance > 15:  # 40
-                self.stop_motors()
-                hole_size = self.align_with_hole()
-                has_pipe_already = "Invalid"
-                # sleep(5)
-                print("hole_size:", hole_size)
-
-                if hole_size != 0:
-                    has_pipe_already = self.has_pipe_check()
-
-                if has_pipe_already is False or hole_size == 20 and (
-                        self.current_pipe_size == hole_size
-                        or (self.first_pipe_place and hole_size > self.current_pipe_size)):
-
-                    print("Hole detect and matches pipe! Placing pipe...")
-                    self.move_timed(1, speed=500)
-                    self.place_pipe(hole_size)
-                    self.move_timed(0.5, direction="backwards", speed=300)
-                    self.move_handler(1, direction="top", speed=1000)
-                    self.handler.left.run_forever(speed_sp=-50)
-                    self.rotate(90, speed=90)
-
-                    if not self.still_have_pipe():
-                        self.first_pipe_place = False
-
-                    # sleep(5)
-
-                elif has_pipe_already is True:
-                    print("Already has pipe! Misguided sensor info")
-                    self.rotate(90, speed=90)
-                    continue
-                elif has_pipe_already is None:
-                    print("Info not reliable at all!")
-                    self.rotate(90, speed=90)
-                    continue
-                elif has_pipe_already == "Invalid":
-                    continue
+            # if pipe_distance > 15:  # 40
+            #     self.stop_motors()
+            #     hole_size = self.align_with_hole()
+            #     has_pipe_already = "Invalid"
+            #     # sleep(5)
+            #     print("hole_size:", hole_size)
+            #
+            #     if hole_size != 0:
+            #         has_pipe_already = self.has_pipe_check()
+            #
+            #     if has_pipe_already is False or hole_size == 20 and (
+            #             self.current_pipe_size == hole_size
+            #             or (self.first_pipe_place and hole_size > self.current_pipe_size)):
+            #
+            #         print("Hole detect and matches pipe! Placing pipe...")
+            #         self.move_timed(1, speed=500)
+            #         self.place_pipe(hole_size)
+            #         self.move_timed(0.5, direction="backwards", speed=300)
+            #         self.move_handler(1, direction="top", speed=1000)
+            #         self.handler.left.run_forever(speed_sp=-50)
+            #         self.rotate(90, speed=90)
+            #
+            #         if not self.still_have_pipe():
+            #             self.first_pipe_place = False
+            #
+            #         # sleep(5)
+            #
+            #     elif has_pipe_already is True:
+            #         print("Already has pipe! Misguided sensor info")
+            #         self.rotate(90, speed=90)
+            #         continue
+            #     elif has_pipe_already is None:
+            #         print("Info not reliable at all!")
+            #         self.rotate(90, speed=90)
+            #         continue
+            #     elif has_pipe_already == "Invalid":
+            #         continue
 
             if front_distance < front_distance_to_rotate:
                 self.stop_motors()
                 print("rotating cause it found small front dist")
                 if border_situation is not None:
                     if border_situation is False:
-                        # print("cruva sem risco")
+                        # print("curva sem risco")
                         # sleep(3)
                         self.move_timed(how_long=0.2, direction="backwards")
                         self.rotate(0, axis="own", speed=90)
@@ -1172,6 +1172,50 @@ class PipeLineRobot:
         print("pid is not necessary")
         return None
 
+    def verify(self):
+        self.stop_motors()
+        default_speed = 200
+        print("called verify")
+        k_to_find_end_by_color = 0
+        k_reliable_angle = 60
+        color_data = self.get_sensor_data("ColorSensor", "r")
+
+        if color_data[0] != k_to_find_end_by_color and color_data[1] != k_to_find_end_by_color:
+            return False
+
+        elif color_data[0] == k_to_find_end_by_color and color_data[1] != k_to_find_end_by_color:
+            self.reset_gyroscope()
+            while color_data[1] != k_to_find_end_by_color:
+                self.motors.right.run_forever(speed_sp=default_speed)
+                if self.gyroscope_sensor.value() <= -k_reliable_angle:
+                    self.stop_motors()
+                    ev3.Sound.beep()
+                    while self.gyroscope_sensor.value() < 0:
+                        self.motors.right.run_forever(speed_sp=-default_speed)
+                    self.stop_motors()
+                    return False
+                color_data = self.get_sensor_data("ColorSensor", "r")
+            self.stop_motors()
+            return True
+
+        elif color_data[1] == k_to_find_end_by_color and color_data[0] != k_to_find_end_by_color:
+            self.reset_gyroscope()
+            while color_data[0] != k_to_find_end_by_color:
+                self.motors.left.run_forever(speed_sp=default_speed)
+                if self.gyroscope_sensor.value() >= k_reliable_angle:
+                    self.stop_motors()
+                    ev3.Sound.beep()
+                    while self.gyroscope_sensor.value() > 0:
+                        self.motors.left.run_forever(speed_sp=-default_speed)
+                    self.stop_motors()
+                    return False
+                color_data = self.get_sensor_data("ColorSensor", "r")
+            self.stop_motors()
+            return True
+
+        elif color_data[0] == k_to_find_end_by_color and color_data[1] == k_to_find_end_by_color:
+            return True
+
     def slope_following(self):
         print("called slope following")
         self.color_sensors[0].mode = "COL-REFLECT"
@@ -1189,7 +1233,11 @@ class PipeLineRobot:
             control = pid(left_distance)
             color_data = self.get_sensor_data("ColorSensor", "r")
 
-            if k_to_find_end_by_color == color_data[0] and k_to_find_end_by_color == color_data[1]:
+            if k_to_find_end_by_color == color_data[0] or k_to_find_end_by_color == color_data[1]:
+                # prescisa confirmar se realmente terminou tudo
+                if not self.verify():
+                    continue
+                # prescisa confirmar se realmente terminou tudo
                 self.move_timed(how_long=0.5, direction="backwards", speed=1000)
                 print("found undefined on both color_sensors")
                 break
@@ -1245,7 +1293,7 @@ class PipeLineRobot:
     def climb_green_slope(self):
         self.stop_motors()
         print("called climb_green_slope")
-        default_speed = 400
+        default_speed = 600
         counter = 0
 
         self.color_sensors[0].mode = "COL-COLOR"
