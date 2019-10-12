@@ -1013,7 +1013,8 @@ class PipeLineRobot:
                 self.stop_motors()
                 if color_data[0] < k_min_white_reflect or color_data[1] < k_min_white_reflect:  # double check
                     ev3.Sound.beep()
-                    print("found something different from white")
+                    # print("found something different from white, color_data = ", color_data)
+                    # sleep(1)
                     needs_to_be_on_color = self.get_out_of_color()
                     self.color_alignment(aligment_with_color=needs_to_be_on_color)
                     its_green_slope = self.verify_green_slope()
