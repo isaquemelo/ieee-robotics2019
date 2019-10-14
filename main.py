@@ -21,8 +21,10 @@ robot = PipeLineRobot()
 # 110 frente
 
 def main():
-    robot.black_line_following(side="right")
-    return
+    while True:
+        robot.green_slope()
+        robot.slope_following()
+        sleep(7)
     try:
         robot.initial_location_reset()
         robot.slope_following()
