@@ -51,10 +51,11 @@ class PipeLineRobot:
         self.motors.left.polarity = "inversed"
         self.motors.right.polarity = "inversed"
 
-        self.handler = Duo(ev3.LargeMotor('outC'), ev3.LargeMotor('outC'))
+        self.handler = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outB'))
 
-        self.move_handler(3, direction="top", speed=1000)
-        self.handler.left.run_forever(speed_sp=-1000)
+        # self.handler.left.stop_action = "hold"
+        # self.move_handler(how_long=3, direction="top", speed=1000)
+        self.handler.left.run_forever(speed_sp=-500)
 
         # define status
         self.historic = [""]
@@ -270,22 +271,38 @@ class PipeLineRobot:
         default_speed = 150
         max_speed = 200
 
-        pid = PID(6, 0, 2, setpoint=1)
+        pid = PID(6, 0, 2, setpoint=2)
         front_distance_to_rotate = 2
 
-        k_steps = None
+        if hole_size == 10:
+            k_steps = 230
 
-        while <= k_steps:
+        elif hole_size == 15:
+            k_steps = 360 - 120
 
+        elif hole_size == 20:
+            k_steps = 480 - 120
+
+        ev3.Sound.beep()
+        print("starting phase_out_place_pipe")
+        sleep(2)
+        initial_step = self.motors.left.position + self.motors.right.position
+        while self.motors.left.position + self.motors.right.position <= initial_step + k_steps*2:
+
+            # verifica colisão frontal
             if self.get_sensor_data("InfraredSensor")[2] <= front_distance_to_rotate:
                 self.stop_motors()
-                return
+                print("robot found wall")
+                break
 
+            # verifica queda
             color_data = self.get_sensor_data("ColorSensor", "r")
             if color_data[0] == 0 or color_data[1] == 0:
                 self.stop_motors()
-                if self.get_sensor_data("Ultrasonic")[1] > 23:
-                    return
+                if self.verify():
+                    if self.get_sensor_data("Ultrasonic")[1] > 20:
+                        print("robot was close to fall")
+                        break
 
             control = pid(self.get_sensor_data("InfraredSensor")[0])
 
@@ -305,6 +322,9 @@ class PipeLineRobot:
             self.motors.right.run_forever(speed_sp=speed_b)
 
         self.stop_motors()
+        print("ending phase_out_place_pipe")
+        sleep(2)
+        ev3.Sound.beep()
         return
 
     def pipeline_support_following(self):
@@ -312,7 +332,7 @@ class PipeLineRobot:
         print("pipeline_support_following")
         default_speed = 150
 
-        pid = PID(6, 0, 2, setpoint=1)
+        pid = PID(6, 0, 2, setpoint=2)
         front_distance_to_rotate = 2
 
         speed_a = 0
@@ -339,15 +359,16 @@ class PipeLineRobot:
             # print(pipe_distance)
             color_data = self.get_sensor_data("ColorSensor", "r")
 
-            # if color_data[0] == 0 or color_data[1] == 0:
-            #     self.stop_motors()
-            #     if self.get_sensor_data("Ultrasonic")[1] > 23:
-            #         print("finished pipeline_support_following 'cause found the edge upper_dist =", upper_distance)
-            #         # self.color_alignment(aligment_with_color=True)
-            #         self.move_timed(how_long=0.5
-            #                         , direction="backwards", speed=300)
-            #         self.rotate(80, speed=150)
-            #         return
+            if color_data[0] == 0 or color_data[1] == 0:
+                self.stop_motors()
+                if self.verify():
+                    if self.get_sensor_data("Ultrasonic")[1] > 20:
+                        print("finished pipeline_support_following")
+                        # self.color_alignment(aligment_with_color=True)
+                        self.move_timed(how_long=0.5
+                                        , direction="backwards", speed=300)
+                        self.rotate(80, speed=150)
+                        return
 
             if pipe_distance > 15:  # 40
                 self.stop_motors()
@@ -366,7 +387,6 @@ class PipeLineRobot:
                     print("Hole detect and matches pipe! Placing pipe...")
                     self.move_timed(1, speed=500)
                     self.place_pipe(hole_size)
-                    self.phase_out_place_pipe(hole_size)
                     self.move_timed(0.5, direction="backwards", speed=300)
                     self.move_handler(1, direction="top", speed=1000)
                     self.handler.left.run_forever(speed_sp=-50)
@@ -374,7 +394,7 @@ class PipeLineRobot:
 
                     have_pipe = self.still_have_pipe()
                     print("have_pipe", have_pipe)
-
+                    self.phase_out_place_pipe(hole_size)
 
                     if not have_pipe:
                         self.first_pipe_place = False
@@ -449,61 +469,43 @@ class PipeLineRobot:
 
     def place_pipe(self, size):
         self.stop_motors()
-        self.handler.left.stop_action = "hold"
-        if size == 20:
-            for i in range(4):
-                self.move_handler(how_long=0.5, direction="down", speed=50)
-                self.move_handler(how_long=0.2, direction="up", speed=200)
 
-            self.move_timed(how_long=0.4, direction="backward", speed=100)
-            self.move_handler(how_long=0.2, direction="down", speed=100)
-            self.move_timed(how_long=0.4, direction="forward", speed=100)
+
+        if size == 20:
+            self.handler.left.stop_action = "hold"
+            for i in range(7):
+                self.move_handler(how_long=0.1, direction="down", speed=200)
+                self.move_handler(how_long=0.2, direction="up", speed=400)
+
+            self.move_handler(how_long=0.1, direction="down", speed=200)
+            # self.stop_handler()
+            # sleep(2)
+
+        elif size == 10:
+            self.handler.left.stop_action = "hold"
+            for i in range(4):
+                self.move_handler(how_long=0.2, direction="up", speed=50)
+                self.move_handler(how_long=0.1, direction="down", speed=100)
+
+            for i in range(4):
+                self.move_handler(how_long=0.2, direction="up", speed=100)
+                self.move_handler(how_long=0.1, direction="down", speed=100)
+
+            self.move_handler(how_long=0.3, direction="down", speed=100)
+
+        elif size == 15:
+            self.handler.left.stop_action = "hold"
+            for i in range(4):
+                self.move_handler(how_long=0.3, direction="up", speed=50)
+                self.move_handler(how_long=0.1, direction="down", speed=100)
+
+            for i in range(4):
+                self.move_handler(how_long=0.2, direction="up", speed=100)
+                self.move_handler(how_long=0.1, direction="down", speed=100)
 
             for i in range(2):
                 self.move_handler(how_long=0.4, direction="up", speed=100)
                 self.move_handler(how_long=0.3, direction="down", speed=100)
-
-        elif size == 15:
-            for i in range(4):
-                self.move_handler(how_long=0.5, direction="down", speed=50)
-                self.move_handler(how_long=0.2, direction="up", speed=200)
-
-            self.move_timed(how_long=0.4, direction="backward", speed=100)
-            self.move_handler(how_long=0.2, direction="down", speed=100)
-            self.rotate(angle=3, speed=90)
-            self.move_timed(how_long=0.4, direction="forward", speed=100)
-
-            for i in range(2):
-                self.move_handler(how_long=0.4, direction="up", speed=100)
-                self.move_handler(how_long=0.2, direction="down", speed=100)
-
-            self.move_timed(how_long=0.4, direction="backward", speed=100)
-            self.move_handler(how_long=0.2, direction="down", speed=100)
-            self.rotate(angle=-3, speed=90)
-            self.move_timed(how_long=0.4, direction="forward", speed=100)
-
-            for i in range(2):
-                self.move_handler(how_long=0.4, direction="up", speed=100)
-                self.move_handler(how_long=0.2, direction="down", speed=100)
-
-            self.move_timed(how_long=0.4, direction="backward", speed=100)
-            self.move_handler(how_long=0.2, direction="down", speed=100)
-            self.rotate(angle=-3, speed=90)
-            self.move_timed(how_long=0.4, direction="forward", speed=100)
-
-            for i in range(2):
-                self.move_handler(how_long=0.4, direction="up", speed=100)
-                self.move_handler(how_long=0.2, direction="down", speed=100)
-
-        elif size == 10:
-            self.handler.left.stop_action = "hold"
-            self.handler.left.stop()
-
-            for i in range(4):
-                self.move_handler(how_long=0.5, direction="down", speed=50)
-                self.move_handler(how_long=0.2, direction="up", speed=200)
-
-            self.move_handler(how_long=0.2, direction="down", speed=100)
 
     def has_pipe_check(self) -> bool:
         top_values = []
@@ -549,10 +551,11 @@ class PipeLineRobot:
             color_data = self.get_sensor_data("ColorSensor", "r")
             if color_data[0] == 0 or color_data[1] == 0:
                 self.stop_motors()
-                if self.get_sensor_data("Ultrasonic")[1] > 23:
-                    ev3.Sound.beep()
-                    print("found end of the pipeline")
-                    return 0
+                if self.verify():
+                    if self.get_sensor_data("Ultrasonic")[1] > 20:
+                        ev3.Sound.beep()
+                        print("found end of the pipeline")
+                        return 0
 
             # print(side_distance, front_distance)
             # print("control = ", control)
@@ -616,6 +619,7 @@ class PipeLineRobot:
             return 10
         elif 330 <= cycles[0] <= 480 and 330 <= cycles[1] <= 480:
             return 20
+
 
         elif cycles[0] <= 30 or cycles[1] <= 30:
             return "Invalid"
