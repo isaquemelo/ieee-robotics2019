@@ -22,39 +22,40 @@ robot = PipeLineRobot()
 
 def main():
     try:
-        print(robot.still_have_pipe())
-        robot.initial_location_reset()
-        robot.status = robot.status_dictionary["doneInitialPositionReset"]
-        robot.publish_data()
-
-        slope_side = "right"
-
-        while True:
-            robot.status = robot.status_dictionary["want10pipe"]
-            robot.publish_data()
-
-            while True:
-                print(robot.robot_status)
-                if robot.robot_status in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
-                    robot.go_grab_pipe_routine(side=slope_side, pipe_being_taken=robot.robot_status)
-                    break
-
-            if robot.still_have_pipe():
-                robot.status = robot.status_dictionary["rescuedPipe"]
-                robot.publish_data()
-
-                robot.pipeline_support_conection_meeting_area("left")
-                robot.pipeline_support_following()
-                robot.pipeline_support_conection_meeting_area("right")
-
-                slope_side = "left"
-
-            else:
-                robot.status = robot.status_dictionary["want10pipe"]
-                robot.publish_data()
-                continue
-
-            break
+        robot.pipeline_support_following()
+        # print(robot.still_have_pipe())
+        # robot.initial_location_reset()
+        # robot.status = robot.status_dictionary["doneInitialPositionReset"]
+        # robot.publish_data()
+        #
+        # slope_side = "right"
+        #
+        # while True:
+        #     robot.status = robot.status_dictionary["want10pipe"]
+        #     robot.publish_data()
+        #
+        #     while True:
+        #         print(robot.robot_status)
+        #         if robot.robot_status in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
+        #             robot.go_grab_pipe_routine(side=slope_side, pipe_being_taken=robot.robot_status)
+        #             break
+        #
+        #     if robot.still_have_pipe():
+        #         robot.status = robot.status_dictionary["rescuedPipe"]
+        #         robot.publish_data()
+        #
+        #         robot.pipeline_support_conection_meeting_area("left")
+        #         robot.pipeline_support_following()
+        #         robot.pipeline_support_conection_meeting_area("right")
+        #
+        #         slope_side = "left"
+        #
+        #     else:
+        #         robot.status = robot.status_dictionary["want10pipe"]
+        #         robot.publish_data()
+        #         continue
+        #
+        #     break
 
 
     except KeyboardInterrupt:
@@ -62,7 +63,8 @@ def main():
         robot.motors.left.stop()
         robot.handler.left.reset()
         robot.handler.left.stop()
-        robot.motors.alternative.stop()
+        robot.handler.left.reset()
+        robot.handler.left.stop()
 
         server.client.loop_stop()
         server.client.disconnect()
@@ -77,7 +79,8 @@ except KeyboardInterrupt:
     robot.motors.right.stop()
     robot.motors.left.stop()
     robot.handler.left.stop()
-    robot.motors.alternative.stop()
+    robot.handler.left.reset()
+    robot.handler.left.stop()
 
     server.client.loop_stop()
     server.client.disconnect()
