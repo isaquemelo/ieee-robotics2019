@@ -1058,7 +1058,7 @@ class PipeLineRobot:
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         default_speed = 200
-        expected_save_side_dist = 30
+        expected_save_side_dist = 40
         k_min_white_reflect = 50
         k_dist_from_robot = 20
 
@@ -1350,7 +1350,7 @@ class PipeLineRobot:
     def climb_green_slope(self):
         self.stop_motors()
         print("called climb_green_slope")
-        default_speed = 600
+        default_speed = 400
         counter = 0
 
         self.color_sensors[0].mode = "COL-COLOR"
