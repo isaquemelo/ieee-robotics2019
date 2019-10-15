@@ -2,7 +2,7 @@
 
 import ev3dev.ev3 as ev3
 # import math
-# from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 from time import sleep
 
 # from simple_pid import PID
@@ -22,8 +22,8 @@ robot = PipeLineRobot()
 
 def main():
     while True:
-        robot.pipeline_support_conection_meeting_area("to pipeline")
-        sleep(3)
+        robot.pipeline_support_following()
+        sleep(7)
     try:
         robot.initial_location_reset()
         robot.slope_following()

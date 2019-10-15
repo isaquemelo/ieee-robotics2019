@@ -281,11 +281,11 @@ class PipeLineRobot:
             k_steps = 360 - 120
 
         elif hole_size == 20:
-            k_steps = 480 - 120
+            k_steps = 480 - 140
 
         ev3.Sound.beep()
         print("starting phase_out_place_pipe")
-        sleep(2)
+        # sleep(2)
         initial_step = self.motors.left.position + self.motors.right.position
         while self.motors.left.position + self.motors.right.position <= initial_step + k_steps*2:
 
@@ -323,7 +323,7 @@ class PipeLineRobot:
 
         self.stop_motors()
         print("ending phase_out_place_pipe")
-        sleep(2)
+        # sleep(2)
         ev3.Sound.beep()
         return
 
@@ -345,15 +345,25 @@ class PipeLineRobot:
         last_pipe_distance = self.get_sensor_data("Ultrasonic")[0]
         last_last_pipe_distance = 255
 
+
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
+
+        # counter for ignoring umpossible pipe_hole
+        invalid_hole_counter = 0
+        max_invalid_hole_counter = 2
+        k_time_invalid_hole_counter = timedelta(seconds=2)
+        k_timer = datetime.now()
+        first_count = True
+        # counter for ignoring umpossible pipe_hole
+
         while True:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
             front_distance = self.get_sensor_data("InfraredSensor")[2]
             pipe_distance = self.get_sensor_data("Ultrasonic")[0]
             upper_distance = self.get_sensor_data("Ultrasonic")[1]
             control = pid(side_distance)
-
+            print("invalid_hole_counter =", invalid_hole_counter)
             # print(side_distance, front_distance)
             # print("control = ", control)
             # print(pipe_distance)
@@ -370,47 +380,90 @@ class PipeLineRobot:
                         self.rotate(80, speed=150)
                         return
 
-            # if pipe_distance > 15:  # 40
-            #     self.stop_motors()
-            #     hole_size = self.align_with_hole()
-            #     has_pipe_already = "Invalid"
-            #     # sleep(5)
-            #     print("hole_size:", hole_size)
-            #
-            #     if hole_size != 0:
-            #         has_pipe_already = self.has_pipe_check()
-            #
-            #     if has_pipe_already is False or hole_size == 20 and (self.current_pipe_size == hole_size
-            #                                                          or (
-            #                                                                  self.first_pipe_place and hole_size > self.current_pipe_size)):
-            #
-            #         print("Hole detect and matches pipe! Placing pipe...")
-            #         self.move_timed(1, speed=500)
-            #         self.place_pipe(hole_size)
-            #         self.move_timed(0.5, direction="backwards", speed=300)
-            #         self.move_handler(1, direction="top", speed=1000)
-            #         self.handler.left.run_forever(speed_sp=-50)
-            #         self.rotate(90, speed=90)
-            #
-            #         have_pipe = self.still_have_pipe()
-            #         print("have_pipe", have_pipe)
-            #         self.phase_out_place_pipe(hole_size)
-            #
-            #         if not have_pipe:
-            #             self.first_pipe_place = False
-            #
-            #         # sleep(5)
-            #
-            #     elif has_pipe_already is True:
-            #         print("Already has pipe! Misguided sensor info")
-            #         self.rotate(90, speed=90)
-            #         continue
-            #     elif has_pipe_already is None:
-            #         print("Info not reliable at all!")
-            #         self.rotate(90, speed=90)
-            #         continue
-            #     elif has_pipe_already == "Invalid":
-            #         continue
+            if invalid_hole_counter < max_invalid_hole_counter:
+                if pipe_distance > 15:  # 40
+                    self.stop_motors()
+
+                    begin = datetime.now()
+                    hole_size = self.align_with_hole()
+                    end = datetime.now()
+                    k_time_for_align_with_hole = end - begin  # represents the time necessary to  hole_size = self.align_with_hole()
+
+                    has_pipe_already = "Invalid"
+                    # sleep(5)
+                    print("hole_size:", hole_size)
+
+                    if hole_size != 0:
+
+                        begin = datetime.now()
+                        has_pipe_already = self.has_pipe_check()
+                        end = datetime.now()
+                        k_time_for_has_pipe_check = end - begin  # represents the time necessary to  has_pipe_already = self.has_pipe_check()
+
+
+                    if has_pipe_already is False or hole_size == 20 and (self.current_pipe_size == hole_size
+                                            or (self.first_pipe_place and hole_size > self.current_pipe_size)):
+
+                            print("Hole detect and matches pipe! Placing pipe...")
+                            invalid_hole_counter = 0
+                            first_count = True
+                            self.move_timed(1, speed=500)
+                            self.place_pipe(hole_size)
+                            self.move_timed(0.5, direction="backwards", speed=300)
+                            self.move_handler(1, direction="top", speed=1000)
+                            self.handler.left.run_forever(speed_sp=-50)
+                            self.rotate(90, speed=90)
+
+                            have_pipe = self.still_have_pipe()
+                            print("have_pipe", have_pipe)
+                            self.phase_out_place_pipe(hole_size)
+
+                            if not have_pipe:
+                                self.first_pipe_place = False
+
+                        # sleep(5)
+
+                    elif has_pipe_already is True:
+                        print("Already has pipe! Misguided sensor info")
+
+                        begin = datetime.now()
+                        self.rotate(90, speed=90)
+                        end = datetime.now()
+                        k_time_for_roatation = end - begin
+
+                        if k_timer >= datetime.now() or first_count:
+                            invalid_hole_counter += 1
+                            k_timer = datetime.now() + k_time_invalid_hole_counter + k_time_for_roatation + k_time_for_align_with_hole + k_time_for_has_pipe_check
+                            first_count = False
+                        else:
+                            first_count = True
+                            invalid_hole_counter = 0
+                        continue
+                    elif has_pipe_already is None:
+                        print("Info not reliable at all!")
+
+                        begin = datetime.now()
+                        self.rotate(90, speed=90)
+                        end = datetime.now()
+                        k_time_for_roatation = end - begin
+
+                        if k_timer >= datetime.now() or first_count:
+                            invalid_hole_counter += 1
+                            k_timer = datetime.now() + k_time_invalid_hole_counter + k_time_for_roatation + k_time_for_align_with_hole + k_time_for_has_pipe_check
+                            first_count = False
+                        else:
+                            first_count = True
+                            invalid_hole_counter = 0
+                        continue
+                    elif has_pipe_already == "Invalid":
+                        continue
+            else:
+                # ev3.Sound.beep()
+                print("robot canceled the action of trying to place pipe cause it has failed to many times")
+                invalid_hole_counter = 0
+                first_count = True
+                # sleep(3)
+                self.phase_out_place_pipe(10)
 
             if front_distance < front_distance_to_rotate:
                 self.stop_motors()
