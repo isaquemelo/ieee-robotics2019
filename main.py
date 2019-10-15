@@ -23,14 +23,18 @@ robot = PipeLineRobot()
 def main():
     while True:
         robot.pipeline_support_following()
-        sleep(7)
+        sleep(5)
     try:
-        robot.initial_location_reset()
-        robot.slope_following()
-        robot.go_grab_pipe_routine(side="right", pipe_being_taken="pipeInPositionToRescue-15")
-        robot.pipeline_support_conection_meeting_area("to meeting area")
-        robot.pipeline_support_following()
         robot.pipeline_support_conection_meeting_area("to pipeline")
+        robot.pipeline_support_following()
+        robot.pipeline_support_conection_meeting_area("to meeting area")
+
+        # robot.initial_location_reset()
+        # robot.slope_following()
+        # robot.go_grab_pipe_routine(side="right", pipe_being_taken="pipeInPositionToRescue-15")
+        # robot.pipeline_support_conection_meeting_area("to meeting area")
+        # robot.pipeline_support_following()
+        # robot.pipeline_support_conection_meeting_area("to pipeline")
 
         # print(robot.still_have_pipe())
         # robot.initial_location_reset()
@@ -53,9 +57,9 @@ def main():
         #         robot.status = robot.status_dictionary["rescuedPipe"]
         #         robot.publish_data()
         #
-        #         robot.pipeline_support_conection_meeting_area("left")
+        #         robot.pipeline_support_conection_meeting_area("to pipeline")
         #         robot.pipeline_support_following()
-        #         robot.pipeline_support_conection_meeting_area("right")
+        #         robot.pipeline_support_conection_meeting_area("to meeting area")
         #
         #         slope_side = "left"
         #

@@ -24,6 +24,16 @@ class PipeLineRobot:
     def __init__(self):
         self.DEFAULT_SPEED = 400
 
+        # pipeline consts
+        self.kp_for_pipeline = 6
+        self.ki_for_pipeline = 0
+        self.kd_for_pipeline = 2
+        self.set_point_for_pipeline = 2
+        self.default_speed_for_pipeline = 150
+        self.max_control_for_pipeline = 300
+        self.front_distance_to_rotate = 2
+        # pipeline consts
+
         # define sensors
         self.gyroscope_sensor = ev3.GyroSensor('in2')
         self.reset_gyroscope()
@@ -123,7 +133,7 @@ class PipeLineRobot:
         print(payload)
 
     def receiver_on_client_connect(self, client, userdata, flags, rc):
-        print("The bluetooth bricks are connected with result code", str(rc))
+        print("The receiver bluetooth bricks are connected with result code", str(rc))
         client.subscribe("topic/PipeLineRobot")
 
     def publish_data(self):
@@ -268,11 +278,8 @@ class PipeLineRobot:
     def phase_out_place_pipe(self, hole_size):
         self.stop_motors()
         print("called phase_out_place_pipe")
-        default_speed = 150
-        max_speed = 200
 
-        pid = PID(6, 0, 2, setpoint=2)
-        front_distance_to_rotate = 2
+        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline, setpoint=self.set_point_for_pipeline)
 
         if hole_size == 10:
             k_steps = 230
@@ -290,7 +297,7 @@ class PipeLineRobot:
         while self.motors.left.position + self.motors.right.position <= initial_step + k_steps*2:
 
             # verifica colisão frontal
-            if self.get_sensor_data("InfraredSensor")[2] <= front_distance_to_rotate:
+            if self.get_sensor_data("InfraredSensor")[2] <= self.front_distance_to_rotate:
                 self.stop_motors()
                 print("robot found wall")
                 break
@@ -306,17 +313,13 @@ class PipeLineRobot:
 
             control = pid(self.get_sensor_data("InfraredSensor")[0])
 
-            speed_a = default_speed + control
-            speed_b = default_speed - control
+            if control > self.max_control_for_pipeline:
+                control = self.max_control_for_pipeline
+            elif control < -self.max_control_for_pipeline:
+                control = -self.max_control_for_pipeline
 
-            if speed_a >= max_speed:
-                speed_a = max_speed
-            elif speed_a <= -max_speed:
-                speed_a = -max_speed
-            if speed_b >= max_speed:
-                speed_b = max_speed
-            elif speed_b <= -max_speed:
-                speed_b = -max_speed
+            speed_a = self.default_speed_for_pipeline + control
+            speed_b = self.default_speed_for_pipeline - control
 
             self.motors.left.run_forever(speed_sp=speed_a)
             self.motors.right.run_forever(speed_sp=speed_b)
@@ -330,10 +333,8 @@ class PipeLineRobot:
     def pipeline_support_following(self):
         self.stop_motors()
         print("pipeline_support_following")
-        default_speed = 150
 
-        pid = PID(6, 0, 2, setpoint=2)
-        front_distance_to_rotate = 2
+        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline, setpoint=self.set_point_for_pipeline)
 
         speed_a = 0
         speed_b = 0
@@ -400,7 +401,6 @@ class PipeLineRobot:
                         end = datetime.now()
                         k_time_for_has_pipe_check = end - begin  # represents the time necessary to  has_pipe_already = self.has_pipe_check()
 
-
                     if has_pipe_already is False or hole_size == 20 and (self.current_pipe_size == hole_size
                                             or (self.first_pipe_place and hole_size > self.current_pipe_size)):
 
@@ -465,7 +465,7 @@ class PipeLineRobot:
                 # sleep(3)
                 self.phase_out_place_pipe(10)
 
-            if front_distance < front_distance_to_rotate:
+            if front_distance < self.front_distance_to_rotate:
                 self.stop_motors()
                 print("rotating cause it found small front dist")
                 if border_situation is not None:
@@ -499,20 +499,15 @@ class PipeLineRobot:
                     self.move_timed(how_long=0.2, direction="backwards")
                     self.rotate(90, axis="own", speed=90)
 
-            speed_a = default_speed + control
-            speed_b = default_speed - control
+            if control > self.max_control_for_pipeline:
+                control = self.max_control_for_pipeline
+            elif control < -self.max_control_for_pipeline:
+                control = -self.max_control_for_pipeline
+
+            speed_a = self.default_speed_for_pipeline + control
+            speed_b = self.default_speed_for_pipeline - control
 
             # print(control)
-
-            if speed_a >= 1000:
-                speed_a = 1000
-            elif speed_a <= -1000:
-                speed_a = -1000
-
-            if speed_b >= 1000:
-                speed_b = 1000
-            elif speed_b <= -1000:
-                speed_b = -1000
 
             self.motors.left.run_forever(speed_sp=speed_a)
             self.motors.right.run_forever(speed_sp=speed_b)
@@ -578,11 +573,10 @@ class PipeLineRobot:
 
     def align_with_hole(self) -> int:
         self.stop_motors()
-        default_speed = 150
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
 
-        pid = PID(12, 0, 6, setpoint=2)
+        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline, setpoint=self.set_point_for_pipeline)
 
         speed_a = 0
         speed_b = 0
@@ -631,7 +625,7 @@ class PipeLineRobot:
                 self.rotate(-90, speed=100)
                 return self.pipe_size([end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1]])
 
-            if self.get_sensor_data("InfraredSensor")[2] <= 1:
+            if self.get_sensor_data("InfraredSensor")[2] <= self.front_distance_to_rotate:
                 print("found the wall")
                 self.rotate(angle=80, speed=90)
                 return 0
@@ -644,20 +638,15 @@ class PipeLineRobot:
                                 speed=150)
                 break
 
-            speed_a = default_speed + control
-            speed_b = default_speed - control
+            if control > self.max_control_for_pipeline:
+                control = self.max_control_for_pipeline
+            elif control < -self.max_control_for_pipeline:
+                control = -self.max_control_for_pipeline
+
+            speed_a = self.default_speed_for_pipeline + control
+            speed_b = self.default_speed_for_pipeline - control
 
             # print(control)
-
-            if speed_a >= 1000:
-                speed_a = 1000
-            elif speed_a <= -1000:
-                speed_a = -1000
-
-            if speed_b >= 1000:
-                speed_b = 1000
-            elif speed_b <= -1000:
-                speed_b = -1000
 
             self.motors.left.run_forever(speed_sp=speed_a)
             self.motors.right.run_forever(speed_sp=speed_b)
@@ -1136,16 +1125,16 @@ class PipeLineRobot:
                     self.move_timed(how_long=0.4, direction="backward")
                     left_dist = self.get_sensor_data("InfraredSensor")[0]
                     right_dist = self.get_sensor_data("InfraredSensor")[1]
-                    sleep(2)
+                    sleep(1)
                     left_dist = self.get_sensor_data("InfraredSensor")[0]
                     right_dist = self.get_sensor_data("InfraredSensor")[1]
                     if left_dist > expected_save_side_dist:
                         print("risk situation, left_dist = ", left_dist)
-                        sleep(2)
+                        # sleep(2)
                         self.get_out_of_risk_edge_situation(side="left")
                     elif right_dist > expected_save_side_dist:
                         print("risk situation, right_dist = ", right_dist)
-                        sleep(2)
+                        # sleep(2)
                         self.get_out_of_risk_edge_situation(side="right")
                     else:
                         print("rotation decision is save")
@@ -1252,11 +1241,14 @@ class PipeLineRobot:
         k_to_find_end_by_color = 0
         k_reliable_angle = 60
         color_data = self.get_sensor_data("ColorSensor", "r")
+        # sleep(3)
 
         if color_data[0] != k_to_find_end_by_color and color_data[1] != k_to_find_end_by_color:
+            print("first case")
             return False
 
         elif color_data[0] == k_to_find_end_by_color and color_data[1] != k_to_find_end_by_color:
+            print("second case")
             self.reset_gyroscope()
             while color_data[1] != k_to_find_end_by_color:
                 self.motors.right.run_forever(speed_sp=default_speed)
@@ -1266,12 +1258,15 @@ class PipeLineRobot:
                     while self.gyroscope_sensor.value() < 0:
                         self.motors.right.run_forever(speed_sp=-default_speed)
                     self.stop_motors()
+                    print("wrong")
                     return False
                 color_data = self.get_sensor_data("ColorSensor", "r")
             self.stop_motors()
+            print("right")
             return True
 
         elif color_data[1] == k_to_find_end_by_color and color_data[0] != k_to_find_end_by_color:
+            print("thrid case")
             self.reset_gyroscope()
             while color_data[0] != k_to_find_end_by_color:
                 self.motors.left.run_forever(speed_sp=default_speed)
@@ -1281,17 +1276,20 @@ class PipeLineRobot:
                     while self.gyroscope_sensor.value() > 0:
                         self.motors.left.run_forever(speed_sp=-default_speed)
                     self.stop_motors()
+                    print("wrong")
                     return False
                 color_data = self.get_sensor_data("ColorSensor", "r")
             self.stop_motors()
+            print("right")
             return True
 
         elif color_data[0] == k_to_find_end_by_color and color_data[1] == k_to_find_end_by_color:
+            print("fourth case")
             return True
 
     def slope_following(self):
         self.stop_motors()
-        sleep(3)
+        # sleep(3)
         print("called slope following")
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
@@ -1310,6 +1308,9 @@ class PipeLineRobot:
             if k_to_find_end_by_color == color_data[0] or k_to_find_end_by_color == color_data[1]:
                 # prescisa confirmar se realmente terminou tudo
                 if not self.verify_undefined():
+                    # print("verified undefined and returned False")
+                    # ev3.Sound.beep()
+                    # sleep(3)
                     continue
                 # prescisa confirmar se realmente terminou tudo
                 self.move_timed(how_long=0.5, direction="backwards", speed=1000)
