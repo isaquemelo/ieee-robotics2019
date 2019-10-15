@@ -1244,7 +1244,8 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
 
         default_speed = 500
-        pid = PID(6, 0, 2, setpoint=22)
+        control_max_speed = 300
+        pid = PID(3, 0, 6, setpoint=22)
 
         k_to_find_end_by_color = 0
         while True:
@@ -1262,18 +1263,13 @@ class PipeLineRobot:
                 print("found undefined on both color_sensors")
                 break
 
+            if control > control_max_speed:
+                control = control_max_speed
+            elif control < -control_max_speed:
+                control = -control_max_speed
+
             speed_a = default_speed + control
             speed_b = default_speed - control
-
-            if speed_a >= 1000:
-                speed_a = 1000
-            elif speed_a <= -1000:
-                speed_a = -1000
-
-            if speed_b >= 1000:
-                speed_b = 1000
-            elif speed_b <= -1000:
-                speed_b = -1000
 
             if upper_dist >= 23:
                 self.motors.left.run_forever(speed_sp=100)

@@ -22,7 +22,6 @@ robot = PipeLineRobot()
 
 def main():
     while True:
-        robot.green_slope()
         robot.slope_following()
         sleep(7)
     try:
