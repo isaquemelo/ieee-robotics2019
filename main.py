@@ -22,8 +22,8 @@ robot = PipeLineRobot()
 
 def main():
     while True:
-        robot.slope_following()
-        sleep(7)
+        robot.pipeline_support_conection_meeting_area("to pipeline")
+        sleep(3)
     try:
         robot.initial_location_reset()
         robot.slope_following()

@@ -1458,15 +1458,16 @@ class PipeLineRobot:
         self.move_timed(how_long=0.3, direction="backward")
         self.rotate(angle=160)
 
-    def pipeline_support_conection_meeting_area(self, side="to meeting area"):
+    def pipeline_support_conection_meeting_area(self, side="to pipeline"):
         self.stop_motors()
         print("called pipeline_support_diving")
-        default_speed = 300
-        pid = PID(12, 0, 6, setpoint=41)
+        default_speed = 500
+        max_control_speed = 300
+        pid = PID(3, 0, 6, setpoint=41)
         k_to_stop = 2
 
-        if side == "to pipeline":
-            pid = PID(12, 0, 3, setpoint=41)
+        if side == "to meeting area":
+            pid = PID(3, 0, 6, setpoint=41)
             self.color_sensors[0].mode = "COL-COLOR"
             self.color_sensors[1].mode = "COL-COLOR"
             side = 1
@@ -1494,20 +1495,14 @@ class PipeLineRobot:
 
             control = pid(side_distance)
 
+            if control > max_control_speed:
+                control = max_control_speed
+            elif control < -max_control_speed:
+                control = -max_control_speed
+
             speed_a = default_speed + control
             speed_b = default_speed - control
 
-            # print(control)
-
-            if speed_a >= 1000:
-                speed_a = 1000
-            elif speed_a <= -1000:
-                speed_a = -1000
-
-            if speed_b >= 1000:
-                speed_b = 1000
-            elif speed_b <= -1000:
-                speed_b = -1000
 
             self.motors.left.run_forever(speed_sp=speed_b)
             self.motors.right.run_forever(speed_sp=speed_a)
