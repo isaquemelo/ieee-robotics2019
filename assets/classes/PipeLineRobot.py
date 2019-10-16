@@ -542,7 +542,7 @@ class PipeLineRobot:
                         # print("curva sem risco")
                         # sleep(3)
                         self.move_timed(how_long=0.2, direction="backwards")
-                        self.rotate(0, axis="own", speed=90)
+                        self.rotate(90, axis="own", speed=90)
                         time = datetime.now()
                         border_situation = True
                     elif border_situation and not (datetime.now() - initial_time > timedelta(seconds=3)):
