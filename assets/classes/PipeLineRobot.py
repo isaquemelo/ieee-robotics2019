@@ -100,13 +100,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        # self.external_ip = "192.168.0.1"
-        # self.publisher = mqtt.Client()
-        # self.publisher.connect(self.external_ip, 1883, 60)
-        # self.publisher.on_connect = self.publisher_on_client_connect
-        # # self.publisher.on_message = self.publisher_on_client_message
-        # self.publisher.on_publish = self.publisher_on_client_publish
-        # self.publisher.loop_start()
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -279,7 +279,8 @@ class PipeLineRobot:
         self.stop_motors()
         print("called phase_out_place_pipe")
 
-        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline, setpoint=self.set_point_for_pipeline)
+        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline,
+                  setpoint=self.set_point_for_pipeline)
 
         if hole_size == 10:
             k_steps = 230
@@ -294,7 +295,7 @@ class PipeLineRobot:
         print("starting phase_out_place_pipe")
         # sleep(2)
         initial_step = self.motors.left.position + self.motors.right.position
-        while self.motors.left.position + self.motors.right.position <= initial_step + k_steps*2:
+        while self.motors.left.position + self.motors.right.position <= initial_step + k_steps * 2:
 
             # verifica colisão frontal
             if self.get_sensor_data("InfraredSensor")[2] <= self.front_distance_to_rotate:
@@ -336,7 +337,8 @@ class PipeLineRobot:
 
         done = False
 
-        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline, setpoint=self.set_point_for_pipeline)
+        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline,
+                  setpoint=self.set_point_for_pipeline)
 
         speed_a = 0
         speed_b = 0
@@ -347,7 +349,6 @@ class PipeLineRobot:
 
         last_pipe_distance = self.get_sensor_data("Ultrasonic")[0]
         last_last_pipe_distance = 255
-
 
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
@@ -404,93 +405,97 @@ class PipeLineRobot:
                             k_time_for_has_pipe_check = end - begin  # represents the time necessary to  has_pipe_already = self.has_pipe_check()
 
                         if has_pipe_already is False or hole_size == 20 and (self.current_pipe_size == hole_size
-                                                or (self.first_pipe_place and hole_size > self.current_pipe_size)):
+                                                                             or (
+                                                                                     self.first_pipe_place and hole_size > self.current_pipe_size)):
 
-                                print("Hole detect and matches pipe! Placing pipe...")
-                                invalid_hole_counter = 0
-                                first_count = True
-                                self.move_timed(1, speed=500)
-                                self.place_pipe(10)
-                                self.move_timed(0.5, direction="backwards", speed=300)
-                                self.move_handler(1, direction="top", speed=1000)
-                                self.handler.left.run_forever(speed_sp=-50)
-                                self.rotate(90, speed=90)
-                                done = True
+                            print("Hole detect and matches pipe! Placing pipe...")
+                            invalid_hole_counter = 0
+                            first_count = True
+                            self.move_timed(1, speed=500)
+                            self.place_pipe(self.current_pipe_size)
+                            self.move_timed(0.5, direction="backwards", speed=300)
+                            self.move_handler(1, direction="top", speed=1000)
+                            self.handler.left.run_forever(speed_sp=-50)
 
-                                have_pipe = self.still_have_pipe()
-                                print("have_pipe", have_pipe)
-                                self.phase_out_place_pipe(hole_size)
+                            # self.move_timed(0.5, direction="backwards", speed=300)
+                            # have_pipe = self.still_have_pipe()
+                            # print("have_pipe", have_pipe)
+                            # self.move_timed(0.5, direction="forward", speed=300)
 
-                                pid = PID(8, 0, 2, setpoint=self.set_point_for_pipeline)
+                            self.rotate(90, speed=90)
+                            done = True
 
-                                self.default_speed_for_pipeline = 300
+                            self.phase_out_place_pipe(hole_size)
 
-                                if not have_pipe:
-                                    self.first_pipe_place = False
+                            pid = PID(8, 0, 6, setpoint=5)
 
-                                # # aqui mesmo
-                                # while True:
-                                #     front_distance = self.get_sensor_data("InfraredSensor")[2]
-                                #
-                                #     self.motors.left.run_forever(speed_sp=1000)
-                                #     self.motors.right.run_forever(speed_sp=1000)
-                                #
-                                #     color_data = self.get_sensor_data("ColorSensor", "r")
-                                #
-                                #     if color_data[0] == 0 or color_data[1] == 0:
-                                #         self.stop_motors()
-                                #         if self.verify_undefined():
-                                #             if self.get_sensor_data("Ultrasonic")[1] > 20:
-                                #                 print("finished pipeline_support_following")
-                                #                 # self.color_alignment(aligment_with_color=True)
-                                #                 self.move_timed(how_long=0.5
-                                #                                 , direction="backwards", speed=300)
-                                #                 self.rotate(80, speed=150)
-                                #                 return
-                                #
-                                #     if front_distance < self.front_distance_to_rotate:
-                                #         self.stop_motors()
-                                #         print("rotating cause it found small front dist")
-                                #         if border_situation is not None:
-                                #             if border_situation is False:
-                                #                 # print("curva sem risco")
-                                #                 # sleep(3)
-                                #                 self.move_timed(how_long=0.2, direction="backwards")
-                                #                 self.rotate(0, axis="own", speed=90)
-                                #                 time = datetime.now()
-                                #                 border_situation = True
-                                #             elif border_situation and not (
-                                #                     datetime.now() - initial_time > timedelta(seconds=3)):
-                                #                 border_situation = None
-                                #                 # print("curva com provavel risco")
-                                #                 if datetime.now() - time <= timedelta(seconds=1.7):
-                                #                     # print("realmente havia risco")
-                                #                     self.rotate(90, axis="own", speed=90)
-                                #                 else:
-                                #                     # print("na verdade nao havia risco")
-                                #                     self.move_timed(how_long=0.2, direction="backwards")
-                                #                     self.rotate(90, axis="own", speed=90)
-                                #                 # sleep(3)
-                                #             elif border_situation and (
-                                #                     datetime.now() - initial_time > timedelta(seconds=3)):
-                                #                 border_situation = None
-                                #                 # print("curva sem risco")
-                                #                 # sleep(3)
-                                #                 self.move_timed(how_long=0.2, direction="backwards")
-                                #                 self.rotate(90, axis="own", speed=90)
-                                #         elif border_situation is None:
-                                #             # print("curva sem risco")
-                                #             # sleep(3)
-                                #             self.move_timed(how_long=0.2, direction="backwards")
-                                #             self.rotate(90, axis="own", speed=90)
-                                #
-                                #     if color_data[0] > 15 or color_data[1] > 15:
-                                #         self.motors.left.stop()
-                                #         self.motors.right.stop()
-                                #         return
+                            self.default_speed_for_pipeline = 300
+
+                            self.first_pipe_place = False
+
+                            # # aqui mesmo
+                            # while True:
+                            #     front_distance = self.get_sensor_data("InfraredSensor")[2]
+                            #
+                            #     self.motors.left.run_forever(speed_sp=1000)
+                            #     self.motors.right.run_forever(speed_sp=1000)
+                            #
+                            #     color_data = self.get_sensor_data("ColorSensor", "r")
+                            #
+                            #     if color_data[0] == 0 or color_data[1] == 0:
+                            #         self.stop_motors()
+                            #         if self.verify_undefined():
+                            #             if self.get_sensor_data("Ultrasonic")[1] > 20:
+                            #                 print("finished pipeline_support_following")
+                            #                 # self.color_alignment(aligment_with_color=True)
+                            #                 self.move_timed(how_long=0.5
+                            #                                 , direction="backwards", speed=300)
+                            #                 self.rotate(80, speed=150)
+                            #                 return
+                            #
+                            #     if front_distance < self.front_distance_to_rotate:
+                            #         self.stop_motors()
+                            #         print("rotating cause it found small front dist")
+                            #         if border_situation is not None:
+                            #             if border_situation is False:
+                            #                 # print("curva sem risco")
+                            #                 # sleep(3)
+                            #                 self.move_timed(how_long=0.2, direction="backwards")
+                            #                 self.rotate(0, axis="own", speed=90)
+                            #                 time = datetime.now()
+                            #                 border_situation = True
+                            #             elif border_situation and not (
+                            #                     datetime.now() - initial_time > timedelta(seconds=3)):
+                            #                 border_situation = None
+                            #                 # print("curva com provavel risco")
+                            #                 if datetime.now() - time <= timedelta(seconds=1.7):
+                            #                     # print("realmente havia risco")
+                            #                     self.rotate(90, axis="own", speed=90)
+                            #                 else:
+                            #                     # print("na verdade nao havia risco")
+                            #                     self.move_timed(how_long=0.2, direction="backwards")
+                            #                     self.rotate(90, axis="own", speed=90)
+                            #                 # sleep(3)
+                            #             elif border_situation and (
+                            #                     datetime.now() - initial_time > timedelta(seconds=3)):
+                            #                 border_situation = None
+                            #                 # print("curva sem risco")
+                            #                 # sleep(3)
+                            #                 self.move_timed(how_long=0.2, direction="backwards")
+                            #                 self.rotate(90, axis="own", speed=90)
+                            #         elif border_situation is None:
+                            #             # print("curva sem risco")
+                            #             # sleep(3)
+                            #             self.move_timed(how_long=0.2, direction="backwards")
+                            #             self.rotate(90, axis="own", speed=90)
+                            #
+                            #     if color_data[0] > 15 or color_data[1] > 15:
+                            #         self.motors.left.stop()
+                            #         self.motors.right.stop()
+                            #         return
 
 
-                            # sleep(5)
+                        # sleep(5)
 
                         elif has_pipe_already is True:
                             print("Already has pipe! Misguided sensor info")
@@ -593,7 +598,7 @@ class PipeLineRobot:
                 self.move_handler(how_long=0.1, direction="down", speed=200)
                 self.move_handler(how_long=0.2, direction="up", speed=400)
 
-            self.move_handler(how_long=0.1, direction="down", speed=200)
+            self.move_handler(how_long=5, direction="down", speed=20)
 
         elif size == 10:
             for i in range(4):
@@ -645,7 +650,8 @@ class PipeLineRobot:
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
 
-        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline, setpoint=self.set_point_for_pipeline)
+        pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline,
+                  setpoint=self.set_point_for_pipeline)
 
         speed_a = 0
         speed_b = 0
@@ -699,13 +705,14 @@ class PipeLineRobot:
                 self.rotate(angle=80, speed=90)
                 return 0
 
-            if datetime.now() >= initial_time + timedelta(seconds=3):
-                print("Alignment took to long, canceling...")
-                end_hole_time = datetime.now()
-                delta_time = (end_hole_time - initial_time)
-                self.move_timed(delta_time.seconds + delta_time.microseconds / 10 ** 6, direction="backwards",
-                                speed=150)
-                break
+            # undo the alignment if the total time is greater than 3s
+            # if datetime.now() >= initial_time + timedelta(seconds=3):
+            #     print("Alignment took to long, canceling...")
+            #     end_hole_time = datetime.now()
+            #     delta_time = (end_hole_time - initial_time)
+            #     self.move_timed(delta_time.seconds + delta_time.microseconds / 10 ** 6, direction="backwards",
+            #                     speed=150)
+            #     break
 
             if control > self.max_control_for_pipeline:
                 control = self.max_control_for_pipeline
@@ -1024,7 +1031,8 @@ class PipeLineRobot:
                 begin = datetime.now() + timedelta(seconds=3)
 
                 self.stop_motors()
-                self.handler.left.run_forever(speed_sp=500)
+                self.handler.left.reset()
+                self.handler.left.run_forever(speed_sp=1000)
 
             if found_pipe and datetime.now() >= begin:
                 found_pipe = False
@@ -1626,7 +1634,6 @@ class PipeLineRobot:
             speed_a = default_speed + control
             speed_b = default_speed - control
 
-
             self.motors.left.run_forever(speed_sp=speed_b)
             self.motors.right.run_forever(speed_sp=speed_a)
 
@@ -1650,7 +1657,7 @@ class PipeLineRobot:
         self.move_handler(how_long=0.5, direction="down", speed=50)
 
         if self.get_sensor_data("Ultrasonic")[1] < 15:
-
+            self.take_pipe_again()
             return True
         else:
             return False
