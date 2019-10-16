@@ -21,9 +21,10 @@ robot = PipeLineRobot()
 # 110 frente
 
 def main():
-    while True:
-        robot.pipeline_support_following()
-        sleep(5)
+    #robot.pipeline_support_conection_meeting_area("to pipeline")
+    robot.pipeline_support_following()
+    exit(0)
+
     try:
         robot.pipeline_support_conection_meeting_area("to pipeline")
         robot.pipeline_support_following()
