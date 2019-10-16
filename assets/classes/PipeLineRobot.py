@@ -421,9 +421,9 @@ class PipeLineRobot:
                                 print("have_pipe", have_pipe)
                                 self.phase_out_place_pipe(hole_size)
 
-                                pid = PID(20, 0, 5, setpoint=self.set_point_for_pipeline)
+                                pid = PID(8, 0, 2, setpoint=self.set_point_for_pipeline)
 
-                                self.default_speed_for_pipeline = 600
+                                self.default_speed_for_pipeline = 300
 
                                 if not have_pipe:
                                     self.first_pipe_place = False
