@@ -99,13 +99,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        # self.external_ip = "192.168.0.1"
-        # self.publisher = mqtt.Client()
-        # self.publisher.connect(self.external_ip, 1883, 60)
-        # self.publisher.on_connect = self.publisher_on_client_connect
-        # # self.publisher.on_message = self.publisher_on_client_message
-        # self.publisher.on_publish = self.publisher_on_client_publish
-        # self.publisher.loop_start()
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -420,8 +420,6 @@ class PipeLineRobot:
                             self.place_pipe(self.current_pipe_size)
                             self.move_timed(0.5, direction="backwards", speed=300)
                             self.move_handler(1, direction="top", speed=1000)
-                            # here
-                            self.move_handler(how_long=1, direction="down", speed=1000)
 
                             # self.move_timed(0.5, direction="backwards", speed=300)
                             # have_pipe = self.still_have_pipe()
@@ -1012,7 +1010,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         found_pipe = False
         begin = None
-        k_found_pipe = 15
+        k_found_pipe = 18
 
         pid = PID(1.025, 0, 0.2, setpoint=39)
         default = 300
@@ -1021,6 +1019,8 @@ class PipeLineRobot:
         min_control = max_speed_bound + default
         first_time = True
 
+        motors_position = (self.motors.left.position, self.motors.right.position)
+
         if side == "left":
             side = 0
         else:
@@ -1028,17 +1028,48 @@ class PipeLineRobot:
 
         while True:
             control = pid(int(self.get_sensor_data("ColorSensor", "r")[side]))
-            print(default - control, default + control)
-
+            # print(default - control, default + control)
             bottom_front = self.get_sensor_data("InfraredSensor")[2]
+
+            if self.motors.left.position - motors_position[0] > 3200:
+                self.stop_motors()
+                c = 0
+                value = 10 if side == 0 else -10
+
+                while c < 5:
+                    self.rotate(value, speed=200)
+                    self.move_timed(0.4, speed=200)
+                    c += 1
+
+                color_data = self.get_sensor_data("ColorSensor", "r")
+
+                while True:
+                    color_data = self.get_sensor_data("ColorSensor", "r")
+
+                    if color_data[0] < 50 or color_data[1] < 50:
+                        if self.verify_green_slope():
+                            self.color_alignment(True)
+                            self.green_slope()
+                            self.slope_following()
+                            self.rotate(80, speed=150)
+                            return
+                        continue
+
+                    self.motors.left.run_forever(speed_sp=DEFAULT_SPEED)
+                    self.motors.right.run_forever(speed_sp=DEFAULT_SPEED)
+
+                return
+
             if bottom_front <= k_found_pipe and first_time:
                 found_pipe = True
                 first_time = False
-                begin = datetime.now() + timedelta(seconds=3)
+
 
                 self.stop_motors()
                 self.handler.left.reset()
-                self.move_handler(how_long=1, direction="down", speed=1000)
+                self.handler.left.stop_action = "brake"
+                self.move_handler(how_long=3, direction="down", speed=1000)
+                begin = datetime.now() + timedelta(seconds=3)
 
             if found_pipe and datetime.now() >= begin:
                 found_pipe = False
@@ -1092,6 +1123,7 @@ class PipeLineRobot:
             else:
                 self.motors.left.run_forever(speed_sp=speed_b)
                 self.motors.right.run_forever(speed_sp=speed_a)
+
 
         self.color_sensors[0].mode = "COL-COLOR"
         self.color_sensors[1].mode = "COL-COLOR"
@@ -1201,10 +1233,10 @@ class PipeLineRobot:
                         ev3.Sound.beep()
                         ev3.Sound.beep()
 
-                        self.green_slope()
                         self.status = self.status_dictionary["doneInitialPositionReset"]
                         self.publish_data()
 
+                        self.green_slope()
                         self.slope_following()
                         break
                     else:
@@ -1450,7 +1482,7 @@ class PipeLineRobot:
     def climb_green_slope(self):
         self.stop_motors()
         print("called climb_green_slope")
-        default_speed = 500
+        default_speed = 1000
         counter = 0
 
         self.color_sensors[0].mode = "COL-COLOR"
@@ -1546,14 +1578,14 @@ class PipeLineRobot:
                 self.motors.right.run_forever(speed_sp=200 + 20)
                 if color_date[0] < 50:
                     self.stop_motors()
-                    self.rotate(angle=4, speed=150)
+                    self.rotate(angle=12, speed=150)
                     break
             else:
                 self.motors.left.run_forever(speed_sp=200 + 20)
                 self.motors.right.run_forever(speed_sp=200)
                 if color_date[1] < 50:
                     self.stop_motors()
-                    self.rotate(angle=-4, speed=150)
+                    self.rotate(angle=-12, speed=150)
                     break
 
     def go_grab_pipe_routine(self, side, pipe_being_taken):
