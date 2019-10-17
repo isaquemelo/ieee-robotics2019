@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env nice --10 python3
 from assets.classes.duo import Duo
 import ev3dev.ev3 as ev3
 import math
@@ -64,7 +64,7 @@ class PipeLineRobot:
         self.handler = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outB'))
 
         # self.handler.left.stop_action = "hold"
-        self.move_handler(how_long=3, direction="top", speed=500)
+        self.move_handler(how_long=1, direction="top", speed=500)
 
         # define status
         self.historic = [""]
@@ -99,13 +99,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        self.external_ip = "192.168.0.1"
-        self.publisher = mqtt.Client()
-        self.publisher.connect(self.external_ip, 1883, 60)
-        self.publisher.on_connect = self.publisher_on_client_connect
-        # self.publisher.on_message = self.publisher_on_client_message
-        self.publisher.on_publish = self.publisher_on_client_publish
-        self.publisher.loop_start()
+        # self.external_ip = "192.168.0.1"
+        # self.publisher = mqtt.Client()
+        # self.publisher.connect(self.external_ip, 1883, 60)
+        # self.publisher.on_connect = self.publisher_on_client_connect
+        # # self.publisher.on_message = self.publisher_on_client_message
+        # self.publisher.on_publish = self.publisher_on_client_publish
+        # self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -267,7 +267,7 @@ class PipeLineRobot:
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         pass
 
-    def move_handler(self, how_long=7, direction="down", speed=50):
+    def move_handler(self, how_long=7., direction="down", speed=50):
         end_time = datetime.now() + timedelta(seconds=how_long)
 
         vel = speed
@@ -1012,7 +1012,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         found_pipe = False
         begin = None
-        k_found_pipe = 19
+        k_found_pipe = 15
 
         pid = PID(1.025, 0, 0.2, setpoint=39)
         default = 300
@@ -1038,12 +1038,12 @@ class PipeLineRobot:
 
                 self.stop_motors()
                 self.handler.left.reset()
-                self.move_handler(how_long=1, direction="top", speed=1000)
+                self.move_handler(how_long=1, direction="down", speed=1000)
 
             if found_pipe and datetime.now() >= begin:
                 found_pipe = False
                 self.move_handler(how_long=1, direction="up", speed=1000)
-                self.move_handler(how_long=1, direction="up", speed=1000)
+                # self.move_handler(how_long=1, direction="up", speed=1000)
 
                 c = 0
                 value = 10 if side == 0 else -10
@@ -1200,6 +1200,10 @@ class PipeLineRobot:
                         ev3.Sound.beep()
                         ev3.Sound.beep()
                         ev3.Sound.beep()
+
+                        self.status = self.status_dictionary["doneInitialPositionReset"]
+                        self.publish_data()
+
                         self.green_slope()
                         self.slope_following()
                         break

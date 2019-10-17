@@ -21,6 +21,8 @@ robot = PipeLineRobot()
 # 110 frente
 
 def main():
+    # robot.black_line_following(side="right")
+    # return
     # robot.pipeline_support_conection_meeting_area("to pipeline")
     # robot.pipeline_support_following()
     # exit(0)
@@ -29,8 +31,6 @@ def main():
 
         # print(robot.still_have_pipe())
         robot.initial_location_reset()
-        robot.status = robot.status_dictionary["doneInitialPositionReset"]
-        robot.publish_data()
 
         slope_side = "right"
 
