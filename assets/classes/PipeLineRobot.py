@@ -64,8 +64,7 @@ class PipeLineRobot:
         self.handler = Duo(ev3.LargeMotor('outB'), ev3.LargeMotor('outB'))
 
         # self.handler.left.stop_action = "hold"
-        # self.move_handler(how_long=3, direction="top", speed=1000)
-        self.handler.left.run_forever(speed_sp=-500)
+        self.move_handler(how_long=3, direction="top", speed=500)
 
         # define status
         self.historic = [""]
@@ -255,7 +254,12 @@ class PipeLineRobot:
         self.motors.left.stop()
         self.motors.right.stop()
 
+    def reset_handler_stop_action(self):
+        self.handler.left.stop_action = "brake"
+
+
     def stop_handler(self):
+        self.handler.left.stop_action = "hold"
         self.handler.left.stop()
         self.handler.right.stop()
 
@@ -271,9 +275,10 @@ class PipeLineRobot:
         if direction != "down":
             vel = -speed
 
+        self.handler.left.stop_action = "brake"
         while datetime.now() < end_time:
             self.handler.left.run_forever(speed_sp=vel)
-        self.handler.left.stop()
+        self.stop_handler()
 
     def phase_out_place_pipe(self, hole_size):
         self.stop_motors()
@@ -415,7 +420,8 @@ class PipeLineRobot:
                             self.place_pipe(self.current_pipe_size)
                             self.move_timed(0.5, direction="backwards", speed=300)
                             self.move_handler(1, direction="top", speed=1000)
-                            self.handler.left.run_forever(speed_sp=-50)
+                            # here
+                            self.move_handler(how_long=1, direction="down", speed=1000)
 
                             # self.move_timed(0.5, direction="backwards", speed=300)
                             # have_pipe = self.still_have_pipe()
@@ -988,7 +994,7 @@ class PipeLineRobot:
 
     def sensors_verification(self):
         self.stop_motors()
-        self.handler.left.stop()
+        self.stop_handler()
 
         while True:
             infrared = self.get_sensor_data("InfraredSensor")
@@ -1032,12 +1038,12 @@ class PipeLineRobot:
 
                 self.stop_motors()
                 self.handler.left.reset()
-                self.handler.left.run_forever(speed_sp=1000)
+                self.move_handler(how_long=1, direction="top", speed=1000)
 
             if found_pipe and datetime.now() >= begin:
                 found_pipe = False
                 self.move_handler(how_long=1, direction="up", speed=1000)
-                self.handler.left.run_forever(speed_sp=-1000)
+                self.move_handler(how_long=1, direction="up", speed=1000)
 
                 c = 0
                 value = 10 if side == 0 else -10
@@ -1674,5 +1680,4 @@ class PipeLineRobot:
         self.stop_motors()
 
         self.move_handler(how_long=2, direction="up", speed=500)
-        self.handler.left.run_forever(speed_sp=-1000)
         return
