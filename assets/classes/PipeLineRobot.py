@@ -1201,10 +1201,10 @@ class PipeLineRobot:
                         ev3.Sound.beep()
                         ev3.Sound.beep()
 
+                        self.green_slope()
                         self.status = self.status_dictionary["doneInitialPositionReset"]
                         self.publish_data()
 
-                        self.green_slope()
                         self.slope_following()
                         break
                     else:
