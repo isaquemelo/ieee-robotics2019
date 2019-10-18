@@ -56,6 +56,7 @@ def main():
                     robot.pipeline_support_conection_meeting_area(side="to meeting area")
                     robot.rotate(angle=90, speed=90)
                     robot.slope_following()
+                    robot.rotate(angle=90, speed=90)
                     robot.pipeline_support_conection_meeting_area(side="to pipeline")
                     robot.pipeline_support_following()
                 robot.pipeline_support_conection_meeting_area("to meeting area")
