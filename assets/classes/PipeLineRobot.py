@@ -208,7 +208,9 @@ class PipeLineRobot:
         while now_angle < angle + start_angle:
             # print("now angle:", now_angle, "goal: |", angle + start_angle, "|")
             if time_limit:
+                # print("OP")
                 if datetime.now() > end_time:
+                    self.stop_motors()
                     return
 
             if reverse:

@@ -23,7 +23,9 @@ robot = PipeLineRobot()
 def main():
     # robot.pipeline_support_conection_meeting_area("to pipeline")
     # exit(0)
-
+    while True:
+        robot.rotate(90, speed=50, time_limit=True)
+        ev3.Sound.beep()
     try:
         robot.pipeline_support_following()
         # print(robot.still_have_pipe())
