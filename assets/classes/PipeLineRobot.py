@@ -320,9 +320,8 @@ class PipeLineRobot:
             if color_data[0] == 0 or color_data[1] == 0:
                 self.stop_motors()
                 if self.verify_undefined():
-                    if self.get_sensor_data("Ultrasonic")[1] > 20:
-                        print("robot was close to fall")
-                        break
+                    print("robot was close to fall")
+                    break
 
             control = pid(self.get_sensor_data("InfraredSensor")[0])
 
@@ -377,7 +376,6 @@ class PipeLineRobot:
             side_distance = self.get_sensor_data("InfraredSensor")[0]
             front_distance = self.get_sensor_data("InfraredSensor")[2]
             pipe_distance = self.get_sensor_data("Ultrasonic")[0]
-            upper_distance = self.get_sensor_data("Ultrasonic")[1]
             control = pid(side_distance)
             # print("invalid_hole_counter =", invalid_hole_counter)
             # print(side_distance, front_distance)
@@ -388,13 +386,12 @@ class PipeLineRobot:
             if color_data[0] == 0 or color_data[1] == 0:
                 self.stop_motors()
                 if self.verify_undefined():
-                    if self.get_sensor_data("Ultrasonic")[1] > 20:
-                        print("finished pipeline_support_following")
-                        # self.color_alignment(aligment_with_color=True)
-                        self.move_timed(how_long=0.5
-                                        , direction="backwards", speed=300)
-                        self.rotate(80, speed=150)
-                        return
+                    print("finished pipeline_support_following")
+                    # self.color_alignment(aligment_with_color=True)
+                    self.move_timed(how_long=0.5
+                                    , direction="backwards", speed=300)
+                    self.rotate(80, speed=150)
+                    return
 
             if not done:
                 if invalid_hole_counter < max_invalid_hole_counter:
@@ -619,10 +616,9 @@ class PipeLineRobot:
             if color_data[0] == 0 or color_data[1] == 0:
                 self.stop_motors()
                 if self.verify_undefined():
-                    if self.get_sensor_data("Ultrasonic")[1] > 20:
-                        ev3.Sound.beep()
-                        print("found end of the pipeline")
-                        return 0
+                    ev3.Sound.beep()
+                    print("found end of the pipeline")
+                    return 0
 
             # print(side_distance, front_distance)
             # print("control = ", control)
