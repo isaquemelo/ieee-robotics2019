@@ -24,12 +24,7 @@ def main():
     # robot.pipeline_support_conection_meeting_area("to pipeline")
     # exit(0)
     # robot.still_have_pipe()
-    while True:
-        robot.align_with_hole()
-        ev3.Sound.beep()
-        robot.pipeline_support_conection_meeting_area(side="to meeting area")
-        ev3.Sound.beep()
-        sleep(5)
+
     try:
         # print(robot.still_have_pipe())
         robot.initial_location_reset()

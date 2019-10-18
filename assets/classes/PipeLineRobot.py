@@ -73,7 +73,7 @@ class PipeLineRobot:
 
         # watter server settings
         self.has_pipe = False
-        self.current_pipe_size = 15  # [10, 15, 20]
+        self.current_pipe_size = None  # [10, 15, 20]
 
         self.status_dictionary = {"initialPositionReset": 0, "doneInitialPositionReset": 1, "rescuedPipe": 2,
                                   "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5, "want10pipe": 6,
@@ -100,13 +100,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        # self.external_ip = "192.168.0.1"
-        # self.publisher = mqtt.Client()
-        # self.publisher.connect(self.external_ip, 1883, 60)
-        # self.publisher.on_connect = self.publisher_on_client_connect
-        # # self.publisher.on_message = self.publisher_on_client_message
-        # self.publisher.on_publish = self.publisher_on_client_publish
-        # self.publisher.loop_start()
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -399,109 +399,109 @@ class PipeLineRobot:
                     self.rotate(80, speed=150)
                     return
 
-            # if not done:
-            #     if invalid_hole_counter < max_invalid_hole_counter:
-            #         if pipe_distance > 15:  # 40
-            #             self.stop_motors()
-            #
-            #             begin = datetime.now()
-            #             hole_size = self.align_with_hole()
-            #             if hole_size == "break":
-            #                 self.move_timed(how_long=0.5
-            #                                 , direction="backwards", speed=300)
-            #                 self.rotate(80, speed=150)
-            #                 return
-            #             end = datetime.now()
-            #             k_time_for_align_with_hole = end - begin  # represents the time necessary to  hole_size = self.align_with_hole()
-            #
-            #             has_pipe_already = "Invalid"
-            #             # sleep(5)
-            #             print("hole_size:", hole_size)
-            #
-            #             if hole_size != 0:
-            #                 begin = datetime.now()
-            #                 has_pipe_already = self.has_pipe_check()
-            #                 end = datetime.now()
-            #                 k_time_for_has_pipe_check = end - begin  # represents the time necessary to  has_pipe_already = self.has_pipe_check()
-            #
-            #             if (has_pipe_already is False or hole_size == 20) and (self.current_pipe_size == hole_size
-            #                                                                  or (self.first_pipe_place and hole_size >= self.current_pipe_size)):
-            #
-            #                 print("Hole detect and matches pipe! Placing pipe...", "self.current_pipe_size:", self.current_pipe_size )
-            #                 invalid_hole_counter = 0
-            #                 first_count = True
-            #                 self.move_timed(1, speed=500)
-            #                 self.place_pipe(self.current_pipe_size)
-            #                 self.move_timed(0.5, direction="backwards", speed=300)
-            #                 self.move_handler(1, direction="top", speed=1000)
-            #
-            #                 # self.move_timed(0.5, direction="backwards", speed=300)
-            #                 # have_pipe = self.still_have_pipe()
-            #                 # print("have_pipe", have_pipe)
-            #                 # self.move_timed(0.5, direction="forward", speed=300)
-            #
-            #                 self.rotate(90, speed=90)
-            #                 done = True
-            #
-            #                 if self.phase_out_place_pipe(hole_size) == "break":
-            #                     self.move_timed(how_long=0.5
-            #                                     , direction="backwards", speed=300)
-            #                     self.rotate(80, speed=150)
-            #                     return
-            #
-            #                 pid = PID(8, 0, 6, setpoint=5)
-            #
-            #                 self.default_speed_for_pipeline = 300
-            #
-            #                 self.first_pipe_place = False
-            #
-            #             elif has_pipe_already is True:
-            #                 print("Already has pipe! Misguided sensor info")
-            #
-            #                 begin = datetime.now()
-            #                 self.rotate(90, speed=90)
-            #                 end = datetime.now()
-            #                 k_time_for_roatation = end - begin
-            #
-            #                 if k_timer >= datetime.now() or first_count:
-            #                     invalid_hole_counter += 1
-            #                     k_timer = datetime.now() + k_time_invalid_hole_counter + k_time_for_roatation + k_time_for_align_with_hole + k_time_for_has_pipe_check
-            #                     first_count = False
-            #                 else:
-            #                     first_count = True
-            #                     invalid_hole_counter = 0
-            #                 continue
-            #             elif has_pipe_already is None:
-            #                 print("Info not reliable at all!")
-            #
-            #                 begin = datetime.now()
-            #                 self.rotate(90, speed=90)
-            #                 end = datetime.now()
-            #                 k_time_for_roatation = end - begin
-            #
-            #                 if k_timer >= datetime.now() or first_count:
-            #                     invalid_hole_counter += 1
-            #                     k_timer = datetime.now() + k_time_invalid_hole_counter + k_time_for_roatation + k_time_for_align_with_hole + k_time_for_has_pipe_check
-            #                     first_count = False
-            #                 else:
-            #                     first_count = True
-            #                     invalid_hole_counter = 0
-            #                 continue
-            #             elif has_pipe_already == "Invalid":
-            #                 continue
-            #             else:
-            #                 self.rotate(90, speed=90)
-            #     else:
-            #         # ev3.Sound.beep()
-            #         print("robot canceled the action of trying to place pipe cause it has failed to many times")
-            #         invalid_hole_counter = 0
-            #         first_count = True
-            #         # sleep(3)
-            #         if self.phase_out_place_pipe(10) == "break":
-            #             self.move_timed(how_long=0.5
-            #                             , direction="backwards", speed=300)
-            #             self.rotate(80, speed=150)
-            #             return
+            if not done:
+                if invalid_hole_counter < max_invalid_hole_counter:
+                    if pipe_distance > 15:  # 40
+                        self.stop_motors()
+
+                        begin = datetime.now()
+                        hole_size = self.align_with_hole()
+                        if hole_size == "break":
+                            self.move_timed(how_long=0.5
+                                            , direction="backwards", speed=300)
+                            self.rotate(80, speed=150)
+                            return
+                        end = datetime.now()
+                        k_time_for_align_with_hole = end - begin  # represents the time necessary to  hole_size = self.align_with_hole()
+
+                        has_pipe_already = "Invalid"
+                        # sleep(5)
+                        print("hole_size:", hole_size)
+
+                        if hole_size != 0:
+                            begin = datetime.now()
+                            has_pipe_already = self.has_pipe_check()
+                            end = datetime.now()
+                            k_time_for_has_pipe_check = end - begin  # represents the time necessary to  has_pipe_already = self.has_pipe_check()
+
+                        if (has_pipe_already is False or hole_size == 20) and (self.current_pipe_size == hole_size
+                                                                             or (self.first_pipe_place and hole_size >= self.current_pipe_size)):
+
+                            print("Hole detect and matches pipe! Placing pipe...", "self.current_pipe_size:", self.current_pipe_size )
+                            invalid_hole_counter = 0
+                            first_count = True
+                            self.move_timed(1, speed=500)
+                            self.place_pipe(self.current_pipe_size)
+                            self.move_timed(0.5, direction="backwards", speed=300)
+                            self.move_handler(1, direction="top", speed=1000)
+
+                            # self.move_timed(0.5, direction="backwards", speed=300)
+                            # have_pipe = self.still_have_pipe()
+                            # print("have_pipe", have_pipe)
+                            # self.move_timed(0.5, direction="forward", speed=300)
+
+                            self.rotate(90, speed=90)
+                            done = True
+
+                            if self.phase_out_place_pipe(hole_size) == "break":
+                                self.move_timed(how_long=0.5
+                                                , direction="backwards", speed=300)
+                                self.rotate(80, speed=150)
+                                return
+
+                            pid = PID(8, 0, 6, setpoint=5)
+
+                            self.default_speed_for_pipeline = 300
+
+                            self.first_pipe_place = False
+
+                        elif has_pipe_already is True:
+                            print("Already has pipe! Misguided sensor info")
+
+                            begin = datetime.now()
+                            self.rotate(90, speed=90)
+                            end = datetime.now()
+                            k_time_for_roatation = end - begin
+
+                            if k_timer >= datetime.now() or first_count:
+                                invalid_hole_counter += 1
+                                k_timer = datetime.now() + k_time_invalid_hole_counter + k_time_for_roatation + k_time_for_align_with_hole + k_time_for_has_pipe_check
+                                first_count = False
+                            else:
+                                first_count = True
+                                invalid_hole_counter = 0
+                            continue
+                        elif has_pipe_already is None:
+                            print("Info not reliable at all!")
+
+                            begin = datetime.now()
+                            self.rotate(90, speed=90)
+                            end = datetime.now()
+                            k_time_for_roatation = end - begin
+
+                            if k_timer >= datetime.now() or first_count:
+                                invalid_hole_counter += 1
+                                k_timer = datetime.now() + k_time_invalid_hole_counter + k_time_for_roatation + k_time_for_align_with_hole + k_time_for_has_pipe_check
+                                first_count = False
+                            else:
+                                first_count = True
+                                invalid_hole_counter = 0
+                            continue
+                        elif has_pipe_already == "Invalid":
+                            continue
+                        else:
+                            self.rotate(90, speed=90)
+                else:
+                    # ev3.Sound.beep()
+                    print("robot canceled the action of trying to place pipe cause it has failed to many times")
+                    invalid_hole_counter = 0
+                    first_count = True
+                    # sleep(3)
+                    if self.phase_out_place_pipe(10) == "break":
+                        self.move_timed(how_long=0.5
+                                        , direction="backwards", speed=300)
+                        self.rotate(80, speed=150)
+                        return
 
             if front_distance < self.front_distance_to_rotate:
                 self.stop_motors()
