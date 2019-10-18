@@ -41,9 +41,10 @@ def main():
             robot.publish_data()
 
             while True:
-                print(robot.robot_status)
-                if robot.robot_status in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
-                    robot.go_grab_pipe_routine(side=slope_side, pipe_being_taken=robot.robot_status)
+                print("robot.robot_status", robot.robot_status)
+                now_state = robot.robot_status
+                if now_state in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
+                    robot.go_grab_pipe_routine(side=slope_side, pipe_being_taken=now_state)
                     break
 
             if robot.still_have_pipe():
@@ -60,8 +61,9 @@ def main():
                 slope_side = "left"
 
             else:
-                robot.status = robot.status_dictionary["want10pipe"]
-                robot.publish_data()
+                # robot.status = robot.status_dictionary["want10pipe"]
+                # robot.publish_data()
+                slope_side = "left"
                 continue
 
     except KeyboardInterrupt:
