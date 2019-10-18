@@ -72,7 +72,7 @@ class PipeLineRobot:
 
         # watter server settings
         self.has_pipe = False
-        self.current_pipe_size = None  # [10, 15, 20]
+        self.current_pipe_size = 20  # [10, 15, 20]
 
         self.status_dictionary = {"initialPositionReset": 0, "doneInitialPositionReset": 1, "rescuedPipe": 2,
                                   "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5, "want10pipe": 6,
@@ -99,13 +99,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        self.external_ip = "192.168.0.1"
-        self.publisher = mqtt.Client()
-        self.publisher.connect(self.external_ip, 1883, 60)
-        self.publisher.on_connect = self.publisher_on_client_connect
-        # self.publisher.on_message = self.publisher_on_client_message
-        self.publisher.on_publish = self.publisher_on_client_publish
-        self.publisher.loop_start()
+        # self.external_ip = "192.168.0.1"
+        # self.publisher = mqtt.Client()
+        # self.publisher.connect(self.external_ip, 1883, 60)
+        # self.publisher.on_connect = self.publisher_on_client_connect
+        # # self.publisher.on_message = self.publisher_on_client_message
+        # self.publisher.on_publish = self.publisher_on_client_publish
+        # self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -184,7 +184,7 @@ class PipeLineRobot:
             start_time = datetime.now()
             end_time = start_time + timedelta(seconds=10)
 
-        # print("rotating ", angle, "deg at ", speed, " speed")
+        print("rotating ", angle, "deg at ", speed, " speed")
         if angle == 0:
             # print("Rotate 0 deg does not make sense")
             return
@@ -379,7 +379,7 @@ class PipeLineRobot:
             pipe_distance = self.get_sensor_data("Ultrasonic")[0]
             upper_distance = self.get_sensor_data("Ultrasonic")[1]
             control = pid(side_distance)
-            print("invalid_hole_counter =", invalid_hole_counter)
+            # print("invalid_hole_counter =", invalid_hole_counter)
             # print(side_distance, front_distance)
             # print("control = ", control)
             # print(pipe_distance)
@@ -409,6 +409,8 @@ class PipeLineRobot:
                         has_pipe_already = "Invalid"
                         # sleep(5)
                         print("hole_size:", hole_size)
+
+
 
                         if hole_size != 0:
                             begin = datetime.now()
@@ -442,11 +444,6 @@ class PipeLineRobot:
                             self.default_speed_for_pipeline = 300
 
                             self.first_pipe_place = False
-
-
-
-
-                        # sleep(5)
 
                         elif has_pipe_already is True:
                             print("Already has pipe! Misguided sensor info")
@@ -482,6 +479,8 @@ class PipeLineRobot:
                             continue
                         elif has_pipe_already == "Invalid":
                             continue
+                        else:
+                            self.rotate(90, speed=90)
                 else:
                     # ev3.Sound.beep()
                     print("robot canceled the action of trying to place pipe cause it has failed to many times")
