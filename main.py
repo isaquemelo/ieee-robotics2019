@@ -24,14 +24,12 @@ def main():
     # robot.pipeline_support_conection_meeting_area("to pipeline")
     # exit(0)
     # robot.still_have_pipe()
-
+    # while True:
+    #     robot.initial_location_reset()
+    #     sleep(3)
     try:
-        # print(robot.still_have_pipe())
+
         robot.initial_location_reset()
-        # robot.go_grab_pipe_routine(side="right", pipe_being_taken="pipeInPositionToRescue-15")
-        # robot.pipeline_support_conection_meeting_area("to pipeline")
-        # robot.pipeline_support_following()
-        # robot.pipeline_support_conection_meeting_area("to meeting area")
 
         slope_side = "right"
 
@@ -46,23 +44,30 @@ def main():
                     robot.go_grab_pipe_routine(side=slope_side, pipe_being_taken=now_state)
                     break
 
-            if robot.still_have_pipe():
-                robot.status = robot.status_dictionary["rescuedPipe"]
-                robot.publish_data()
-
-                robot.status = robot.status_dictionary["want10pipe"]
-                robot.publish_data()
+            pipe_check = robot.still_have_pipe()
+            print("do i have pipe?", pipe_check)
+            if pipe_check:
+                # robot.status = robot.status_dictionary["rescuedPipe"]
+                # robot.publish_data()
 
                 robot.pipeline_support_conection_meeting_area("to pipeline")
                 robot.pipeline_support_following()
+                while robot.placed_pipe is False:
+                    robot.pipeline_support_conection_meeting_area(side="to meeting area")
+                    robot.rotate(angle=90, speed=90)
+                    robot.slope_following()
+                    robot.pipeline_support_conection_meeting_area(side="to pipeline")
+                    robot.pipeline_support_following()
                 robot.pipeline_support_conection_meeting_area("to meeting area")
 
                 slope_side = "left"
 
             else:
-                # robot.status = robot.status_dictionary["want10pipe"]
-                # robot.publish_data()
+                print("RUNNING ACTION!!! I DONT HAVE THE PIPE")
+                robot.current_pipe_size = None
                 slope_side = "left"
+                robot.move_timed(1.3, speed=150)
+                robot.rotate(90, speed=150)
                 continue
 
     except KeyboardInterrupt:

@@ -24,6 +24,8 @@ class PipeLineRobot:
     def __init__(self):
         self.DEFAULT_SPEED = 400
 
+        self.placed_pipe = False
+
         # pipeline consts
         self.kp_for_pipeline = 6
         self.ki_for_pipeline = 0
@@ -555,6 +557,7 @@ class PipeLineRobot:
 
     def place_pipe(self, size):
         self.stop_motors()
+        self.placed_pipe = True
         self.handler.left.stop_action = "hold"
 
         if size == 20:
@@ -965,6 +968,8 @@ class PipeLineRobot:
             time.sleep(2)
 
     def black_line_following(self, side):
+        self.stop_motors()
+        self.placed_pipe = False
         self.color_sensors[0].mode = "COL-REFLECT"
         self.color_sensors[1].mode = "COL-REFLECT"
         found_pipe = False
@@ -1008,6 +1013,11 @@ class PipeLineRobot:
                     if color_data[0] < 50 or color_data[1] < 50:
                         if self.verify_green_slope():
                             self.color_alignment(True)
+
+                            # server
+                            self.status = self.status_dictionary["want10pipe"]
+                            self.publish_data()
+
                             self.green_slope()
                             self.slope_following()
                             self.rotate(80, speed=150)
@@ -1056,6 +1066,11 @@ class PipeLineRobot:
                     if color_data[0] < 50 or color_data[1] < 50:
                         if self.verify_green_slope():
                             self.color_alignment(True)
+
+                            # server
+                            self.status = self.status_dictionary["want10pipe"]
+                            self.publish_data()
+
                             self.green_slope()
                             self.slope_following()
                             self.rotate(80, speed=150)
@@ -1197,6 +1212,7 @@ class PipeLineRobot:
                         ev3.Sound.beep()
                         ev3.Sound.beep()
 
+                        # server
                         self.status = self.status_dictionary["doneInitialPositionReset"]
                         self.publish_data()
 
