@@ -107,13 +107,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        # self.external_ip = "192.168.0.1"
-        # self.publisher = mqtt.Client()
-        # self.publisher.connect(self.external_ip, 1883, 60)
-        # self.publisher.on_connect = self.publisher_on_client_connect
-        # # self.publisher.on_message = self.publisher_on_client_message
-        # self.publisher.on_publish = self.publisher_on_client_publish
-        # self.publisher.loop_start()
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -301,6 +301,7 @@ class PipeLineRobot:
                         self.handler.left.run_forever(speed_sp=vel)
                         if counter > 0:
                             print("tried to rise up grab but was not able")
+                            ev3.Sound.beep()
                         counter += 1
             else:
                 self.handler.left.run_forever(speed_sp=vel)
@@ -1079,7 +1080,6 @@ class PipeLineRobot:
                 # self.handler.left.stop_action = "brake"
                 self.move_handler(direction="up", speed=500)
                 # self.handler.left.stop_action = "hold"
-                return  # remover esse negocio
 
                 c = 0
                 value = 10 if side == 0 else -10
