@@ -71,7 +71,7 @@ class PipeLineRobot:
 
         # define status
         self.historic = [""]
-        self.first_pipe_place = False
+        self.first_pipe_place = True
 
         # watter server settings
         self.has_pipe = False
@@ -1214,6 +1214,9 @@ class PipeLineRobot:
 
                         # server
                         self.status = self.status_dictionary["doneInitialPositionReset"]
+                        self.publish_data()
+
+                        self.status = self.status_dictionary["want10pipe"]
                         self.publish_data()
 
                         self.green_slope()

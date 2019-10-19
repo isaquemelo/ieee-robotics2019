@@ -34,8 +34,8 @@ def main():
         slope_side = "right"
 
         while True:
-            robot.status = robot.status_dictionary["want10pipe"]
-            robot.publish_data()
+            # robot.status = robot.status_dictionary["want10pipe"]
+            # robot.publish_data()
 
             while True:
                 print("robot.robot_status", robot.robot_status)
@@ -63,12 +63,16 @@ def main():
 
                 slope_side = "left"
 
+                robot.robot_status = None
+
+
             else:
                 print("RUNNING ACTION!!! I DONT HAVE THE PIPE")
                 robot.current_pipe_size = None
                 slope_side = "left"
                 robot.move_timed(1.3, speed=150)
                 robot.rotate(90, speed=150)
+                robot.robot_status = None
                 continue
 
     except KeyboardInterrupt:
