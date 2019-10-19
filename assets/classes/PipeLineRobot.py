@@ -451,8 +451,8 @@ class PipeLineRobot:
                             end = datetime.now()
                             k_time_for_has_pipe_check = end - begin  # represents the time necessary to  has_pipe_already = self.has_pipe_check()
 
-                        if (has_pipe_already is False or hole_size == 20) and (self.current_pipe_size == hole_size
-                                                                             or (self.first_pipe_place and hole_size >= self.current_pipe_size)):
+                        if (has_pipe_already is False or hole_size == 20) and (self.current_pipe_size <= hole_size):
+                                                                             # or (self.first_pipe_place and hole_size >= self.current_pipe_size)):
 
                             print("Hole detect and matches pipe! Placing pipe...", "self.current_pipe_size:", self.current_pipe_size )
                             invalid_hole_counter = 0
@@ -1704,7 +1704,7 @@ class PipeLineRobot:
             self.move_handler(how_long=0.5, direction="down", speed=50)
             self.move_handler(how_long=0.2, direction="up", speed=150)
 
-        self.move_handler(how_long=0.5, direction="down", speed=50)
+        self.move_handler(how_long=1.5, direction="down", speed=50)
 
         if self.get_sensor_data("Ultrasonic")[1] < 15:
             self.take_pipe_again()

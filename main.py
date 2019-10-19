@@ -24,15 +24,6 @@ def main():
     # robot.pipeline_support_conection_meeting_area("to pipeline")
     # exit(0)
     # robot.still_have_pipe()
-    while True:
-        robot.move_handler(direction="down", speed=500)
-        robot.move_handler(direction="up", speed=500)
-        robot.black_line_following(side="left")
-        for i in range(100):
-            ev3.Sound.beep().wait()
-        robot.stop_handler()
-        ev3.Sound.beep()
-        sleep(5)
     try:
 
         robot.initial_location_reset()
@@ -75,9 +66,9 @@ def main():
             else:
                 print("RUNNING ACTION!!! I DONT HAVE THE PIPE")
                 robot.current_pipe_size = None
-                slope_side = "left"
+                slope_side = "right"
                 robot.move_timed(1.3, speed=150)
-                robot.rotate(90, speed=150)
+                robot.rotate(-90, speed=150)
                 robot.robot_status = None
                 continue
 
