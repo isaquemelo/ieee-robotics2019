@@ -24,9 +24,15 @@ def main():
     # robot.pipeline_support_conection_meeting_area("to pipeline")
     # exit(0)
     # robot.still_have_pipe()
-    # while True:
-    #     robot.initial_location_reset()
-    #     sleep(3)
+    while True:
+        robot.move_handler(direction="down", speed=500)
+        robot.move_handler(direction="up", speed=500)
+        robot.black_line_following(side="left")
+        for i in range(100):
+            ev3.Sound.beep().wait()
+        robot.stop_handler()
+        ev3.Sound.beep()
+        sleep(5)
     try:
 
         robot.initial_location_reset()

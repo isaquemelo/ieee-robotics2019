@@ -24,7 +24,10 @@ class PipeLineRobot:
     def __init__(self):
         self.DEFAULT_SPEED = 400
 
+        # related to the grab
         self.placed_pipe = False
+        self.last_direction = None
+        # related to the grab
 
         # pipeline consts
         self.kp_for_pipeline = 6
@@ -67,7 +70,7 @@ class PipeLineRobot:
 
         # self.handler.left.stop_action = "hold"
         # self.handler.left.reset()
-        self.move_handler(how_long=1.5, direction="top", speed=1000)
+        self.move_handler(how_long=1.5, direction="up", speed=500)
 
         # define status
         self.historic = [""]
@@ -102,13 +105,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        self.external_ip = "192.168.0.1"
-        self.publisher = mqtt.Client()
-        self.publisher.connect(self.external_ip, 1883, 60)
-        self.publisher.on_connect = self.publisher_on_client_connect
-        # self.publisher.on_message = self.publisher_on_client_message
-        self.publisher.on_publish = self.publisher_on_client_publish
-        self.publisher.loop_start()
+        # self.external_ip = "192.168.0.1"
+        # self.publisher = mqtt.Client()
+        # self.publisher.connect(self.external_ip, 1883, 60)
+        # self.publisher.on_connect = self.publisher_on_client_connect
+        # # self.publisher.on_message = self.publisher_on_client_message
+        # self.publisher.on_publish = self.publisher_on_client_publish
+        # self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -277,21 +280,43 @@ class PipeLineRobot:
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         pass
 
-    def move_handler(self, how_long=7., direction="down", speed=50):
-        end_time = datetime.now() + timedelta(seconds=how_long)
-
-        vel = speed
-
+    def move_handler(self, how_long=None, direction="down", speed=50):
+        print("called move_handler, with how_long =", how_long)
+        self.last_direction = direction
         if direction != "down":
             vel = -speed
+        else:
+            vel = speed
 
-        self.handler.left.stop_action = "brake"
+        if how_long is None:
+            self.handler.left.reset()
+            begin = self.handler.left.position
 
-        while datetime.now() < end_time:
-            self.handler.left.run_forever(speed_sp=vel)
+            if direction != "down":
+                if self.last_direction != "down":
+                    counter = 0
+                    while abs(abs(self.handler.left.position) - abs(begin)) < 60:
+                        self.handler.left.run_forever(speed_sp=vel)
+                        if counter > 0:
+                            print("tried to rise up grab but was not able")
+                        counter += 1
+            else:
+                self.handler.left.run_forever(speed_sp=vel)
 
-        self.handler.left.stop_action = "hold"
-        self.stop_handler()
+            return
+
+        else:
+            end_time = datetime.now() + timedelta(seconds=how_long)
+
+            self.handler.left.stop_action = "brake"
+
+            while datetime.now() < end_time:
+                self.handler.left.run_forever(speed_sp=vel)
+
+            self.handler.left.stop_action = "hold"
+            self.stop_handler()
+            return
+
 
     def phase_out_place_pipe(self, hole_size):
         self.stop_motors()
@@ -1033,22 +1058,23 @@ class PipeLineRobot:
                 found_pipe = True
                 first_time = False
 
-                self.stop_motors()
-                self.handler.left.reset()
-                self.handler.left.stop_action = "brake"
+                # self.stop_motors()
+                # self.handler.left.reset()
+                # self.handler.left.stop_action = "brake"
                 self.move_timed(0.8, direction="backwards", speed=150)
-                self.move_handler(how_long=3, direction="down", speed=1000)
-                self.handler.left.stop_action = "hold"
+                self.move_handler(how_long=3, direction="down", speed=500)
+                # self.handler.left.stop_action = "hold"
                 begin = datetime.now() + timedelta(seconds=3)
 
             if found_pipe and datetime.now() >= begin:
                 found_pipe = False
                 # self.move_handler(how_long=1, direction="up", speed=1000)
                 self.stop_motors()
-                self.handler.left.reset()
-                self.handler.left.stop_action = "brake"
-                self.move_handler(how_long=1.5, direction="up", speed=1000)
-                self.handler.left.stop_action = "hold"
+                # self.handler.left.reset()
+                # self.handler.left.stop_action = "brake"
+                self.move_handler(direction="up", speed=500)
+                # self.handler.left.stop_action = "hold"
+                return  # remover esse negocio
 
                 c = 0
                 value = 10 if side == 0 else -10
