@@ -25,7 +25,6 @@ def main():
     # exit(0)
     # robot.still_have_pipe()
     try:
-
         robot.initial_location_reset()
 
         slope_side = "right"

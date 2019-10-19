@@ -78,7 +78,7 @@ class PipeLineRobot:
 
         # watter server settings
         self.has_pipe = False
-        self.current_pipe_size = None  # [10, 15, 20]
+        self.current_pipe_size = 10  # [10, 15, 20]
 
         self.status_dictionary = {"initialPositionReset": 0, "doneInitialPositionReset": 1, "rescuedPipe": 2,
                                   "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5, "want10pipe": 6,
@@ -87,10 +87,12 @@ class PipeLineRobot:
                                  3: "pipeInPositionToRescue-10", 4: "pipeInPositionToRescue-15",
                                  5: "pipeInPositionToRescue-20"}
 
+        self.hole_times = []
+
         self.status = self.status_dictionary["initialPositionReset"]
         self.robot_status = 0
 
-        self.secondary_brick_ip = "101.42.0.83"
+        self.secondary_brick_ip = "101.42.0.3"
         self.client = mqtt.Client()
         self.client.connect(self.secondary_brick_ip, 1883, 60)
         self.client.on_connect = self.on_connect
@@ -384,6 +386,8 @@ class PipeLineRobot:
         pid = PID(self.kp_for_pipeline, self.ki_for_pipeline, self.kd_for_pipeline,
                   setpoint=self.set_point_for_pipeline)
 
+        self.default_speed_for_pipeline = 150
+
         speed_a = 0
         speed_b = 0
 
@@ -432,7 +436,9 @@ class PipeLineRobot:
                         self.stop_motors()
 
                         begin = datetime.now()
+
                         hole_size = self.align_with_hole()
+
                         if hole_size == "break":
                             self.move_timed(how_long=0.5
                                             , direction="backwards", speed=300)
@@ -453,7 +459,6 @@ class PipeLineRobot:
 
                         if (has_pipe_already is False or hole_size == 20) and (self.current_pipe_size <= hole_size):
                                                                              # or (self.first_pipe_place and hole_size >= self.current_pipe_size)):
-
                             print("Hole detect and matches pipe! Placing pipe...", "self.current_pipe_size:", self.current_pipe_size )
                             invalid_hole_counter = 0
                             first_count = True
@@ -681,7 +686,8 @@ class PipeLineRobot:
                 # print("pipe size", self.pipe_size([end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1]]))
 
                 data = [end_hole_position[0] - initial_pos[0], end_hole_position[1] - initial_pos[1]]
-                print("data", data)
+
+                # print("data", data)
                 if data[0] <= 30 or data[1] <= 30:
                     ev3.Sound.beep()
                     return 0
@@ -718,14 +724,13 @@ class PipeLineRobot:
             self.motors.left.run_forever(speed_sp=speed_a)
             self.motors.right.run_forever(speed_sp=speed_b)
 
-    def pipe_size(self, cycles) -> int:
-        if 35 <= cycles[0] <= 230 and 35 <= cycles[1] <= 230:
+    def pipe_size(self, delta_cycles):
+        if 35 <= delta_cycles[0] <= 230 and 35 <= delta_cycles[1] <= 230:
             return 10
-        elif 330 <= cycles[0] <= 480 and 330 <= cycles[1] <= 480:
+        elif 330 <= delta_cycles[0] <= 480 and 330 <= delta_cycles[1] <= 480:
             return 20
 
-
-        elif cycles[0] <= 30 or cycles[1] <= 30:
+        elif delta_cycles[0] <= 30 or delta_cycles[1] <= 30:
             return "Invalid"
         else:
             return 15
