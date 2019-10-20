@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e33d40b6-f1d9-43d1-a073-691af46b2087" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" afterDir="false" />
     </list>
@@ -11,13 +12,30 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="ieee-robotics2019" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="46" column="21" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
+            <state relative-caret-position="197">
+              <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
               <folding>
                 <element signature="e#24#48#0" expanded="true" />
               </folding>
@@ -28,54 +46,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="310" column="63" lean-forward="true" selection-start-line="310" selection-start-column="63" selection-end-line="310" selection-end-column="63" />
-              <folding>
-                <element signature="e#23#57#0" expanded="true" />
-                <element signature="e#3327#3365#0" />
-                <element signature="e#3445#3553#0" />
-                <element signature="e#3635#3745#0" />
-                <element signature="e#3824#4215#0" />
-                <element signature="e#4296#4413#0" />
-                <element signature="e#4451#4601#0" />
-                <element signature="e#4664#4972#0" />
-                <element signature="e#5037#5138#0" />
-                <element signature="e#5179#5267#0" />
-                <element signature="e#5350#6389#0" />
-                <element signature="e#6462#7877#0" />
-                <element signature="e#7969#8306#0" />
-                <element signature="e#8369#8683#0" />
-                <element signature="e#8730#8923#0" />
-                <element signature="e#8960#9016#0" />
-                <element signature="e#9054#9112#0" />
-                <element signature="e#9143#9205#0" />
-                <element signature="e#10877#12704#0" />
-                <element signature="e#12714#12902#0" />
-                <element signature="e#12956#13111#0" />
-                <element signature="e#13149#14264#0" />
-                <element signature="e#14270#14305#0" />
-                <element signature="e#27592#28547#0" />
-                <element signature="e#28553#28586#0" />
-                <element signature="e#30200#30351#0" />
-                <element signature="e#30492#31558#0" />
-                <element signature="e#31612#33135#0" />
-                <element signature="e#33355#35383#0" />
-                <element signature="e#35424#35886#0" />
-                <element signature="e#35936#36355#0" />
-                <element signature="e#36401#36834#0" />
-                <element signature="e#36886#39715#0" />
-                <element signature="e#39802#43229#0" />
-                <element signature="e#43277#45593#0" />
-                <element signature="e#45637#46245#0" />
-                <element signature="e#46282#49003#0" />
-                <element signature="e#49062#50261#0" />
-                <element signature="e#50302#51645#0" />
-                <element signature="e#51687#52656#0" />
-                <element signature="e#52699#53441#0" />
-                <element signature="e#53511#54962#0" />
-                <element signature="e#55023#56340#0" />
-                <element signature="e#56392#56982#0" />
-              </folding>
+            <state relative-caret-position="257">
+              <caret line="1085" lean-forward="true" selection-start-line="1085" selection-end-line="1085" />
             </state>
           </provider>
         </entry>
@@ -91,28 +63,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>initial</find>
-      <find>abismo</find>
-      <find>verdezada</find>
-      <find>self.underground_position_reset(</find>
-      <find>self.infrared_sensors['diagonal_top']</find>
-      <find>Fim underground</find>
-      <find>self.underground_position_reset</find>
-      <find>in3</find>
-      <find>on_messa</find>
-      <find>self.handler.left.run_forever(speed_sp=-150)</find>
-      <find>initial_location</find>
-      <find>pipe</find>
-      <find>right side</find>
-      <find>diagonal</find>
-      <find>diagonal_top</find>
-      <find>InfraredSensor</find>
-      <find>self.ultrasonic_sensors[&quot;diagonal_top&quot;].value()</find>
-      <find>before_black_line_flw</find>
-      <find>initial_loca</find>
-      <find>underground_position_reset</find>
-      <find>get</find>
-      <find>pipeline_support_following</find>
       <find>.now</find>
       <find>move_Time</find>
       <find>verify</find>
@@ -121,6 +71,28 @@
       <find>go_do</find>
       <find>go_down</find>
       <find>slope_fo</find>
+      <find>pipeline_support</find>
+      <find>reset</find>
+      <find>black_line_follow</find>
+      <find>__init</find>
+      <find>__init__</find>
+      <find>stop_action</find>
+      <find>support</find>
+      <find>publish_data</find>
+      <find>self.publish_data()</find>
+      <find>rotate</find>
+      <find>suppor</find>
+      <find>black_line</find>
+      <find># server</find>
+      <find>self.handler.left.stop_action =</find>
+      <find>self.handler.left.reset()</find>
+      <find>.3</find>
+      <find>placed_pipe</find>
+      <find>self.move_han</find>
+      <find>robot.handler.right.run</find>
+      <find>self.handler.left.run</find>
+      <find>black_</find>
+      <find>still</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -146,8 +118,8 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="-1" />
-    <option name="width" value="672" />
-    <option name="height" value="737" />
+    <option name="width" value="1366" />
+    <option name="height" value="370" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -155,7 +127,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -174,16 +145,11 @@
               <item name="assets" type="462c0819:PsiDirectoryNode" />
               <item name="classes" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="ieee-robotics2019" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ieee-robotics2019" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="handlers" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -250,6 +216,9 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="StructureViewFactory">
+    <option name="AUTOSCROLL_FROM_SOURCE" value="true" />
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -293,7 +262,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="269242000" />
+    <option name="totallyTimeSpent" value="331795000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -306,10 +275,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="-1" width="1366" height="740" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.20543806" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.38842976" weight="0.20619336" />
+      <window_info id="Structure" order="1" sideWeight="0.8657143" side_tool="true" visible="true" weight="0.20619336" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -322,15 +290,15 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32884902" />
       <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.31993568" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.49242425" visible="true" weight="0.45980707" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.49242425" visible="true" weight="0.28938907" />
       <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.50757575" side_tool="true" weight="0.7461929" />
-      <window_info anchor="bottom" id="Python Console" order="13" weight="0.32884902" />
+      <window_info anchor="bottom" id="Python Console" order="13" weight="0.6141479" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="SciView" order="3" weight="0.32969603" />
-      <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="right" id="Remote Host" order="5" weight="0.17651515" />
+      <window_info anchor="right" id="Remote Host" order="4" weight="0.17651515" />
+      <window_info anchor="right" id="Database" order="5" weight="0.32930514" />
     </layout>
     <layout-to-restore>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18394388" />
@@ -451,8 +419,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="46" column="21" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
+        <state relative-caret-position="197">
+          <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
           <folding>
             <element signature="e#24#48#0" expanded="true" />
           </folding>
@@ -461,54 +429,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="310" column="63" lean-forward="true" selection-start-line="310" selection-start-column="63" selection-end-line="310" selection-end-column="63" />
-          <folding>
-            <element signature="e#23#57#0" expanded="true" />
-            <element signature="e#3327#3365#0" />
-            <element signature="e#3445#3553#0" />
-            <element signature="e#3635#3745#0" />
-            <element signature="e#3824#4215#0" />
-            <element signature="e#4296#4413#0" />
-            <element signature="e#4451#4601#0" />
-            <element signature="e#4664#4972#0" />
-            <element signature="e#5037#5138#0" />
-            <element signature="e#5179#5267#0" />
-            <element signature="e#5350#6389#0" />
-            <element signature="e#6462#7877#0" />
-            <element signature="e#7969#8306#0" />
-            <element signature="e#8369#8683#0" />
-            <element signature="e#8730#8923#0" />
-            <element signature="e#8960#9016#0" />
-            <element signature="e#9054#9112#0" />
-            <element signature="e#9143#9205#0" />
-            <element signature="e#10877#12704#0" />
-            <element signature="e#12714#12902#0" />
-            <element signature="e#12956#13111#0" />
-            <element signature="e#13149#14264#0" />
-            <element signature="e#14270#14305#0" />
-            <element signature="e#27592#28547#0" />
-            <element signature="e#28553#28586#0" />
-            <element signature="e#30200#30351#0" />
-            <element signature="e#30492#31558#0" />
-            <element signature="e#31612#33135#0" />
-            <element signature="e#33355#35383#0" />
-            <element signature="e#35424#35886#0" />
-            <element signature="e#35936#36355#0" />
-            <element signature="e#36401#36834#0" />
-            <element signature="e#36886#39715#0" />
-            <element signature="e#39802#43229#0" />
-            <element signature="e#43277#45593#0" />
-            <element signature="e#45637#46245#0" />
-            <element signature="e#46282#49003#0" />
-            <element signature="e#49062#50261#0" />
-            <element signature="e#50302#51645#0" />
-            <element signature="e#51687#52656#0" />
-            <element signature="e#52699#53441#0" />
-            <element signature="e#53511#54962#0" />
-            <element signature="e#55023#56340#0" />
-            <element signature="e#56392#56982#0" />
-          </folding>
+        <state relative-caret-position="257">
+          <caret line="1085" lean-forward="true" selection-start-line="1085" selection-end-line="1085" />
         </state>
       </provider>
     </entry>

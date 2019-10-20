@@ -297,6 +297,7 @@ class PipeLineRobot:
             if direction != "down":
                 if self.last_direction != "down":
                     counter = 0
+                    begin_time = datetime.now()
                     while abs(abs(self.handler.left.position) - abs(begin)) < 60:
                         self.handler.left.run_forever(speed_sp=vel)
                         if counter > 0:
@@ -1045,11 +1046,12 @@ class PipeLineRobot:
                         if self.verify_green_slope():
                             self.color_alignment(True)
 
+                            self.green_slope()
+
                             # server
                             self.status = self.status_dictionary["want10pipe"]
                             self.publish_data()
 
-                            self.green_slope()
                             self.slope_following()
                             self.rotate(80, speed=150)
                             return
@@ -1068,7 +1070,7 @@ class PipeLineRobot:
                 # self.handler.left.reset()
                 # self.handler.left.stop_action = "brake"
                 self.move_timed(0.8, direction="backwards", speed=150)
-                self.move_handler(how_long=3, direction="down", speed=500)
+                self.move_handler(how_long=3, direction="down", speed=1000)
                 # self.handler.left.stop_action = "hold"
                 begin = datetime.now() + timedelta(seconds=3)
 
@@ -1078,7 +1080,13 @@ class PipeLineRobot:
                 self.stop_motors()
                 # self.handler.left.reset()
                 # self.handler.left.stop_action = "brake"
-                self.move_handler(direction="up", speed=500)
+
+                for i in range(1):
+                    self.move_handler(how_long=0.5, direction="down", speed=50)
+                    self.move_handler(how_long=0.2, direction="up", speed=150)
+
+                # self.move_handler(direction="up", speed=500)
+                self.move_handler(how_long=2, direction="up", speed=1000)
                 # self.handler.left.stop_action = "hold"
 
                 c = 0
@@ -1098,11 +1106,13 @@ class PipeLineRobot:
                         if self.verify_green_slope():
                             self.color_alignment(True)
 
+                            self.green_slope()
+
                             # server
                             self.status = self.status_dictionary["want10pipe"]
                             self.publish_data()
 
-                            self.green_slope()
+
                             self.slope_following()
                             self.rotate(80, speed=150)
                             return
