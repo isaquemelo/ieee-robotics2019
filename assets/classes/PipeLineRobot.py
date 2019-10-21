@@ -107,13 +107,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        self.external_ip = "192.168.0.1"
-        self.publisher = mqtt.Client()
-        self.publisher.connect(self.external_ip, 1883, 60)
-        self.publisher.on_connect = self.publisher_on_client_connect
-        # self.publisher.on_message = self.publisher_on_client_message
-        self.publisher.on_publish = self.publisher_on_client_publish
-        self.publisher.loop_start()
+        # self.external_ip = "192.168.0.1"
+        # self.publisher = mqtt.Client()
+        # self.publisher.connect(self.external_ip, 1883, 60)
+        # self.publisher.on_connect = self.publisher_on_client_connect
+        # # self.publisher.on_message = self.publisher_on_client_message
+        # self.publisher.on_publish = self.publisher_on_client_publish
+        # self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -1232,7 +1232,7 @@ class PipeLineRobot:
         default_speed = 200
         expected_save_side_dist = 40
         k_min_white_reflect = 50
-        k_dist_from_robot = 20
+        k_dist_from_robot = 25
 
         while True:
             bottom_front_dist = self.get_sensor_data("InfraredSensor")[2]
@@ -1280,13 +1280,15 @@ class PipeLineRobot:
                         # sleep(2)
                         self.get_out_of_risk_edge_situation(side="right")
                     else:
-                        # print("rotation decision is save")
+                        print("rotation decision is save")
                         self.rotate(80)
 
             if bottom_front_dist <= k_dist_from_robot:
                 self.stop_motors()
                 # print("found robot")
                 ev3.Sound.beep()
+                self.move_timed(how_long=0.5, direction="backward", speed=400)
+                print("rotating cause it found robot")
                 self.rotate(80)
 
             self.motors.left.run_forever(speed_sp=default_speed)
