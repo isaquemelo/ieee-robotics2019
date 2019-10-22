@@ -4,7 +4,7 @@ import ev3dev.ev3 as ev3
 # import math
 from datetime import datetime, timedelta
 from time import sleep
-
+import random
 # from simple_pid import PID
 from assets.classes.PipeLineRobot import PipeLineRobot
 # import json
@@ -21,11 +21,21 @@ robot = PipeLineRobot()
 
 
 def main():
-    robot.pipeline_support_following()
     while True:
-        robot.black_line_following(side="left")
-        robot.green_slope()
-        sleep(5)
+        robot.rotate(random.choice([-90, 90]))
+        sleep(3)
+    #robot.green_slope()
+    #robot.slope_following()
+    #robot.rotate(angle=90, speed=90)
+    #robot.pipeline_support_conection_meeting_area(side="to pipeline")
+    # robot.pipeline_support_following()
+    #
+    #
+    # return
+    # while True:
+    #     robot.black_line_following(side="left")
+    #     robot.green_slope()
+    #     sleep(5)
     try:
         robot.initial_location_reset()
 
