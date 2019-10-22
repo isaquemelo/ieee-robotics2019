@@ -21,21 +21,12 @@ robot = PipeLineRobot()
 
 
 def main():
-    while True:
-        robot.rotate(random.choice([-90, 90]))
-        sleep(3)
-    #robot.green_slope()
-    #robot.slope_following()
-    #robot.rotate(angle=90, speed=90)
-    #robot.pipeline_support_conection_meeting_area(side="to pipeline")
-    # robot.pipeline_support_following()
-    #
-    #
-    # return
-    # while True:
-    #     robot.black_line_following(side="left")
-    #     robot.green_slope()
-    #     sleep(5)
+    robot.get_on_position_before_black_line_flw(side="right")
+    robot.adjust_before_black_line_flw(side="right")
+    robot.black_line_following(side="right")
+    robot.pipeline_support_conection_meeting_area(side="to pipeline")
+    robot.pipeline_support_following()
+    return
     try:
         robot.initial_location_reset()
 

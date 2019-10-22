@@ -79,7 +79,7 @@ class PipeLineRobot:
 
         # watter server settings
         self.has_pipe = False
-        self.current_pipe_size = 20  # [10, 15, 20]
+        self.current_pipe_size = 15  # [10, 15, 20]
 
         self.status_dictionary = {"initialPositionReset": 0, "doneInitialPositionReset": 1, "rescuedPipe": 2,
                                   "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5, "want10pipe": 6,
@@ -227,7 +227,7 @@ class PipeLineRobot:
                 self.motors.right.run_forever(speed_sp=speed)
 
         self.stop_motors()
-        print("saiuuuu")
+        # print("saiuuuu")
 
     def move_timed(self, how_long=0.3, direction="forward", speed=DEFAULT_SPEED):
         end_time = datetime.now() + timedelta(seconds=how_long)
@@ -1001,7 +1001,7 @@ class PipeLineRobot:
         self.color_sensors[1].mode = "COL-REFLECT"
         found_pipe = False
         begin = None
-        k_found_pipe = 18
+        k_found_pipe = 20
 
         pid = PID(1.025, 0, 0.2, setpoint=39)
         default = 300
@@ -1044,8 +1044,8 @@ class PipeLineRobot:
                             self.green_slope()
 
                             # server
-                            self.status = self.status_dictionary["want10pipe"]
-                            self.publish_data()
+                            # self.status = self.status_dictionary["want10pipe"]
+                            # self.publish_data()
 
                             self.slope_following()
                             self.rotate(80, speed=150)
@@ -1104,8 +1104,8 @@ class PipeLineRobot:
                             self.green_slope()
 
                             # server
-                            self.status = self.status_dictionary["want10pipe"]
-                            self.publish_data()
+                            # self.status = self.status_dictionary["want10pipe"]
+                            # self.publish_data()
 
 
                             self.slope_following()
@@ -1249,11 +1249,11 @@ class PipeLineRobot:
                         ev3.Sound.beep()
 
                         # server
-                        self.status = self.status_dictionary["doneInitialPositionReset"]
-                        self.publish_data()
+                        # self.status = self.status_dictionary["doneInitialPositionReset"]
+                        # self.publish_data()
 
-                        self.status = self.status_dictionary["want10pipe"]
-                        self.publish_data()
+                        # self.status = self.status_dictionary["want10pipe"]
+                        # self.publish_data()
 
                         self.green_slope()
                         self.slope_following()
@@ -1316,7 +1316,6 @@ class PipeLineRobot:
         # self.color_sensors[0].mode = "COL-REFLECT"
         # self.color_sensors[1].mode = "COL-REFLECT"
         return False
-
 
 
     def green_slope(self):
