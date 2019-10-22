@@ -187,79 +187,40 @@ class PipeLineRobot:
             return [self.dict_colors[self.color_sensors[0].color], self.dict_colors[self.color_sensors[1].color]]
 
     def rotate(self, angle, axis="own", speed=DEFAULT_SPEED, time_limit=False):
-        # if time_limit:
-        #     print("Time limit exceded")
-        #     start_time = datetime.now()
-        #     end_time = start_time + timedelta(seconds=10)
-        #
+        if time_limit:
+            print("Time limit enabled!")
+            start_time = datetime.now()
+            end_time = start_time + timedelta(seconds=10)
+
         print("rotating ", angle, "deg at ", speed, " speed")
-        # if angle == 0:
-        #     # print("Rotate 0 deg does not make sense")
-        #     return
-        #
-        # # if 30 > angle > 0:
-        # #     speed = map_values(math.fabs(angle), 0, 90, 100, 1000)
-        #
-        # reverse = False
-        # if angle < 0:
-        #     reverse = True
-        #     angle *= -1
-        #
-        # #self.reset_gyroscope()
-        #
-        # start_angle = self.gyroscope_sensor.value()
-        # #         # print("start_angle:", start_angle)
-        # now_angle = start_angle
-        #
-        # self.stop_motors()
-        #
-        # while now_angle < angle + start_angle:
-        #     print("now angle:", now_angle, "goal: |", angle + start_angle, "|")
-        #     if time_limit:
-        #         # print("OP")
-        #         if datetime.now() > end_time:
-        #             self.stop_motors()
-        #             return
-        #
-        #     if reverse:
-        #         if axis == "own":
-        #             self.motors.left.run_forever(speed_sp=-speed)
-        #             self.motors.right.run_forever(speed_sp=speed)
-        #         else:
-        #             self.motors.right.run_forever(speed_sp=speed)
-        #
-        #         now_angle = self.gyroscope_sensor.value() * -1
-        #     else:
-        #         if axis == "own":
-        #             self.motors.left.run_forever(speed_sp=speed)
-        #             self.motors.right.run_forever(speed_sp=-speed)
-        #         else:
-        #             self.motors.left.run_forever(speed_sp=speed)
-        #         now_angle = self.gyroscope_sensor.value()
-        #
-        # self.motors.left.stop()
-        # self.motors.right.stop()
 
         start_angle = self.gyroscope_sensor.value()
         end_angle = start_angle + angle
 
-        print("current angle:", start_angle, "expected angle:", end_angle)
-
         if end_angle - start_angle > 0:
             while True:
+                if time_limit:
+                    # print("OP")
+                    if datetime.now() > end_time:
+                        self.stop_motors()
+                        return
+
                 now_angle = self.gyroscope_sensor.value()
-                #print("now angle:", now_angle, "goal: |", end_angle, "|")
                 if end_angle - now_angle <= 0:
-                    #print("broke")
                     break
 
                 self.motors.left.run_forever(speed_sp=speed)
                 self.motors.right.run_forever(speed_sp=-speed)
         else:
             while True:
+                if time_limit:
+                    # print("OP")
+                    if datetime.now() > end_time:
+                        self.stop_motors()
+                        return
+
                 now_angle = self.gyroscope_sensor.value()
-                if end_angle - now_angle > 0:
-                    #print("broke")
+                if end_angle - now_angle >= 0:
                     break
 
                 self.motors.left.run_forever(speed_sp=-speed)

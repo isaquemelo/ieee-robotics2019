@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e33d40b6-f1d9-43d1-a073-691af46b2087" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" beforeDir="false" afterPath="$PROJECT_DIR$/assets/classes/PipeLineRobot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,23 +31,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
-              <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
+            <state relative-caret-position="272">
+              <caret line="243" selection-start-line="243" selection-end-line="243" />
               <folding>
-                <element signature="e#24#48#0" expanded="true" />
+                <element signature="e#7300#7316#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="257">
-              <caret line="1085" lean-forward="true" selection-start-line="1085" selection-end-line="1085" />
+            <state relative-caret-position="204">
+              <caret line="27" column="18" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
+              <folding>
+                <element signature="e#24#48#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -63,26 +66,12 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>.now</find>
-      <find>move_Time</find>
-      <find>verify</find>
-      <find>self.go_</find>
-      <find>go_to_position_before_pipeline</find>
-      <find>go_do</find>
-      <find>go_down</find>
-      <find>slope_fo</find>
-      <find>pipeline_support</find>
-      <find>reset</find>
-      <find>black_line_follow</find>
-      <find>__init</find>
       <find>__init__</find>
       <find>stop_action</find>
       <find>support</find>
-      <find>publish_data</find>
       <find>self.publish_data()</find>
       <find>rotate</find>
       <find>suppor</find>
-      <find>black_line</find>
       <find># server</find>
       <find>self.handler.left.stop_action =</find>
       <find>self.handler.left.reset()</find>
@@ -93,6 +82,20 @@
       <find>self.handler.left.run</find>
       <find>black_</find>
       <find>still</find>
+      <find>black_line</find>
+      <find>want10pipe</find>
+      <find>for i in range(1)</find>
+      <find>veri</find>
+      <find>verify_green_slope_ac</find>
+      <find>verify_green_slope()</find>
+      <find>pipeline_support</find>
+      <find>current_pipe_size</find>
+      <find>hole_time</find>
+      <find>publish_data</find>
+      <find>axis=&quot;</find>
+      <find>rotate(self</find>
+      <find>PLACE_PIPE(self.</find>
+      <find>ROTATE(</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -126,31 +129,7 @@
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="ieee-robotics2019" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ieee-robotics2019" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ieee-robotics2019" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ieee-robotics2019" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ieee-robotics2019" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ieee-robotics2019" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="classes" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -258,11 +237,13 @@
       <workItem from="1569853595290" duration="2419000" />
       <workItem from="1569870285501" duration="3991000" />
       <workItem from="1570204403969" duration="19115000" />
+      <workItem from="1571665914216" duration="1803000" />
+      <workItem from="1571744996090" duration="30275000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="331795000" />
+    <option name="totallyTimeSpent" value="372468000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -277,7 +258,7 @@
     <frame x="0" y="-1" width="1366" height="740" extended-state="6" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.38842976" weight="0.20619336" />
-      <window_info id="Structure" order="1" sideWeight="0.8657143" side_tool="true" visible="true" weight="0.20619336" />
+      <window_info id="Structure" order="1" sideWeight="0.8657143" side_tool="true" visible="true" weight="0.18504532" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -290,7 +271,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32884902" />
       <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.31993568" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.49242425" visible="true" weight="0.28938907" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.49242425" visible="true" weight="0.3279743" />
       <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.50757575" side_tool="true" weight="0.7461929" />
       <window_info anchor="bottom" id="Python Console" order="13" weight="0.6141479" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -300,31 +281,6 @@
       <window_info anchor="right" id="Remote Host" order="4" weight="0.17651515" />
       <window_info anchor="right" id="Database" order="5" weight="0.32930514" />
     </layout>
-    <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18394388" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49924242" weight="0.32994923" />
-      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="File Transfer" order="9" sideWeight="0.4969697" weight="0.3258595" />
-      <window_info anchor="bottom" id="Database Changes" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" sideWeight="0.4939394" visible="true" weight="0.32436472" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.5060606" side_tool="true" weight="0.32994923" />
-      <window_info anchor="bottom" id="Python Console" order="13" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" weight="0.32969603" />
-      <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="right" id="Remote Host" order="5" weight="0.17692907" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -417,10 +373,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/.PyCharm2019.1/system/python_stubs/-1247971763/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="199">
+          <caret line="758" column="8" selection-start-line="758" selection-start-column="8" selection-end-line="758" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
+        <state relative-caret-position="204">
+          <caret line="27" column="18" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
           <folding>
             <element signature="e#24#48#0" expanded="true" />
           </folding>
@@ -429,8 +392,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/classes/PipeLineRobot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="1085" lean-forward="true" selection-start-line="1085" selection-end-line="1085" />
+        <state relative-caret-position="272">
+          <caret line="243" selection-start-line="243" selection-end-line="243" />
+          <folding>
+            <element signature="e#7300#7316#0" />
+          </folding>
         </state>
       </provider>
     </entry>
