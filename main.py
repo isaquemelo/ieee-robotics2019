@@ -21,9 +21,9 @@ robot = PipeLineRobot()
 
 
 def main():
-    # robot.pipeline_support_conection_meeting_area("to pipeline")
-    # exit(0)
-    # robot.still_have_pipe()
+    while True:
+        robot.initial_location_reset()
+        sleep(5)
     try:
         robot.initial_location_reset()
 
