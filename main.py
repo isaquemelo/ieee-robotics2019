@@ -22,7 +22,7 @@ robot = PipeLineRobot()
 
 def main():
     while True:
-        robot.initial_location_reset()
+        robot.climb_green_slope()
         sleep(5)
     try:
         robot.initial_location_reset()

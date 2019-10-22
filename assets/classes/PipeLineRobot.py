@@ -1295,8 +1295,9 @@ class PipeLineRobot:
                 self.stop_motors()
                 # print("found robot")
                 ev3.Sound.beep()
+                ev3.Sound.beep()
                 self.move_timed(how_long=0.5, direction="backward", speed=400)
-                print("rotating cause it found robot")
+                # print("rotating cause it found robot")
                 self.rotate(80)
 
             self.motors.left.run_forever(speed_sp=default_speed)
@@ -1526,7 +1527,7 @@ class PipeLineRobot:
     def climb_green_slope(self):
         self.stop_motors()
         # print("called climb_green_slope")
-        default_speed = 1000
+        default_speed = 400
         counter = 0
 
         self.color_sensors[0].mode = "COL-COLOR"
