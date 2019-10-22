@@ -1260,7 +1260,7 @@ class PipeLineRobot:
                         ev3.Sound.beep()
                         ev3.Sound.beep()
                         ev3.Sound.beep()
-                        return  # remover esse negocio
+
                         # server
                         self.status = self.status_dictionary["doneInitialPositionReset"]
                         self.publish_data()
