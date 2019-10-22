@@ -21,8 +21,10 @@ robot = PipeLineRobot()
 
 
 def main():
+    robot.pipeline_support_following()
     while True:
-        robot.climb_green_slope()
+        robot.black_line_following(side="left")
+        robot.green_slope()
         sleep(5)
     try:
         robot.initial_location_reset()

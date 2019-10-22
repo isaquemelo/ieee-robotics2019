@@ -88,8 +88,6 @@ class PipeLineRobot:
                                  3: "pipeInPositionToRescue-10", 4: "pipeInPositionToRescue-15",
                                  5: "pipeInPositionToRescue-20"}
 
-        self.hole_times = []
-
         self.status = self.status_dictionary["initialPositionReset"]
         self.robot_status = 0
 
@@ -190,6 +188,7 @@ class PipeLineRobot:
 
     def rotate(self, angle, axis="own", speed=DEFAULT_SPEED, time_limit=False):
         if time_limit:
+            print("Time limit exceded")
             start_time = datetime.now()
             end_time = start_time + timedelta(seconds=10)
 
@@ -474,8 +473,7 @@ class PipeLineRobot:
                             # have_pipe = self.still_have_pipe()
                             # print("have_pipe", have_pipe)
                             # self.move_timed(0.5, direction="forward", speed=300)
-
-                            self.rotate(90, speed=90)
+                            self.rotate(90, speed=150, time_limit=False)
                             done = True
 
                             if self.phase_out_place_pipe(hole_size) == "break":
@@ -1051,8 +1049,8 @@ class PipeLineRobot:
                     color_data = self.get_sensor_data("ColorSensor", "r")
 
                     if color_data[0] < 50 or color_data[1] < 50:
+                        self.color_alignment(aligment_with_color=True)
                         if self.verify_green_slope_rgb():
-                            self.color_alignment(True)
 
                             self.green_slope()
 
