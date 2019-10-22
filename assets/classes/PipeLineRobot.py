@@ -1038,9 +1038,8 @@ class PipeLineRobot:
                     color_data = self.get_sensor_data("ColorSensor", "r")
 
                     if color_data[0] < 50 or color_data[1] < 50:
-                        self.color_alignment(aligment_with_color=True)
-                        if self.verify_green_slope_rgb():
-
+                        if self.verify_green_slope():
+                            self.color_alignment(aligment_with_color=True)
                             self.green_slope()
 
                             # server
@@ -1098,7 +1097,7 @@ class PipeLineRobot:
                     color_data = self.get_sensor_data("ColorSensor", "r")
 
                     if color_data[0] < 50 or color_data[1] < 50:
-                        if self.verify_green_slope_rgb():
+                        if self.verify_green_slope():
                             self.color_alignment(True)
 
                             self.green_slope()
@@ -1241,7 +1240,7 @@ class PipeLineRobot:
                     # sleep(1)
                     needs_to_be_on_color = self.get_out_of_color()
                     self.color_alignment(aligment_with_color=needs_to_be_on_color)
-                    its_green_slope = self.verify_green_slope_rgb()
+                    its_green_slope = self.verify_green_slope()
                     if its_green_slope:
                         # print("found green slope")
                         ev3.Sound.beep()
@@ -1742,65 +1741,17 @@ class PipeLineRobot:
         self.move_handler(how_long=2, direction="up", speed=1000)
         return
 
-    def verify_green_slope_ac(self):
+    def verify_green_slope(self):
         self.stop_motors()
-        robot.color_sensors[0].mode = "RGB-RAW"
-        robot.color_sensors[0].mode = "RGB-RAW"
-        print(robot.color_sensors[0].value(0), robot.color_sensors[0].value(1), robot.color_sensors[0].value(2))
-        sleep(3)
-        self.color_sensors[0].mode = "COL-REFLECT"
-        self.color_sensors[1].mode = "COL-REFLECT"
-        self.move_timed(how_long=0.3, direction="backward")
-        left, right, down = self.get_sensor_data("InfraredSensor")
-        left_save_dist = 30
-        right_save_dist = 30
-        green_slope_dist = 35
-
-        if left > left_save_dist:
-            self.rotate(angle=-90, speed=90)
-            if self.get_sensor_data("InfraredSensor")[1] >= green_slope_dist:
-                self.rotate(angle=90, speed=90)
-                return True
-            self.rotate(angle=90, speed=90)
-            return False
-
-        if right > right_save_dist:
-            self.rotate(angle=90, speed=90)
-            if self.get_sensor_data("InfraredSensor")[0] >= green_slope_dist:
-                self.rotate(angle=-90, speed=90)
-                return True
-            self.rotate(angle=-90, speed=90)
-            return False
-
-        elif left <= left_save_dist and right_save_dist <= right_save_dist:
-            self.rotate(angle=-90, speed=90)
-            if self.get_sensor_data("InfraredSensor")[1] >= green_slope_dist:
-                self.rotate(angle=90, speed=90)
-                return True
-            self.rotate(angle=90, speed=90)
-            return False
-
-    def verify_green_slope_rgb(self):
-        self.stop_motors()
-        green_slope_red_const = 20
-        bound = 10
-        print("verify_green_slope_rgb")
-        self.color_sensors[0].mode = "RGB-RAW"
-        self.color_sensors[1].mode = "RGB-RAW"
-        left = self.color_sensors[0].value(0)
-        right = self.color_sensors[1].value(0)
-        print(left, right)
-        sleep(5)
-        self.color_sensors[0].mode = "COL-REFLECT"
-        self.color_sensors[1].mode = "COL-REFLECT"
-        if abs(left - green_slope_red_const) <= 10 and abs(right - green_slope_red_const) <= 10:
+        self.color_sensors[0].mode = "COL-COLOR"
+        self.color_sensors[1].mode = "COL-COLOR"
+        # print("called verify_green_slope")
+        color_data = self.get_sensor_data("ColorSensor")
+        if (color_data[0] == "Green" and color_data[1] != "Undefined") or (
+                color_data[1] == "Green" and color_data[0] != "Undefined"):
+            self.color_sensors[0].mode = "COL-REFLECT"
+            self.color_sensors[1].mode = "COL-REFLECT"
             return True
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
         return False
-
-    def checking_rgb(self):
-        self.color_sensors[0].mode = "RGB-RAW"
-        self.color_sensors[1].mode = "RGB-RAW"
-        left = [self.color_sensors[0].value(0), self.color_sensors[0].value(1), self.color_sensors[0].value(2)]
-        right = [self.color_sensors[1].value(0), self.color_sensors[1].value(1), self.color_sensors[1].value(2)]
-        print("left = ", left)
-        print("right = ", right)
