@@ -1628,17 +1628,22 @@ class PipeLineRobot:
         # print("called adjust_before_black_line_flw")
         default_speed = 200
 
-        self.reset_gyroscope()
         gyro = self.get_sensor_data("GyroSensor")
 
         if side == "left":
-            while gyro < 74:
+            angle = 74
+            start_angle = self.gyroscope_sensor.value()
+            end_angle = start_angle + angle
+            while gyro < end_angle:
                 self.motors.right.run_forever(speed_sp=-default_speed)
                 gyro = self.get_sensor_data("GyroSensor")
             self.stop_motors()
 
         else:
-            while gyro > -74:
+            angle = -74
+            start_angle = self.gyroscope_sensor.value()
+            end_angle = start_angle + angle
+            while gyro > end_angle:
                 self.motors.left.run_forever(speed_sp=-default_speed)
                 gyro = self.get_sensor_data("GyroSensor")
             self.stop_motors()
@@ -1689,16 +1694,22 @@ class PipeLineRobot:
         # print("get_out_of_risk_edge_situation, with side", side)
         default_speed = 200
         k_angle = 60
-        self.reset_gyroscope()
+        # self.reset_gyroscope()
         gyro = self.get_sensor_data("GyroSensor")
 
         if side == "left":
-            while gyro > -k_angle:
+            angle = -60
+            start_angle = self.gyroscope_sensor.value()
+            end_angle = start_angle + angle
+            while gyro > end_angle:
                 self.motors.left.run_forever(speed_sp=-default_speed)
                 gyro = self.get_sensor_data("GyroSensor")
 
         else:
-            while gyro < k_angle:
+            angle = 60
+            start_angle = self.gyroscope_sensor.value()
+            end_angle = start_angle + angle
+            while gyro < end_angle:
                 self.motors.right.run_forever(speed_sp=-default_speed)
                 gyro = self.get_sensor_data("GyroSensor")
 
