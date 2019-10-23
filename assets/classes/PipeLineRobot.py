@@ -42,8 +42,7 @@ class PipeLineRobot:
 
         # define sensors
         self.gyroscope_sensor = ev3.GyroSensor('in2')
-        self.reset_gyroscope()
-        self.gyro_value = 0
+        # self.reset_gyroscope()
 
         self.color_sensors = (ev3.ColorSensor('in1'), ev3.ColorSensor('in4'))
         self.color_sensors[0].mode = "COL-COLOR"
@@ -106,13 +105,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        self.external_ip = "192.168.0.1"
-        self.publisher = mqtt.Client()
-        self.publisher.connect(self.external_ip, 1883, 60)
-        self.publisher.on_connect = self.publisher_on_client_connect
-        # self.publisher.on_message = self.publisher_on_client_message
-        self.publisher.on_publish = self.publisher_on_client_publish
-        self.publisher.loop_start()
+        # self.external_ip = "192.168.0.1"
+        # self.publisher = mqtt.Client()
+        # self.publisher.connect(self.external_ip, 1883, 60)
+        # self.publisher.on_connect = self.publisher_on_client_connect
+        # # self.publisher.on_message = self.publisher_on_client_message
+        # self.publisher.on_publish = self.publisher_on_client_publish
+        # self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -209,8 +208,11 @@ class PipeLineRobot:
                 if end_angle - now_angle <= 0:
                     break
 
-                self.motors.left.run_forever(speed_sp=speed)
-                self.motors.right.run_forever(speed_sp=-speed)
+                if axis == "own":
+                    self.motors.left.run_forever(speed_sp=speed)
+                    self.motors.right.run_forever(speed_sp=-speed)
+                else:
+                    self.motors.left.run_forever(speed_sp=speed)
         else:
             while True:
                 if time_limit:
@@ -223,8 +225,11 @@ class PipeLineRobot:
                 if end_angle - now_angle >= 0:
                     break
 
-                self.motors.left.run_forever(speed_sp=-speed)
-                self.motors.right.run_forever(speed_sp=speed)
+                if axis == "own":
+                    self.motors.left.run_forever(speed_sp=-speed)
+                    self.motors.right.run_forever(speed_sp=speed)
+                else:
+                    self.motors.right.run_forever(speed_sp=speed)
 
         self.stop_motors()
         # print("saiuuuu")
@@ -1394,9 +1399,12 @@ class PipeLineRobot:
     def verify_undefined(self):
         self.stop_motors()
         default_speed = 200
+        speed = default_speed
         # print("called verify_undefined")
         k_to_find_end_by_color = 0
         k_reliable_angle = 60
+        self.color_sensors[0].mode = "COL-REFLECT"
+        self.color_sensors[1].mode = "COL-REFLECT"
         color_data = self.get_sensor_data("ColorSensor", "r")
         # sleep(3)
 
@@ -1405,40 +1413,67 @@ class PipeLineRobot:
             return False
 
         elif color_data[0] == k_to_find_end_by_color and color_data[1] != k_to_find_end_by_color:
-            # print("second case")
-            self.reset_gyroscope()
-            while color_data[1] != k_to_find_end_by_color:
-                self.motors.right.run_forever(speed_sp=default_speed)
-                if self.gyroscope_sensor.value() <= -k_reliable_angle:
-                    self.stop_motors()
-                    ev3.Sound.beep()
-                    while self.gyroscope_sensor.value() < 0:
-                        self.motors.right.run_forever(speed_sp=-default_speed)
-                    self.stop_motors()
-                    # print("wrong")
-                    return False
-                color_data = self.get_sensor_data("ColorSensor", "r")
+            angle = -60
+            start_angle = self.gyroscope_sensor.value()
+            print(start_angle)
+            end_angle = start_angle + angle
+
+            if end_angle - start_angle <= 0:
+                while True:
+                    color_data = self.get_sensor_data("ColorSensor", "r")
+
+                    now_angle = self.gyroscope_sensor.value()
+                    if end_angle - now_angle >= 0:
+                        self.stop_motors()
+                        # inverse rotation by opposite angle
+
+                        while now_angle < start_angle:
+                            now_angle = self.gyroscope_sensor.value()
+                            self.motors.right.run_forever(speed_sp=-speed)
+
+                        self.stop_motors()
+                        return False
+
+                    elif color_data[1] == k_to_find_end_by_color:
+                        self.stop_motors()
+                        return True
+
+                    # self.motors.left.run_forever(speed_sp=-speed)
+                    self.motors.right.run_forever(speed_sp=speed)
+
             self.stop_motors()
-            # print("right")
-            return True
 
         elif color_data[1] == k_to_find_end_by_color and color_data[0] != k_to_find_end_by_color:
-            # print("thrid case")
-            self.reset_gyroscope()
-            while color_data[0] != k_to_find_end_by_color:
-                self.motors.left.run_forever(speed_sp=default_speed)
-                if self.gyroscope_sensor.value() >= k_reliable_angle:
-                    self.stop_motors()
-                    ev3.Sound.beep()
-                    while self.gyroscope_sensor.value() > 0:
-                        self.motors.left.run_forever(speed_sp=-default_speed)
-                    self.stop_motors()
-                    # print("wrong")
-                    return False
-                color_data = self.get_sensor_data("ColorSensor", "r")
+            angle = 60
+            start_angle = self.gyroscope_sensor.value()
+            print(start_angle)
+            end_angle = start_angle + angle
+
+            if end_angle - start_angle >= 0:
+                while True:
+                    color_data = self.get_sensor_data("ColorSensor", "r")
+                    now_angle = self.gyroscope_sensor.value()
+
+                    if end_angle - now_angle <= 0:
+                        self.stop_motors()
+                        # inverse rotation by opposite angle
+
+                        while now_angle > start_angle:
+                            now_angle = self.gyroscope_sensor.value()
+                            self.motors.left.run_forever(speed_sp=-speed)
+
+                        self.stop_motors()
+                        return False
+
+                    elif color_data[0] == k_to_find_end_by_color:
+                        self.stop_motors()
+                        return True
+
+                    # self.motors.left.run_forever(speed_sp=-speed)
+                    self.motors.left.run_forever(speed_sp=speed)
+
             self.stop_motors()
-            # print("right")
-            return True
+
 
         elif color_data[0] == k_to_find_end_by_color and color_data[1] == k_to_find_end_by_color:
             # print("fourth case")
