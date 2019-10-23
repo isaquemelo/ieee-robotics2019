@@ -42,7 +42,6 @@ class PipeLineRobot:
 
         # define sensors
         self.gyroscope_sensor = ev3.GyroSensor('in2')
-        # self.reset_gyroscope()
 
         self.color_sensors = (ev3.ColorSensor('in1'), ev3.ColorSensor('in4'))
         self.color_sensors[0].mode = "COL-COLOR"
@@ -105,13 +104,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        # self.external_ip = "192.168.0.1"
-        # self.publisher = mqtt.Client()
-        # self.publisher.connect(self.external_ip, 1883, 60)
-        # self.publisher.on_connect = self.publisher_on_client_connect
-        # # self.publisher.on_message = self.publisher_on_client_message
-        # self.publisher.on_publish = self.publisher_on_client_publish
-        # self.publisher.loop_start()
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -158,10 +157,6 @@ class PipeLineRobot:
     def on_connect(self, client, userdata, flags, rc):
         print("The robots are connected with result code", str(rc))
         client.subscribe("topic/sensors")
-
-    def reset_gyroscope(self):
-        self.gyroscope_sensor.mode = 'GYRO-RATE'
-        self.gyroscope_sensor.mode = 'GYRO-ANG'
 
     def get_sensor_data(self, sensor_name, ColorSensorMode="COL-COLOR"):
         # returns the value of a sensor
@@ -1183,7 +1178,6 @@ class PipeLineRobot:
             self.stop_motors()
             right_back_end = datetime.now()
 
-            # self.reset_gyroscope()
             angle = k_rotation
             start_angle = self.gyroscope_sensor.value()
             end_angle = start_angle + angle
@@ -1199,7 +1193,6 @@ class PipeLineRobot:
             self.stop_motors()
             left_front_end = datetime.now()
 
-            # self.reset_gyroscope()
             angle = -k_rotation
             start_angle = self.gyroscope_sensor.value()
             end_angle = start_angle + angle
@@ -1700,7 +1693,6 @@ class PipeLineRobot:
         # print("get_out_of_risk_edge_situation, with side", side)
         default_speed = 200
         k_angle = 60
-        # self.reset_gyroscope()
         gyro = self.get_sensor_data("GyroSensor")
 
         if side == "left":
