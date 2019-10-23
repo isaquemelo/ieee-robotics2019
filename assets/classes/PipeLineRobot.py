@@ -79,7 +79,7 @@ class PipeLineRobot:
 
         # watter server settings
         self.has_pipe = False
-        self.current_pipe_size = 15  # [10, 15, 20]
+        self.current_pipe_size = 10  # [10, 15, 20]
 
         self.status_dictionary = {"initialPositionReset": 0, "doneInitialPositionReset": 1, "rescuedPipe": 2,
                                   "placingPipe": 3, "donePlacingPipe": 4, "waiting": 5, "want10pipe": 6,
@@ -106,13 +106,13 @@ class PipeLineRobot:
         self.receiver.on_message = self.receiver_on_client_message
         self.receiver.loop_start()
 
-        # self.external_ip = "192.168.0.1"
-        # self.publisher = mqtt.Client()
-        # self.publisher.connect(self.external_ip, 1883, 60)
-        # self.publisher.on_connect = self.publisher_on_client_connect
-        # # self.publisher.on_message = self.publisher_on_client_message
-        # self.publisher.on_publish = self.publisher_on_client_publish
-        # self.publisher.loop_start()
+        self.external_ip = "192.168.0.1"
+        self.publisher = mqtt.Client()
+        self.publisher.connect(self.external_ip, 1883, 60)
+        self.publisher.on_connect = self.publisher_on_client_connect
+        # self.publisher.on_message = self.publisher_on_client_message
+        self.publisher.on_publish = self.publisher_on_client_publish
+        self.publisher.loop_start()
 
     def publisher_on_client_publish(self, client, userdata, result):  # create function for callback
         # print("data published")
@@ -263,6 +263,10 @@ class PipeLineRobot:
     def reset_handler_stop_action(self):
         self.handler.left.stop_action = "brake"
 
+    def stop_handler_brake(self, mode="brake"):
+        print("releasing the handler so it does not get to warm")
+        self.handler.left.stop_action = mode
+        self.handler.left.stop()
 
     def stop_handler(self):
         self.handler.left.stop()
@@ -419,6 +423,7 @@ class PipeLineRobot:
                     self.move_timed(how_long=0.5
                                     , direction="backwards", speed=300)
                     self.rotate(80, speed=150)
+                    self.stop_handler_brake()  # release the handler to avoid it get warm
                     return
 
             if not done:
@@ -434,6 +439,7 @@ class PipeLineRobot:
                             self.move_timed(how_long=0.5
                                             , direction="backwards", speed=300)
                             self.rotate(80, speed=150)
+                            self.stop_handler_brake()  # release the handler to avoid it get warm
                             return
                         end = datetime.now()
                         k_time_for_align_with_hole = end - begin  # represents the time necessary to  hole_size = self.align_with_hole()
@@ -469,6 +475,7 @@ class PipeLineRobot:
                                 self.move_timed(how_long=0.5
                                                 , direction="backwards", speed=300)
                                 self.rotate(80, speed=150)
+                                self.stop_handler_brake()  # release the handler to avoid it get warm
                                 return
 
                             pid = PID(8, 0, 6, setpoint=5)
@@ -523,6 +530,7 @@ class PipeLineRobot:
                         self.move_timed(how_long=0.5
                                         , direction="backwards", speed=300)
                         self.rotate(80, speed=150)
+                        self.stop_handler_brake()  # release the handler to avoid it get warm
                         return
 
             if front_distance < self.front_distance_to_rotate:
@@ -1043,8 +1051,8 @@ class PipeLineRobot:
                             self.green_slope()
 
                             # server
-                            # self.status = self.status_dictionary["want10pipe"]
-                            # self.publish_data()
+                            self.status = self.status_dictionary["want10pipe"]
+                            self.publish_data()
 
                             self.slope_following()
                             self.rotate(80, speed=150)
@@ -1103,8 +1111,8 @@ class PipeLineRobot:
                             self.green_slope()
 
                             # server
-                            # self.status = self.status_dictionary["want10pipe"]
-                            # self.publish_data()
+                            self.status = self.status_dictionary["want10pipe"]
+                            self.publish_data()
 
 
                             self.slope_following()
@@ -1248,11 +1256,11 @@ class PipeLineRobot:
                         ev3.Sound.beep()
 
                         # server
-                        # self.status = self.status_dictionary["doneInitialPositionReset"]
-                        # self.publish_data()
+                        self.status = self.status_dictionary["doneInitialPositionReset"]
+                        self.publish_data()
 
-                        # self.status = self.status_dictionary["want10pipe"]
-                        # self.publish_data()
+                        self.status = self.status_dictionary["want10pipe"]
+                        self.publish_data()
 
                         self.green_slope()
                         self.slope_following()
@@ -1635,6 +1643,7 @@ class PipeLineRobot:
             self.move_timed(how_long=0.5, direction="backward")
             self.rotate(angle=-80)
 
+        self.move_handler(how_long=0.5, direction="up", speed=500)
         self.climb_green_slope()
         self.get_on_position_before_black_line_flw(side)
         self.adjust_before_black_line_flw(side)

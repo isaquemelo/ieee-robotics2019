@@ -21,20 +21,14 @@ robot = PipeLineRobot()
 
 
 def main():
-    robot.get_on_position_before_black_line_flw(side="right")
-    robot.adjust_before_black_line_flw(side="right")
-    robot.black_line_following(side="right")
-    robot.pipeline_support_conection_meeting_area(side="to pipeline")
-    robot.pipeline_support_following()
-    return
     try:
         robot.initial_location_reset()
 
         slope_side = "right"
 
         while True:
-            # robot.status = robot.status_dictionary["want10pipe"]
-            # robot.publish_data()
+            robot.status = robot.status_dictionary["want10pipe"]
+            robot.publish_data()
 
             while True:
                 print("robot.robot_status", robot.robot_status)
@@ -46,8 +40,8 @@ def main():
             pipe_check = robot.still_have_pipe()
             print("do i have pipe?", pipe_check)
             if pipe_check:
-                # robot.status = robot.status_dictionary["rescuedPipe"]
-                # robot.publish_data()
+                robot.status = robot.status_dictionary["rescuedPipe"]
+                robot.publish_data()
 
                 robot.pipeline_support_conection_meeting_area("to pipeline")
                 robot.pipeline_support_following()
