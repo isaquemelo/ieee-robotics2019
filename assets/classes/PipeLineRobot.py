@@ -1183,10 +1183,13 @@ class PipeLineRobot:
             self.stop_motors()
             right_back_end = datetime.now()
 
-            self.reset_gyroscope()
+            # self.reset_gyroscope()
+            angle = k_rotation
+            start_angle = self.gyroscope_sensor.value()
+            end_angle = start_angle + angle
             left_front_begin = datetime.now()
             while color_data[0] >= k_min_white_reflect:
-                if self.get_sensor_data("GyroSensor") > k_rotation:
+                if self.get_sensor_data("GyroSensor") > end_angle:
                     self.stop_motors()
                     # print("alignment failed")
                     self.move_timed(how_long=0.3, direction="backward")
@@ -1196,10 +1199,13 @@ class PipeLineRobot:
             self.stop_motors()
             left_front_end = datetime.now()
 
-            self.reset_gyroscope()
+            # self.reset_gyroscope()
+            angle = -k_rotation
+            start_angle = self.gyroscope_sensor.value()
+            end_angle = start_angle + angle
             right_front_begin = datetime.now()
             while color_data[1] >= k_min_white_reflect:
-                if self.get_sensor_data("GyroSensor") < -k_rotation:
+                if self.get_sensor_data("GyroSensor") < end_angle:
                     self.stop_motors()
                     # print("alignment failed")
                     self.move_timed(how_long=0.3, direction="backward")

@@ -21,6 +21,8 @@ robot = PipeLineRobot()
 
 
 def main():
+    robot.initial_location_reset()
+    return
     try:
         #robot.rotate(-60, axis="fixed")
         print(robot.verify_undefined())
