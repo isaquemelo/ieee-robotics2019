@@ -45,7 +45,10 @@ def main():
 
                 robot.pipeline_support_conection_meeting_area("to pipeline")
                 robot.pipeline_support_following()
-                while robot.placed_pipe is False:
+                didnt_placed_pipe = robot.still_have_pipe()
+                if didnt_placed_pipe is True:
+                    robot.take_pipe_again()
+                while didnt_placed_pipe is True or robot.placed_pipe is False:
                     robot.pipeline_support_conection_meeting_area(side="to meeting area")
                     robot.rotate(angle=90, speed=90)
                     robot.slope_following()
