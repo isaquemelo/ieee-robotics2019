@@ -1561,7 +1561,7 @@ class PipeLineRobot:
     def climb_green_slope(self):
         self.stop_motors()
         # print("called climb_green_slope")
-        default_speed = 400
+        default_speed = 600
         counter = 0
 
         self.color_sensors[0].mode = "COL-COLOR"
@@ -1686,7 +1686,7 @@ class PipeLineRobot:
 
         else:
             # print("using right side")
-            self.move_timed(how_long=0.5, direction="backward")
+            self.move_timed(how_long=0.2, direction="backward")
             self.rotate(angle=-80)
 
         self.move_handler(how_long=0.5, direction="up", speed=500)
