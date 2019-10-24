@@ -22,6 +22,10 @@ robot = PipeLineRobot()
 
 def main():
     try:
+        while not robot.start:
+            robot.btn.process()
+            print('PRESS UP TO START')
+
         robot.initial_location_reset()
 
         slope_side = "right"

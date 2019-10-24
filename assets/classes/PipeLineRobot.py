@@ -74,6 +74,9 @@ class PipeLineRobot:
         # define status
         self.historic = [""]
         self.first_pipe_place = True
+        self.start = False
+        self.btn = ev3.Button()
+        self.btn.on_up = self.up
 
         # watter server settings
         self.has_pipe = False
@@ -157,6 +160,10 @@ class PipeLineRobot:
     def on_connect(self, client, userdata, flags, rc):
         print("The robots are connected with result code", str(rc))
         client.subscribe("topic/sensors")
+
+    def up(self, state):
+        if state:
+            self.start = True
 
     def get_sensor_data(self, sensor_name, ColorSensorMode="COL-COLOR"):
         # returns the value of a sensor
