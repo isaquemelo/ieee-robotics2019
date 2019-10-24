@@ -730,9 +730,9 @@ class PipeLineRobot:
             self.motors.right.run_forever(speed_sp=speed_b)
 
     def pipe_size(self, delta_cycles):
-        if 35 <= delta_cycles[0] <= 230 and 35 <= delta_cycles[1] <= 230:
+        if 38 <= delta_cycles[0] <= 250 and 38 <= delta_cycles[1] <= 250:
             return 10
-        elif 330 <= delta_cycles[0] <= 480 and 330 <= delta_cycles[1] <= 480:
+        elif 345 <= delta_cycles[0] <= 501 and 345 <= delta_cycles[1] <= 501:
             return 20
 
         elif delta_cycles[0] <= 30 or delta_cycles[1] <= 30:
