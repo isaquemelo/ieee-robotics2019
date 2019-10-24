@@ -22,9 +22,6 @@ robot = PipeLineRobot()
 
 def main():
     try:
-        robot.pipeline_support_following()
-
-        return
         while not robot.start:
             robot.btn.process()
             print('PRESS UP TO START')
