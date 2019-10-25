@@ -27,16 +27,13 @@ def main():
             print('PRESS UP TO START')
 
         robot.initial_location_reset()
-        # robot.stop_handler_brake()
+        # robot.stop_handler_brake() it should happen
 
         slope_side = "right"
 
         while True:
-            now_state = robot.robot_status
-            if now_state not in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
-                robot.status = robot.status_dictionary["want10pipe"]
-                robot.publish_data()
-                robot.robot_status = None
+            robot.status = robot.status_dictionary["want10pipe"]
+            robot.publish_data()
 
             while True:
                 print("robot.robot_status", robot.robot_status)
@@ -68,7 +65,6 @@ def main():
                 slope_side = "left"
 
                 robot.robot_status = None
-
 
             else:
                 print("RUNNING ACTION!!! I DONT HAVE THE PIPE")

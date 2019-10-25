@@ -75,7 +75,6 @@ class PipeLineRobot:
         self.historic = [""]
         self.first_pipe_place = True
         self.start = False
-        self.pipe_consumer = []
 
         self.btn = ev3.Button()
         self.btn.on_up = self.up
@@ -134,6 +133,7 @@ class PipeLineRobot:
         print("message received: ", end="")
         payload = unpack("i", message.payload)
         self.robot_status = self.robot_dictionary[int(payload[0])]
+
         # self.ultrasonic_sensors['left'] = payload[0]
         # self.ultrasonic_sensors['right'] = payload[1]
         # self.infrared_sensors['front'] = payload[2]
@@ -432,7 +432,7 @@ class PipeLineRobot:
                     self.move_timed(how_long=0.5
                                     , direction="backwards", speed=300)
                     self.rotate(80, speed=150)
-                    self.stop_handler_brake()  # release the handler to avoid it get warm
+                    self.stop_handler_brake()  # release the handler to avoid it get warm it shouldn't happen
                     return
 
             if not done:
@@ -484,7 +484,7 @@ class PipeLineRobot:
                                 self.move_timed(how_long=0.5
                                                 , direction="backwards", speed=300)
                                 self.rotate(80, speed=150)
-                                self.stop_handler_brake()  # release the handler to avoid it get warm
+                                self.stop_handler_brake()  # release the handler to avoid it get warm it shouldn't happen
                                 return
 
                             pid = PID(8, 0, 6, setpoint=5)
@@ -539,7 +539,7 @@ class PipeLineRobot:
                         self.move_timed(how_long=0.5
                                         , direction="backwards", speed=300)
                         self.rotate(80, speed=150)
-                        self.stop_handler_brake()  # release the handler to avoid it get warm
+                        self.stop_handler_brake()  # release the handler to avoid it get warm it shouldn't happen
                         return
 
             if front_distance < self.front_distance_to_rotate:
@@ -598,11 +598,15 @@ class PipeLineRobot:
         self.handler.left.stop_action = "hold"
 
         if size == 20:
-            for i in range(7):
-                self.move_handler(how_long=0.1, direction="down", speed=200)
-                self.move_handler(how_long=0.2, direction="up", speed=400)
-
+            for i in range(4):
+                self.move_handler(how_long=0.2, direction="up", speed=70)
+                self.move_handler(how_long=0.1, direction="down", speed=100)
+            # for i in range(7):
+            #     self.move_handler(how_long=0.1, direction="down", speed=200)
+            #     self.move_handler(how_long=0.2, direction="up", speed=400)
+            #
             self.move_handler(how_long=5, direction="down", speed=20)
+
 
         elif size == 10:
             for i in range(4):
