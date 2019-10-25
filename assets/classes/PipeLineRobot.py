@@ -75,6 +75,8 @@ class PipeLineRobot:
         self.historic = [""]
         self.first_pipe_place = True
         self.start = False
+        self.pipe_consumer = []
+
         self.btn = ev3.Button()
         self.btn.on_up = self.up
 

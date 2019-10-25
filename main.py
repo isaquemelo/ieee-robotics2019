@@ -27,7 +27,7 @@ def main():
             print('PRESS UP TO START')
 
         robot.initial_location_reset()
-        robot.stop_handler_brake()
+        # robot.stop_handler_brake()
 
         slope_side = "right"
 
@@ -36,12 +36,14 @@ def main():
             if now_state not in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
                 robot.status = robot.status_dictionary["want10pipe"]
                 robot.publish_data()
+                robot.robot_status = None
 
             while True:
                 print("robot.robot_status", robot.robot_status)
                 now_state = robot.robot_status
                 if now_state in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
                     robot.go_grab_pipe_routine(side=slope_side, pipe_being_taken=now_state)
+                    robot.robot_status = None
                     break
 
             pipe_check = robot.still_have_pipe()
@@ -52,10 +54,9 @@ def main():
 
                 robot.pipeline_support_conection_meeting_area("to pipeline")
                 robot.pipeline_support_following()
-                didnt_placed_pipe = robot.still_have_pipe()
-                if didnt_placed_pipe is True:
-                    robot.take_pipe_again()
-                while didnt_placed_pipe is True or robot.placed_pipe is False:
+                still_have_pipe = robot.still_have_pipe()
+
+                while still_have_pipe is True or robot.placed_pipe is False:
                     robot.pipeline_support_conection_meeting_area(side="to meeting area")
                     robot.rotate(angle=90, speed=90)
                     robot.slope_following()
