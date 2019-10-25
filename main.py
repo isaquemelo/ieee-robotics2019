@@ -32,8 +32,10 @@ def main():
         slope_side = "right"
 
         while True:
-            robot.status = robot.status_dictionary["want10pipe"]
-            robot.publish_data()
+            now_state = robot.robot_status
+            if now_state not in ["pipeInPositionToRescue-10", "pipeInPositionToRescue-15", "pipeInPositionToRescue-20"]:
+                robot.status = robot.status_dictionary["want10pipe"]
+                robot.publish_data()
 
             while True:
                 print("robot.robot_status", robot.robot_status)
