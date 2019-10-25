@@ -27,6 +27,7 @@ def main():
             print('PRESS UP TO START')
 
         robot.initial_location_reset()
+        robot.stop_handler_brake()
 
         slope_side = "right"
 
